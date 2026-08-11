@@ -64,6 +64,22 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
+      - name: Trusted publishing preconditions
+        # Two runs failed at the publish step for reasons the logs could not
+        # separate: npm needs >= 11.5.1 AND the OIDC request variables that
+        # `id-token: write` injects. `changeset publish` spawns npm through bun,
+        # so the npm that matters is the one resolved here, not the one the
+        # install step reported.
+        run: |
+          echo "npm:      $(npm --version)  ($(command -v npm))"
+          echo "node:     $(node --version)"
+          echo "OIDC url: ${ACTIONS_ID_TOKEN_REQUEST_URL:+present}${ACTIONS_ID_TOKEN_REQUEST_URL:-MISSING}"
+          echo "OIDC tok: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+present}${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-MISSING}"
+          echo "userconf: ${NPM_CONFIG_USERCONFIG:-unset}"
+          [ -n "${NPM_CONFIG_USERCONFIG:-}" ] && [ -f "$NPM_CONFIG_USERCONFIG" ] && sed 's/=.*/=<redacted>/' "$NPM_CONFIG_USERCONFIG"
+          echo "--- npm resolved via bun, which is how changesets invokes it ---"
+          bun --bun sh -c 'echo "npm: $(npm --version)  ($(command -v npm))"' 2>/dev/null || bun x --version >/dev/null 2>&1 || true
+
       - name: Verify before releasing
         # A release must not be the first place these run. CI already gates the
         # PR; this rejects anything that reached main another way.
