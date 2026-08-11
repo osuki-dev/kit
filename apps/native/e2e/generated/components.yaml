@@ -1,0 +1,431 @@
+appId: dev.osuki.kit
+name: component-coverage
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- waitForAnimationToEnd:
+    timeout: 5000
+- openLink: "osuki:///component-e2e"
+- tapOn:
+    text: "Open"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 3000
+- extendedWaitUntil:
+    visible: "COMPONENT E2E"
+    timeout: 10000
+- assertVisible: "COMPONENT E2E"
+- scrollUntilVisible:
+    element:
+      text: "E2E BUTTON PRIMARY"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E BUTTON PRIMARY"
+
+- tapOn:
+    id: "e2e-button-primary"
+
+- assertVisible: "BUTTON PRESSED 1"
+- scrollUntilVisible:
+    element:
+      text: "E2E PRESSABLE CARD"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E PRESSABLE CARD"
+
+- tapOn: "E2E PRESSABLE CARD"
+- assertVisible: "CARD PRESSED 1"
+- scrollUntilVisible:
+    element:
+      text: "E2E TOGGLE OFF"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E TOGGLE OFF"
+
+- tapOn: "E2E TOGGLE OFF"
+- assertVisible: "E2E TOGGLE ON"
+- scrollUntilVisible:
+    element:
+      text: "E2E CHECKBOX OFF"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E CHECKBOX OFF"
+
+- tapOn:
+    id: "e2e-checkbox-row"
+
+- assertVisible: "E2E CHECKBOX ON"
+- scrollUntilVisible:
+    element:
+      text: "E2E LIST ITEM"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E LIST ITEM"
+
+- tapOn:
+    id: "e2e-list-item-row"
+
+- assertVisible: "Pressed 1"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT SegmentedControl"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT SegmentedControl"
+
+- assertVisible: "SEGMENT ONE"
+- tapOn: "TWO"
+- assertVisible: "SEGMENT TWO"
+- scrollUntilVisible:
+    element:
+      text: "TABS VALUE OVERVIEW"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "TABS VALUE OVERVIEW"
+
+- tapOn:
+    id: "e2e-tabs-orders"
+
+- assertVisible: "TABS VALUE ORDERS"
+- scrollUntilVisible:
+    element:
+      text: "TAG PRESSED 0"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "TAG PRESSED 0"
+
+- tapOn:
+    id: "e2e-tag"
+
+- assertVisible: "TAG PRESSED 1"
+- scrollUntilVisible:
+    element:
+      text: "E2E INPUT LABEL"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E INPUT LABEL"
+- tapOn:
+    id: "e2e-input"
+
+- assertVisible: "INPUT VALUE EMPTY"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: "E2E MODAL OPEN"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E MODAL OPEN"
+
+- tapOn:
+    id: "e2e-modal-trigger"
+
+- assertVisible: "E2E MODAL TITLE"
+- tapOn:
+    id: "e2e-modal-close"
+
+- scrollUntilVisible:
+    element:
+      text: "E2E DIALOG OPEN"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E DIALOG OPEN"
+
+- tapOn:
+    id: "e2e-dialog-trigger"
+
+- assertVisible: "E2E DIALOG TITLE"
+- tapOn:
+    id: "e2e-dialog-action-confirm"
+
+- assertVisible: "DIALOG VALUE CONFIRMED"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Text"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Text"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Button"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Button"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT PressableCard"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT PressableCard"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Toggle"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Toggle"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Checkbox"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Checkbox"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ListItem"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ListItem"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT DataTable"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT DataTable"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT SegmentedControl"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT SegmentedControl"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Tabs"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Tabs"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Tag"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Tag"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Input"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Input"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Select"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Select"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT DateInput"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT DateInput"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Dialog"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Dialog"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Modal"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Modal"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Menu"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Menu"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT OtpInput"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT OtpInput"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ActionSheet"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ActionSheet"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Sheet"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Sheet"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Tooltip"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Tooltip"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Surface"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Surface"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Screen"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Screen"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ScrollScreen"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ScrollScreen"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Badge"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Badge"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Avatar"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Avatar"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Icon"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Icon"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT StatRow"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT StatRow"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT SegmentedProgressBar"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT SegmentedProgressBar"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Toast"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Toast"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Spinner"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Spinner"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Divider"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Divider"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT Timeline"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT Timeline"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ResponsiveContainer"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ResponsiveContainer"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ResponsiveGrid"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ResponsiveGrid"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT KeyboardAvoidingView"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT KeyboardAvoidingView"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT KeyboardStickyView"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT KeyboardStickyView"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT KeyboardToolbar"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT KeyboardToolbar"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT PressableScale"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT PressableScale"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ChoiceRow"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ChoiceRow"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT ChoiceList"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT ChoiceList"
+- scrollUntilVisible:
+    element:
+      text: "E2E COMPONENT InlineActivity"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT InlineActivity"
+- scrollUntilVisible:
+    element:
+      text: "E2E INLINE ACTIVITY ACTIVE"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E INLINE ACTIVITY ACTIVE"
+
+- tapOn:
+    id: "e2e-inline-activity-toggle"
+
+- assertVisible: "E2E INLINE ACTIVITY IDLE"
+- scrollUntilVisible:
+    element:
+      text: "CHOICE LIST ANSWER NONE"
+    direction: UP
+    timeout: 8000
+- assertVisible: "CHOICE LIST ANSWER NONE"
+
+- tapOn:
+    id: "e2e-choice-option-allow-once"
+
+- assertVisible: "CHOICE LIST ANSWER ALLOW-ONCE"
+- tapOn:
+    id: "e2e-choice-list-reset"
+
+- scrollUntilVisible:
+    element:
+      text: "E2E PRESSABLE SCALE TILE"
+    direction: UP
+    timeout: 8000
+- assertVisible: "E2E PRESSABLE SCALE TILE"
+
+- tapOn:
+    id: "e2e-pressable-scale"
+
+- assertVisible: "PRESSABLE SCALE PRESSED 1"

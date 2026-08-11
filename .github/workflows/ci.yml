@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push to a PR makes the previous run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Turbo prints progress bars and spinners without this.
+  CI: "true"
+
+jobs:
+  check:
+    name: Lint, types, tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Lint, format, types, tests
+        # check:ci uses `oxfmt --check`. The local `check` script writes
+        # formatting fixes, which in CI would silently pass a dirty branch.
+        run: bun run check:ci
+
+      - name: App-level UI contracts
+        run: bun run check:app-contracts
+
+      - name: Documentation covers every exported component
+        # The roadmap makes "public docs cover every exported component" a
+        # release condition. Nothing enforced it, and components shipped
+        # undocumented.
+        run: bun run check:docs-coverage
+
+  packages:
+    name: Package publishability
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Pack and verify both packages
+        # Asserts the built lib/ entries exist in the archive and that no
+        # workspace:/catalog:/file:/link: range would be published.
+        run: bun run smoke:public-packages

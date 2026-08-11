@@ -1,0 +1,25 @@
+appId: dev.osuki.kit
+name: ios-smoke
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki:///"
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 30000
+- openLink: "osuki:///search"
+- extendedWaitUntil:
+    visible: "RECENT SEARCHES"
+    timeout: 10000
+- assertVisible: "Search"
+- openLink: "osuki:///account"
+- extendedWaitUntil:
+    visible: "APPEARANCE"
+    timeout: 10000
+- tapOn: "English (US)"
+- extendedWaitUntil:
+    visible: "Language"
+    timeout: 10000
+- assertVisible: "繁體中文"
+- tapOn: "CLOSE"

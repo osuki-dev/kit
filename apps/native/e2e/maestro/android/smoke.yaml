@@ -1,0 +1,28 @@
+appId: dev.osuki.kit
+name: android-smoke
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki:///"
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+- openLink: "osuki:///categories"
+- extendedWaitUntil:
+    visible: "Categories"
+    timeout: 10000
+- openLink: "osuki:///search"
+- extendedWaitUntil:
+    visible: "RECENT SEARCHES"
+    timeout: 10000
+- openLink: "osuki:///account"
+- extendedWaitUntil:
+    visible: "APPEARANCE"
+    timeout: 10000
+- tapOn: "English (US)"
+- extendedWaitUntil:
+    visible: "Language"
+    timeout: 10000
+- assertVisible: "繁體中文"
+- tapOn: "CLOSE"

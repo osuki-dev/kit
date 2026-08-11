@@ -1,0 +1,98 @@
+name: Bug report
+description: A component behaves incorrectly
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: if a change appeared to have "no effect" in a simulator,
+        confirm the edit actually reached the device. A stale bundle looks
+        exactly like a broken component.
+
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: Which export misbehaves.
+      placeholder: BottomSheet
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: What happens
+      description: What you observed, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: >
+        The smallest snippet that shows the problem. A link to a repository or
+        Snack is better than a description.
+      render: tsx
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - iOS
+        - Android
+        - Web (react-native-web)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reproduces-in-showcase
+    attributes:
+      label: Does it reproduce in this repository's showcase app?
+      description: "`cd apps/native && bun run ios` — this tells us whether it is the package or your setup."
+      options:
+        - "Yes"
+        - "No"
+        - "Not checked"
+    validations:
+      required: true
+
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: Paste the output of the commands below.
+      value: |
+        @osuki-dev/ui:
+        @osuki-dev/kit-community:
+        expo:
+        react-native:
+        react-native-reanimated:
+        Device / simulator:
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: theme
+    attributes:
+      label: Theme overrides
+      description: >
+        If you pass a custom theme or preset to ThemeProvider, include it.
+        Many layout reports come from an unstable override object created
+        during render.
+      render: tsx
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or recordings
+      description: Attach anything visual. Include both light and dark mode when relevant.
+    validations:
+      required: false

@@ -1,0 +1,6 @@
+file: /tmp/osuki-checkout-point.BB0ewJ.yaml
+session: cwd:c490d0efad327606:default:test:909d194b828e6eb1:1-osuki-checkout-point-bb0ewj:attempt-1
+attempt: 1/1
+status: passed
+replayed: 6
+healed: 0

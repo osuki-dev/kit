@@ -1,0 +1,95 @@
+appId: dev.osuki.kit
+name: security-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///security-screen"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Security center ready"
+    timeout: 10000
+- tapOn:
+    id: "security-improve-score"
+
+- extendedWaitUntil:
+    visible: "Security score improved to 92%"
+    timeout: 10000
+- tapOn:
+    id: "security-view-details"
+
+- extendedWaitUntil:
+    visible: "Password, sessions, and recovery checks reviewed"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "security-two-factor-toggle"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "security-two-factor-toggle"
+
+- tapOn:
+    id: "security-two-factor-toggle"
+
+- extendedWaitUntil:
+    visible: "Two-factor authentication disabled"
+    timeout: 10000
+- tapOn:
+    id: "security-biometric-toggle"
+
+- extendedWaitUntil:
+    visible: "Biometric login enabled"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "security-session-revoke-macbook"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "security-session-revoke-macbook"
+
+- tapOn:
+    id: "security-session-revoke-macbook"
+
+- extendedWaitUntil:
+    visible: "2 active devices"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "security-revoke-all"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "security-revoke-all"
+
+- tapOn:
+    id: "security-revoke-all"
+
+- extendedWaitUntil:
+    visible: "1 active device"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "security-delete-account"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "security-delete-account"
+
+- tapOn:
+    id: "security-delete-account"
+
+- extendedWaitUntil:
+    visible: "Account deletion requires final confirmation"
+    timeout: 10000

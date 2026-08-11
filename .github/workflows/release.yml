@@ -1,0 +1,79 @@
+name: Release
+
+# Manual only. Running on every push to main meant every merge woke the release
+# machinery up, and a merge that happened to clear the last changeset would
+# publish without anyone deciding to. Releasing is a decision, so it gets a
+# button.
+#
+# Two runs make a release: the first turns pending changesets into a
+# "chore: version packages" PR, and the second — after that PR is merged —
+# finds no changesets left and publishes to npm.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Version or publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # commit the version bump, push tags
+      pull-requests: write # open the "Version Packages" PR
+      id-token: write # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # changesets diffs against the base branch
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # npm publishes the packages: it is the client that supports trusted
+      # publishing, so no NPM_TOKEN is stored anywhere.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Use an npm that supports trusted publishing
+        # Trusted publishing (OIDC) needs npm >= 11.5. Node 22 ships npm 10.
+        run: npm install -g npm@^11.5.0
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Verify before releasing
+        # A release must not be the first place these run. CI already gates the
+        # PR; this rejects anything that reached main another way.
+        run: |
+          bun run check:ci
+          bun run smoke:public-packages
+
+      - name: Create the version PR, or publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # `version` writes the bumps and changelogs; the action opens a PR
+          # with them. Merging that PR runs this workflow again with no
+          # changesets left, and `publish` then goes to npm.
+          version: bun run version:packages
+          publish: bun run release:packages
+          title: "chore: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
+
+      - name: Report
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          echo "### Published" >> "$GITHUB_STEP_SUMMARY"
+          echo '${{ steps.changesets.outputs.publishedPackages }}' >> "$GITHUB_STEP_SUMMARY"

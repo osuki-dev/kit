@@ -1,0 +1,43 @@
+appId: dev.osuki.kit
+name: search-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///search"
+- tapOn:
+    text: "Open"
+    optional: true
+
+- extendedWaitUntil:
+    visible: "RECENT SEARCHES"
+    timeout: 10000
+- tapOn:
+    id: "search-screen-recent-0"
+
+- extendedWaitUntil:
+    visible: "RESULTS"
+    timeout: 15000
+- tapOn:
+    id: "search-header-clear"
+
+- extendedWaitUntil:
+    visible: "RECENT SEARCHES"
+    timeout: 10000
+- tapOn:
+    id: "search-header-input-control"
+
+- inputText: "zzzz-not-found"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "No matching products found."
+    timeout: 15000

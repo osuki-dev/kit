@@ -1,0 +1,71 @@
+name: Component or API proposal
+description: Propose a new component, prop, or variant
+labels: ["proposal", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New components are decided by [the roadmap](../../docs/ui/roadmap.md),
+        not by pull request. Open this proposal before writing code — a PR that
+        adds an unplanned component will be closed with a pointer back here.
+
+        Most requests are better solved by composing existing primitives, so
+        describe the problem rather than the component you have in mind.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you building
+      description: >
+        The screen or interaction you are trying to build, and where the current
+        primitives fall short.
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What you tried with existing primitives
+      description: >
+        Which components you composed and what specifically did not work. This
+        is the part that decides the outcome.
+      render: tsx
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Which package should own this
+      description: >
+        `@osuki-dev/ui` is domain-neutral: primitives, accessibility behavior,
+        and tokens. Anything that encodes app-level semantics — a product card,
+        a checkout stepper, a settings row — belongs in `@osuki-dev/kit-community`.
+      options:
+        - "@osuki-dev/ui (a primitive)"
+        - "@osuki-dev/kit-community (a screen-level recipe)"
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: >
+        A call site, not an implementation. Prefer a `variant`/`size`/`layout`
+        union over booleans that select appearance, and compound subcomponents
+        over `renderHeader`-style props.
+      render: tsx
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked the roadmap and this is not already listed
+          required: true
+        - label: This does not require a network client, storage, or business logic inside the component
+          required: true

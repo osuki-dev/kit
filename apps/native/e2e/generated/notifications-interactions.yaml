@@ -1,0 +1,36 @@
+appId: dev.osuki.kit
+name: notifications-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///notifications"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "New message from Sarah"
+    timeout: 10000
+- tapOn:
+    id: "notification-delete-1"
+
+- assertNotVisible: "New message from Sarah"
+- tapOn:
+    id: "notifications-filter-unread"
+
+- assertVisible: "Order delivered"
+- tapOn:
+    id: "notifications-mark-all-read"
+
+- extendedWaitUntil:
+    visible: "NO NOTIFICATIONS"
+    timeout: 10000
+- assertVisible: "NO NOTIFICATIONS"

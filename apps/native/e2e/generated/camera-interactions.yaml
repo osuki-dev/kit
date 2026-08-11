@@ -1,0 +1,81 @@
+appId: dev.osuki.kit
+name: camera-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///camera"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Scanner ready"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-gallery"
+
+- extendedWaitUntil:
+    visible: "Gallery opened"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-open-link"
+
+- extendedWaitUntil:
+    visible: "Opened https://osuki.dev/product/hydrogen"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-mode-photo"
+
+- extendedWaitUntil:
+    visible: "Photo mode ready"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-flash"
+
+- extendedWaitUntil:
+    visible: "Flash on"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-capture"
+
+- extendedWaitUntil:
+    visible: "Captured photo 1"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-switch"
+
+- extendedWaitUntil:
+    visible: "Using front camera"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-mode-video"
+
+- extendedWaitUntil:
+    visible: "Video mode ready"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-capture"
+
+- extendedWaitUntil:
+    visible: "Recording started"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-capture"
+
+- extendedWaitUntil:
+    visible: "Recording saved"
+    timeout: 10000
+- tapOn:
+    id: "camera-screen-close"
+
+- extendedWaitUntil:
+    visible: "Camera paused"
+    timeout: 10000

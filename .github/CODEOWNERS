@@ -1,0 +1,17 @@
+# Every change needs a maintainer review.
+* @ryuhzk
+
+# Published packages: an API or dependency mistake here reaches every consumer.
+/packages/ui/ @ryuhzk
+/packages/kit-community/ @ryuhzk
+
+# Release and boundary tooling.
+/scripts/ @ryuhzk
+
+# Repository policy and CI.
+/.github/ @ryuhzk
+/CONTRIBUTING.md @ryuhzk
+/SECURITY.md @ryuhzk
+/CODE_OF_CONDUCT.md @ryuhzk
+/LICENSE @ryuhzk
+/NOTICE @ryuhzk

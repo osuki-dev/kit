@@ -1,0 +1,99 @@
+{
+	"name": "@osuki-dev/kit-community",
+	"version": "0.2.0",
+	"private": false,
+	"description": "Open-source community screen templates for Osuki Expo and React Native apps.",
+	"keywords": [
+		"commerce",
+		"expo",
+		"react-native",
+		"screens",
+		"templates"
+	],
+	"homepage": "https://github.com/osuki-dev/kit/tree/main/packages/kit-community#readme",
+	"bugs": {
+		"url": "https://github.com/osuki-dev/kit/issues"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/osuki-dev/kit.git",
+		"directory": "packages/kit-community"
+	},
+	"files": [
+		"CHANGELOG.md",
+		"lib",
+		"LICENSE",
+		"README.md",
+		"src/components",
+		"src/entities",
+		"src/hooks",
+		"src/i18n",
+		"src/index.ts",
+		"src/modules",
+		"src/screens",
+		"src/types",
+		"src/utils"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"main": "./lib/index.js",
+	"types": "./lib/index.d.ts",
+	"react-native": "./src/index.ts",
+	"exports": {
+		".": {
+			"types": "./lib/index.d.ts",
+			"react-native": "./src/index.ts",
+			"import": "./lib/index.js",
+			"default": "./lib/index.js"
+		},
+		"./screens": {
+			"types": "./lib/screens/index.d.ts",
+			"react-native": "./src/screens/index.ts",
+			"import": "./lib/screens/index.js",
+			"default": "./lib/screens/index.js"
+		},
+		"./entities": {
+			"types": "./lib/entities/index.d.ts",
+			"react-native": "./src/entities/index.ts",
+			"import": "./lib/entities/index.js",
+			"default": "./lib/entities/index.js"
+		},
+		"./modules": {
+			"types": "./lib/modules/index.d.ts",
+			"react-native": "./src/modules/index.ts",
+			"import": "./lib/modules/index.js",
+			"default": "./lib/modules/index.js"
+		},
+		"./types": {
+			"types": "./lib/types/index.d.ts",
+			"react-native": "./src/types/index.ts",
+			"import": "./lib/types/index.js",
+			"default": "./lib/types/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"check-types": "tsc --noEmit",
+		"test": "bun src/public-contract.test.ts",
+		"prepack": "bun run build"
+	},
+	"dependencies": {
+		"@tanstack/react-form": "^1.33.1",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@osuki-dev/ui": "^0.2.0",
+		"@types/node": "^22.0.0",
+		"@types/react": "~19.2.17",
+		"react-native-reanimated": "4.5.1",
+		"typescript": "catalog:"
+	},
+	"peerDependencies": {
+		"@osuki-dev/ui": "^0.2.0",
+		"react": ">=19.2.3",
+		"react-native": ">=0.85.0",
+		"react-native-reanimated": ">=4.3.1",
+		"react-native-safe-area-context": ">=5.7.0"
+	}
+}

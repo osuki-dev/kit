@@ -1,0 +1,22 @@
+appId: dev.osuki.kit
+name: page-product
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///product?id=the-inventory-not-tracked-snowboard"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "The Inventory Not Tracked Snowboard"
+    timeout: 10000
+- assertVisible: "The Inventory Not Tracked Snowboard"

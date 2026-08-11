@@ -1,0 +1,16 @@
+appId: dev.osuki.kit
+name: checkout-point-open
+---
+- launchApp:
+    clearState: false
+    stopApp: false
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F10.0.0.11%3A8081"
+- openLink: "osuki:///checkout"
+- extendedWaitUntil:
+    visible: "ORDER SUMMARY"
+    timeout: 10000
+- tapOn:
+    point: "65%,91%"
+- extendedWaitUntil:
+    visible: "PAYMENT METHOD"
+    timeout: 5000

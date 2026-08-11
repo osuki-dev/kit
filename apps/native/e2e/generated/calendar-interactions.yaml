@@ -1,0 +1,69 @@
+appId: dev.osuki.kit
+name: calendar-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///calendar"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Team Standup"
+    timeout: 10000
+- assertVisible: "Month view is ready."
+- tapOn:
+    id: "calendar-screen-view-week"
+
+- extendedWaitUntil:
+    visible: "Week view is active."
+    timeout: 10000
+- tapOn:
+    id: "calendar-screen-view-day"
+
+- extendedWaitUntil:
+    visible: "Day view is active."
+    timeout: 10000
+- tapOn:
+    id: "calendar-screen-next-month"
+
+- extendedWaitUntil:
+    visible:
+      id: "calendar-screen-status"
+    timeout: 10000
+- tapOn:
+    id: "calendar-screen-previous-month"
+
+- extendedWaitUntil:
+    visible:
+      id: "calendar-screen-status"
+    timeout: 10000
+- tapOn:
+    id: "calendar-screen-day-15"
+
+- extendedWaitUntil:
+    visible:
+      id: "calendar-screen-status-card"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "calendar-screen-event-3"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "calendar-screen-event-3"
+
+- tapOn:
+    id: "calendar-screen-event-3"
+
+- extendedWaitUntil:
+    visible: "Opened Client Meeting details."
+    timeout: 10000

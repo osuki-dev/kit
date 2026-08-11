@@ -1,0 +1,51 @@
+appId: dev.osuki.kit
+name: state-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///empty-state"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Choose a state and trigger its action."
+    timeout: 10000
+- tapOn:
+    id: "empty-state-primary-action"
+
+- extendedWaitUntil:
+    visible: "Handled NO MESSAGES; showing NO RESULTS"
+    timeout: 10000
+- assertVisible: "NO RESULTS"
+- openLink: "osuki:///error-state"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Error state ready"
+    timeout: 10000
+- tapOn: "NETWORK"
+- extendedWaitUntil:
+    visible: "Showing NETWORK error"
+    timeout: 10000
+- tapOn:
+    id: "error-state-try-again"
+
+- extendedWaitUntil:
+    visible: "Retry completed"
+    timeout: 10000
+- tapOn:
+    id: "error-state-go-home"
+
+- extendedWaitUntil:
+    visible: "Home navigation requested"
+    timeout: 10000

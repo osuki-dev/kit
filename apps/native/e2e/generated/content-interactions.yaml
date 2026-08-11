@@ -1,0 +1,69 @@
+appId: dev.osuki.kit
+name: content-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///article"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "The Art of Minimalist Design"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "article-share-button"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "article-share-button"
+
+- tapOn:
+    id: "article-share-button"
+
+- extendedWaitUntil:
+    visible: "Share link copied"
+    timeout: 10000
+- openLink: "osuki:///users/1"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "John Doe"
+    timeout: 10000
+- tapOn:
+    id: "user-detail-action-edit"
+
+- extendedWaitUntil:
+    visible: "Editing John Doe"
+    timeout: 10000
+- tapOn:
+    id: "user-detail-action-deactivate"
+
+- extendedWaitUntil:
+    visible: "John Doe deactivated"
+    timeout: 10000
+- assertVisible: "inactive"
+- tapOn:
+    id: "user-detail-action-activate"
+
+- extendedWaitUntil:
+    visible: "John Doe activated"
+    timeout: 10000
+- assertVisible: "active"
+- tapOn:
+    id: "user-detail-action-delete"
+
+- extendedWaitUntil:
+    visible: "John Doe scheduled for review"
+    timeout: 10000
+- assertVisible: "pending"

@@ -1,0 +1,12 @@
+{
+	"$schema": "https://unpkg.com/@changesets/config@3.1.4/schema.json",
+	"changelog": ["@changesets/changelog-github", { "repo": "osuki-dev/kit" }],
+	"commit": false,
+	"fixed": [["@osuki-dev/ui", "@osuki-dev/kit-community"]],
+	"linked": [],
+	"access": "public",
+	"baseBranch": "main",
+	"updateInternalDependencies": "minor",
+	"onlyUpdatePeerDependentsWhenOutOfRange": true,
+	"ignore": ["native"]
+}

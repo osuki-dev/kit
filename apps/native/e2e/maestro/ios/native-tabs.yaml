@@ -1,0 +1,14 @@
+appId: dev.osuki.kit
+name: ios-native-tabs-smoke
+---
+- launchApp:
+    clearState: false
+    stopApp: false
+- openLink: "osuki:///"
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 30000
+- assertVisible: "Shop"
+- assertVisible: "Categories"
+- assertVisible: "Cart"
+- assertVisible: "Account"

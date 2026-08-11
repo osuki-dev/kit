@@ -1,0 +1,24 @@
+# Maestro Flow Script
+appId: dev.osuki.kit
+name: "Local Development Flow"
+
+# Optional - Map of environment variables that should be made available for this Flow
+env:
+  API_KEY: "your-api-key-here"
+  BASE_URL: "https://api.example.com"
+  DEBUG: "true"
+
+
+# Commands Section
+---
+# Launch the application under test
+- launchApp:
+    clearState: true
+    stopApp: true
+
+# Example command to tap on a button
+- tapOn: "Start Debugging"
+
+# Example command to assert that a specific element is visible
+- assertVisible: "Debugging Screen"
+# Add more commands as needed for your testing flow

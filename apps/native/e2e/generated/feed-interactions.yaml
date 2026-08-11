@@ -1,0 +1,51 @@
+appId: dev.osuki.kit
+name: feed-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///feed"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Sarah Chen"
+    timeout: 10000
+- tapOn:
+    id: "feed-like-1"
+
+- assertVisible: "123"
+- tapOn:
+    id: "feed-comment-1"
+
+- assertVisible: "19"
+- tapOn:
+    id: "feed-share-1"
+
+- assertVisible: "6"
+- tapOn:
+    id: "feed-bookmark-1"
+
+- scrollUntilVisible:
+    element:
+      id: "feed-load-more"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "feed-load-more"
+
+- tapOn:
+    id: "feed-load-more"
+
+- extendedWaitUntil:
+    visible: "Osuki Studio"
+    timeout: 10000
+- assertVisible: "Osuki Studio"

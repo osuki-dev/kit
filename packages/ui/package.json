@@ -1,0 +1,97 @@
+{
+	"name": "@osuki-dev/ui",
+	"version": "0.2.0",
+	"private": false,
+	"description": "CJK-friendly Expo and React Native UI primitives for Osuki apps.",
+	"keywords": [
+		"cjk",
+		"design-system",
+		"expo",
+		"react-native",
+		"ui"
+	],
+	"homepage": "https://github.com/osuki-dev/kit/tree/main/packages/ui#readme",
+	"bugs": {
+		"url": "https://github.com/osuki-dev/kit/issues"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/osuki-dev/kit.git",
+		"directory": "packages/ui"
+	},
+	"files": [
+		"CHANGELOG.md",
+		"docs",
+		"lib",
+		"LICENSE",
+		"README.md",
+		"src/components",
+		"src/fonts",
+		"src/index.ts",
+		"src/navigation",
+		"src/theme",
+		"src/utils"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"main": "./lib/index.js",
+	"types": "./lib/index.d.ts",
+	"react-native": "./src/index.ts",
+	"exports": {
+		".": {
+			"types": "./lib/index.d.ts",
+			"react-native": "./src/index.ts",
+			"import": "./lib/index.js",
+			"default": "./lib/index.js"
+		},
+		"./theme": {
+			"types": "./lib/theme/index.d.ts",
+			"react-native": "./src/theme/index.ts",
+			"import": "./lib/theme/index.js",
+			"default": "./lib/theme/index.js"
+		},
+		"./components": {
+			"types": "./lib/components/index.d.ts",
+			"react-native": "./src/components/index.ts",
+			"import": "./lib/components/index.js",
+			"default": "./lib/components/index.js"
+		},
+		"./fonts": {
+			"types": "./lib/fonts/index.d.ts",
+			"react-native": "./src/fonts/index.ts",
+			"import": "./lib/fonts/index.js",
+			"default": "./lib/fonts/index.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"check-types": "tsc --noEmit",
+		"test": "bun src/public-contract.test.ts && bun test src/inline-activity-layout.test.ts",
+		"prepack": "bun run build"
+	},
+	"devDependencies": {
+		"@expo/ui": "~57.0.8",
+		"@types/node": "^22.0.0",
+		"@types/react": "~19.2.17",
+		"expo-image": "~57.0.1",
+		"typescript": "catalog:"
+	},
+	"peerDependencies": {
+		"@expo/ui": ">=57.0.4",
+		"expo-font": ">=57.0.0",
+		"expo-image": ">=56.0.0",
+		"expo-router": ">=57.0.4",
+		"lucide-react-native": "^0.487.0 || ^1.0.0",
+		"react": ">=19.2.3",
+		"react-native": ">=0.85.0",
+		"react-native-keyboard-controller": ">=1.21.6",
+		"react-native-reanimated": ">=4.3.1",
+		"react-native-safe-area-context": ">=5.7.0",
+		"react-native-svg": ">=15.15.4",
+		"react-native-worklets": ">=0.10.0"
+	}
+}

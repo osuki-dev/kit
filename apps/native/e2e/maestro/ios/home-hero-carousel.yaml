@@ -1,0 +1,21 @@
+appId: dev.osuki.kit
+name: ios-home-hero-carousel
+---
+- launchApp:
+    clearState: false
+    stopApp: true
+- openLink: "osuki:///"
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 30000
+- swipe:
+    start: 90%, 26%
+    end: 10%, 26%
+    duration: 450
+- extendedWaitUntil:
+    visible: "SHOP GIFTS"
+    timeout: 10000
+- tapOn: "SHOP GIFTS"
+- extendedWaitUntil:
+    visible: "Search"
+    timeout: 10000

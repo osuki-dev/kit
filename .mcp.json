@@ -1,0 +1,12 @@
+{
+	"mcpServers": {
+		"agent-device": {
+			"command": "agent-device",
+			"args": ["mcp"]
+		},
+		"expo-mcp": {
+			"type": "http",
+			"url": "https://mcp.expo.dev/mcp"
+		}
+	}
+}

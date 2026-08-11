@@ -1,0 +1,38 @@
+# Notice
+
+## Code
+
+All source code in this repository is licensed under the MIT License. See
+[LICENSE](LICENSE).
+
+## Trademarks and brand assets
+
+The MIT License covers code. It does not grant rights to the Osuki name, the
+Osuki logo, or any Osuki brand assets.
+
+The following are **not** covered by the MIT License:
+
+- The names "Osuki", "Osuki Kit", and "Osuki Kit Pro"
+- The Osuki logo and app icon, including the editable sources in
+  `apps/native/assets/brand/` and every generated icon in
+  `apps/native/assets/images/`
+- Marketing imagery and screenshots in `docs/assets/`
+
+You may fork this repository, build on it, and ship products with it. You may
+not present your fork or product as an official Osuki release, and you must
+replace the brand assets with your own before publishing an app.
+
+Generate replacement icons from your own sources:
+
+```bash
+node apps/native/script/generate-brand-assets.mjs
+```
+
+## Third-party fonts
+
+The showcase app loads Noto Sans, Noto Sans SC, and Noto Sans JP through
+`@expo-google-fonts`. Those fonts are licensed under the SIL Open Font License
+by their respective authors and are not covered by this repository's license.
+
+`@osuki-dev/ui` itself ships no font files. Fonts are application-owned: the
+theme resolves semantic font roles to whatever families the application loads.

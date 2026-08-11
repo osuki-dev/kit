@@ -1,0 +1,58 @@
+appId: dev.osuki.kit
+name: player-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///player"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Midnight City"
+    timeout: 10000
+- tapOn:
+    id: "media-player-play-pause"
+
+- extendedWaitUntil:
+    visible: "Playing Midnight City"
+    timeout: 10000
+- tapOn:
+    id: "media-player-next"
+
+- extendedWaitUntil:
+    visible: "Digital Love"
+    timeout: 10000
+- assertVisible: "Playing Digital Love"
+- tapOn:
+    id: "media-player-previous"
+
+- extendedWaitUntil:
+    visible: "Midnight City"
+    timeout: 10000
+- tapOn:
+    id: "media-player-shuffle"
+
+- extendedWaitUntil:
+    visible: "Shuffle on"
+    timeout: 10000
+- tapOn:
+    id: "media-player-repeat"
+
+- extendedWaitUntil:
+    visible: "Repeat all"
+    timeout: 10000
+- tapOn:
+    id: "media-player-rate"
+
+- extendedWaitUntil:
+    visible: "Playback speed 1.25x"
+    timeout: 10000

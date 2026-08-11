@@ -1,0 +1,4 @@
+interface:
+  display_name: "Osuki UI Architecture"
+  short_description: "Keep Osuki UI, theme, and composition architecture consistent"
+  default_prompt: "Apply the Osuki UI architecture rules when designing or changing UI primitives, themes, providers, or reusable Kit components."

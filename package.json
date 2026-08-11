@@ -1,0 +1,51 @@
+{
+	"name": "osuki",
+	"private": true,
+	"workspaces": {
+		"packages": [
+			"apps/*",
+			"packages/*"
+		],
+		"catalog": {
+			"typescript": "^7.0.2",
+			"zod": "^4.4.3"
+		}
+	},
+	"type": "module",
+	"scripts": {
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"test": "turbo test",
+		"dev:native": "turbo -F native dev",
+		"e2e:native:ios": "bun --filter native e2e:ios",
+		"e2e:native:android": "bun --filter native e2e:android",
+		"e2e:native:generated:ios": "bun --filter native e2e:generated:ios",
+		"e2e:native:generated:android": "bun --filter native e2e:generated:android",
+		"e2e:native:replay:ios": "bun --filter native e2e:replay:ios",
+		"e2e:native:replay:android": "bun --filter native e2e:replay:android",
+		"e2e:generate": "bun --filter native e2e:generate",
+		"check:app-contracts": "bun scripts/check-app-contracts.ts",
+		"check:docs-coverage": "bun scripts/check-docs-coverage.ts",
+		"smoke:public-packages": "bun run build:packages && bun scripts/smoke-public-packages.ts",
+		"changeset": "changeset",
+		"version:packages": "changeset version && bun install --lockfile-only && bun run check",
+		"release:packages": "bun run build:packages && changeset publish",
+		"check": "oxlint && oxfmt --write && turbo check-types test",
+		"check:ci": "oxlint && oxfmt --check && turbo check-types test",
+		"deps:check": "syncpack lint --dependency-types prod,dev",
+		"deps:fix": "syncpack fix --dependency-types prod,dev",
+		"build:packages": "turbo -F @osuki-dev/ui -F @osuki-dev/kit-community build"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@changesets/changelog-github": "^0.7.0",
+		"@changesets/cli": "^2.31.1",
+		"oxfmt": "^0.26.0",
+		"oxlint": "^1.73.0",
+		"syncpack": "^15.3.2",
+		"turbo": "^2.10.4",
+		"typescript": "catalog:"
+	},
+	"packageManager": "bun@1.3.11"
+}

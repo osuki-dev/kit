@@ -1,0 +1,53 @@
+appId: dev.osuki.kit
+name: files-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///files"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Design System"
+    timeout: 10000
+- tapOn:
+    id: "files-sort-size"
+
+- assertVisible: "/Documents/Projects · SIZE ASC"
+- tapOn:
+    id: "files-view-toggle"
+
+- tapOn:
+    id: "files-item-folder-design"
+
+- extendedWaitUntil:
+    visible: "tokens.json"
+    timeout: 10000
+- assertVisible: "/Documents/Projects/Design System · SIZE ASC"
+- tapOn:
+    id: "files-item-tokens"
+
+- assertVisible: "Selected tokens.json"
+- tapOn:
+    id: "files-item-archive"
+
+- extendedWaitUntil:
+    visible: "FOLDER IS EMPTY"
+    timeout: 10000
+- assertVisible: "/Documents/Projects/Design System/Archive · SIZE ASC"
+- tapOn:
+    id: "files-navigate-up"
+
+- extendedWaitUntil:
+    visible: "tokens.json"
+    timeout: 10000
+- assertVisible: "/Documents/Projects/Design System · SIZE ASC"

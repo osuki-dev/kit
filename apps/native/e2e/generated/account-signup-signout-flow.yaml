@@ -1,0 +1,87 @@
+appId: dev.osuki.kit
+name: account-signup-signout-flow
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///account"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Account"
+    timeout: 10000
+- tapOn:
+    id: "account-sign-in-button"
+
+- extendedWaitUntil:
+    visible: "Account"
+    timeout: 10000
+- tapOn:
+    id: "auth-mode-sign-up"
+
+- tapOn:
+    id: "auth-name-input"
+- inputText: "Mika Tan"
+
+- tapOn:
+    id: "auth-email-input"
+- inputText: "mika@example.com"
+
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "auth-password-input"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "auth-password-input"
+
+- tapOn:
+    id: "auth-password-input"
+- inputText: "password123"
+
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "auth-confirm-password-input"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "auth-confirm-password-input"
+
+- tapOn:
+    id: "auth-confirm-password-input"
+- inputText: "password123"
+
+- hideKeyboard
+- tapOn:
+    id: "auth-submit-button"
+
+- extendedWaitUntil:
+    visible: "SIGNED IN"
+    timeout: 10000
+- assertVisible: "mika@example.com"
+- scrollUntilVisible:
+    element:
+      id: "settings-item-about-signout"
+    direction: DOWN
+    timeout: 8000
+- assertVisible:
+    id: "settings-item-about-signout"
+
+- tapOn:
+    id: "settings-item-about-signout"
+
+- extendedWaitUntil:
+    visible: "Sign in to continue"
+    timeout: 10000
+- assertVisible: "Sign in to continue"

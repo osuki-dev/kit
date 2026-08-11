@@ -1,0 +1,64 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+build
+# Package build output only; apps/*/lib is source
+packages/*/lib/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env*.local
+
+# IDEs and editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Turbo
+.turbo
+.nx
+
+# Better-T-Stack
+.alchemy
+
+# Testing
+coverage
+.nyc_output
+apps/*/e2e/artifacts/
+
+# Per-machine agent settings
+.claude/settings.local.json
+
+# Exploratory QA output; may capture real store and account data
+dogfood-output/
+
+# Misc
+*.tgz
+.cache
+tmp
+temp
+# Expo prebuild output. Everything that must survive a prebuild belongs in
+# apps/native/app.json, not in these generated projects.
+/apps/native/android
+/apps/native/ios

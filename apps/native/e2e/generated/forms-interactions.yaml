@@ -1,0 +1,64 @@
+appId: dev.osuki.kit
+name: forms-interactions
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: "osuki://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Osuki Market"
+    timeout: 60000
+
+- openLink: "osuki:///forms"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Forms"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "SUBMIT"
+    timeout: 10000
+- tapOn: "SUBMIT"
+- extendedWaitUntil:
+    visible: "Review the highlighted fields before submitting."
+    timeout: 10000
+- openLink: "osuki:///forms"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Forms"
+    timeout: 10000
+- tapOn:
+    id: "form-field-username-input"
+
+- inputText: "Avery Chen"
+- tapOn:
+    id: "form-field-email-input"
+
+- inputText: "avery@example.com"
+- hideKeyboard
+- tapOn:
+    id: "form-field-phone-input"
+
+- inputText: "+14155550123"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "SUBMIT"
+    timeout: 10000
+- tapOn: "SUBMIT"
+- extendedWaitUntil:
+    visible: "Profile saved for Avery Chen"
+    timeout: 10000
+- tapOn: "BROWSE"
+- extendedWaitUntil:
+    visible: "Attachment selected: osuki-profile-brief.pdf"
+    timeout: 10000
+- tapOn: "RESET"
+- extendedWaitUntil:
+    visible: "Form reset."
+    timeout: 10000
