@@ -1,6 +1,6 @@
 {
 	"name": "@osuki-dev/ui",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"private": false,
 	"description": "CJK-friendly Expo and React Native UI primitives for Osuki apps.",
 	"keywords": [
