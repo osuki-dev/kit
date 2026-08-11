@@ -44,14 +44,22 @@ jobs:
 
       # npm publishes the packages: it is the client that supports trusted
       # publishing, so no NPM_TOKEN is stored anywhere.
+      #
+      # Deliberately no `registry-url`. Setting it makes setup-node write an
+      # .npmrc containing `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
+      # and point NPM_CONFIG_USERCONFIG at it. With no NODE_AUTH_TOKEN in the
+      # environment that resolves to an empty credential, and an explicit
+      # authToken in .npmrc takes precedence over OIDC — so npm signs the
+      # provenance, then sends the empty token and the registry answers
+      # `404 Not Found - PUT`, which reads like a missing package rather than an
+      # auth failure. The registry defaults to npmjs.org anyway.
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
 
       - name: Use an npm that supports trusted publishing
-        # Trusted publishing (OIDC) needs npm >= 11.5. Node 22 ships npm 10.
-        run: npm install -g npm@^11.5.0
+        # Trusted publishing (OIDC) needs npm >= 11.5.1. Node 22 ships npm 10.
+        run: npm install -g npm@^11.5.1
 
       - name: Install
         run: bun install --frozen-lockfile
