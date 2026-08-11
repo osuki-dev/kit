@@ -79,21 +79,22 @@
 		"prepack": "bun run build"
 	},
 	"dependencies": {
-		"@tanstack/react-form": "^1.33.1",
-		"zod": "catalog:"
+		"@tanstack/react-form": "^1.33.1"
 	},
 	"devDependencies": {
 		"@osuki-dev/ui": "^0.2.0",
 		"@types/node": "^22.0.0",
 		"@types/react": "~19.2.17",
 		"react-native-reanimated": "4.5.1",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"zod": "catalog:"
 	},
 	"peerDependencies": {
 		"@osuki-dev/ui": "^0.2.0",
 		"react": ">=19.2.3",
 		"react-native": ">=0.85.0",
 		"react-native-reanimated": ">=4.3.1",
-		"react-native-safe-area-context": ">=5.7.0"
+		"react-native-safe-area-context": ">=5.7.0",
+		"zod": ">=4.4.3"
 	}
 }

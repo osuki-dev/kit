@@ -1,14 +1,20 @@
 name: Release
 
-# Manual only. Running on every push to main meant every merge woke the release
-# machinery up, and a merge that happened to clear the last changeset would
-# publish without anyone deciding to. Releasing is a decision, so it gets a
-# button.
+# Runs on every push to main, but a push is not a release. What the run does
+# depends on whether changesets are pending:
 #
-# Two runs make a release: the first turns pending changesets into a
-# "chore: version packages" PR, and the second — after that PR is merged —
-# finds no changesets left and publishes to npm.
+#   changesets pending  -> open or update the "chore: version packages" PR.
+#                          Nothing is published.
+#   none pending        -> the version PR has just been merged, so the bumped
+#                          versions are on main. Publish them to npm.
+#
+# So the gate on publishing is merging the version PR, which is a deliberate
+# human action with the exact version bumps and changelog in front of you.
+# workflow_dispatch is kept for re-running a release that failed after the
+# merge, without an empty commit.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:

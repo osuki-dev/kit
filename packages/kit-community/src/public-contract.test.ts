@@ -69,11 +69,13 @@ for (const entry of [".", "./screens", "./entities", "./modules", "./types"]) {
 }
 
 // A published range using one of these is unresolvable for every consumer.
-// `catalog:` is not listed: `bun pm pack` substitutes the catalog value into the
-// archive manifest, and `smoke:public-packages` asserts that on the real archive
-// rather than on this source manifest. devDependencies are not checked because
-// a consumer never installs them.
-const internalProtocols = ["workspace:", "file:", "link:"];
+// `catalog:` and `workspace:` are bun-only: `bun pm pack` resolves them, but
+// this repo releases through `changeset publish`, which shells out to npm, and
+// npm writes the literal string into the tarball. Trusting the `bun pm pack`
+// behaviour is exactly how this package shipped an uninstallable
+// `"zod": "catalog:"` in 0.2.0. devDependencies are not checked because a
+// consumer never installs them.
+const internalProtocols = ["workspace:", "catalog:", "file:", "link:"];
 for (const field of ["dependencies", "peerDependencies", "optionalDependencies"] as const) {
 	for (const [name, range] of Object.entries(packageJson[field] ?? {})) {
 		const protocol = internalProtocols.find((candidate) => range.startsWith(candidate));

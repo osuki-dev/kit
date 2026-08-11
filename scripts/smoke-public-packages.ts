@@ -61,11 +61,17 @@ function assertPublishableRuntimeDeps(packageJson: {
 	peerDependencies?: Record<string, string>;
 	optionalDependencies?: Record<string, string>;
 }) {
+	// bun 私有协议在 `bun publish` 时会被解析成真实版本号，但我们用 changesets 发布，
+	// 它底层调的是 npm —— npm 不认识这些协议，会把字面量原样写进 tarball，
+	// 结果是任何人都装不上这个包。0.2.0 的 `zod: "catalog:"` 就是这么漏出去的。
+	// devDependencies 不检查：消费者不会安装它们。
+	const bunOnlyProtocols = ["workspace:", "catalog:"];
 	for (const field of ["dependencies", "peerDependencies", "optionalDependencies"] as const) {
 		for (const [name, range] of Object.entries(packageJson[field] ?? {})) {
+			const protocol = bunOnlyProtocols.find((candidate) => range.startsWith(candidate));
 			assert.ok(
-				!range.startsWith("workspace:"),
-				`${field}.${name} must not use workspace protocol`,
+				protocol === undefined,
+				`${field}.${name} must not use the bun-only "${protocol}" protocol — npm publishes it verbatim and consumers cannot install the package`,
 			);
 		}
 	}
