@@ -23,7 +23,6 @@ context, and one keyboard strategy.
 | `react-native`                     | `>=0.85.0`             | everything                                                 |
 | `react-native-safe-area-context`   | `>=5.7.0`              | `Screen`, `ScrollScreen`, `TopBar`, sheets                 |
 | `react-native-reanimated`          | `>=4.3.1`              | `Text` marquee, `PressableScale`, sheets, toasts, skeleton |
-| `react-native-worklets`            | `>=0.10.0`             | required by Reanimated 4                                   |
 | `react-native-svg`                 | `>=15.15.4`            | `Icon`                                                     |
 | `lucide-react-native`              | `^0.487.0 \|\| ^1.0.0` | `Icon`                                                     |
 | `react-native-keyboard-controller` | `>=1.21.6`             | the four `Keyboard*` components                            |
@@ -31,6 +30,9 @@ context, and one keyboard strategy.
 | `expo-image`                       | `>=56.0.0`             | `Image`                                                    |
 | `expo-router`                      | `>=57.0.4`             | `createNavigationTheme`, `useNavigationTheme`              |
 | `@expo/ui`                         | `>=57.0.4`             | `DateInput`                                                |
+
+`react-native-worklets` is not listed above because Reanimated 4 declares it
+itself — install it alongside Reanimated, not because of this kit.
 
 In an Expo project install them with `npx expo install` so the versions match
 the SDK:
