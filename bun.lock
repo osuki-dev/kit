@@ -73,9 +73,9 @@
     },
     "packages/kit-community": {
       "name": "@osuki-dev/kit-community",
-      "version": "0.3.0",
+      "version": "1.0.0",
       "devDependencies": {
-        "@osuki-dev/ui": "^0.3.0",
+        "@osuki-dev/ui": "^1.0.0",
         "@tanstack/react-form": "^1.33.1",
         "@types/node": "^22.0.0",
         "@types/react": "~19.2.18",
@@ -84,7 +84,7 @@
         "zod": "catalog:",
       },
       "peerDependencies": {
-        "@osuki-dev/ui": ">=0.2.0 <1.0.0",
+        "@osuki-dev/ui": ">=1.0.0",
         "@tanstack/react-form": ">=1.33.1 <2.0.0",
         "react": ">=19.2.3",
         "react-native": ">=0.85.0",
@@ -95,7 +95,7 @@
     },
     "packages/ui": {
       "name": "@osuki-dev/ui",
-      "version": "0.3.0",
+      "version": "1.0.0",
       "devDependencies": {
         "@expo/ui": "~57.0.8",
         "@types/node": "^22.0.0",
