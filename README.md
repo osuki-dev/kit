@@ -5,8 +5,6 @@ tapped — dense screens, long lists, CJK text beside Latin text.
 
 Plain React Native styles, semantic theme tokens, and dark mode treated with the
 same care as light. No utility classes, no `className`, no runtime style engine.
-What a component looks like is decided by the theme; what it does is decided by
-its props.
 
 |                                       |                                        |                                                       |
 | :-----------------------------------: | :------------------------------------: | :---------------------------------------------------: |
@@ -15,7 +13,7 @@ its props.
 | ![Settings](docs/assets/settings.png) | ![Theme picker](docs/assets/theme.png) |         ![Checkout](docs/assets/checkout.png)         |
 |        Config-driven settings         |        Swappable theme presets         |                  Multi-step checkout                  |
 
-Screens from `apps/native`, running on the Expo showcase app in this repository.
+Screens from `apps/native`, the Expo showcase app in this repository.
 
 ## Packages
 
@@ -31,22 +29,33 @@ knows, and drop to `@osuki-dev/ui` when it is not.
 npx expo install @osuki-dev/ui @osuki-dev/kit-community
 ```
 
-Both packages are MIT, released together on the same version, and have twelve
-peer dependencies rather than bundling anything —
-[getting-started.md](packages/ui/docs/getting-started.md) has the table.
+Then mount one provider:
+
+```tsx
+import { ThemeProvider } from "@osuki-dev/ui";
+
+export function Root() {
+	return (
+		<ThemeProvider>
+			<App />
+		</ThemeProvider>
+	);
+}
+```
+
+Both packages are MIT and released together on the same version. Nothing is
+bundled — every shared runtime library is a peer dependency, so you control its
+version. [getting-started.md](packages/ui/docs/getting-started.md) has the
+table.
 
 ## Support matrix
 
 | `@osuki-dev/ui` | Expo SDK | React Native | React |
 | --------------- | -------- | ------------ | ----- |
-| 0.2.x           | 57       | 0.86         | 19.2  |
+| 0.3.x           | 57       | 0.86         | 19.2  |
 
 Each release targets one Expo SDK. When a new SDK ships, a compatible release
 follows; older SDKs are not backported.
-
-`0.x` is not API-stable. A minor version may contain breaking changes, and
-renaming a semantic or component token counts as one — consumers key their theme
-overrides on those names.
 
 ## Documentation
 
@@ -66,62 +75,10 @@ installed and an agent can read them offline. In this repository they live in
 ### For coding agents
 
 [`.agents/skills/osuki-kit/SKILL.md`](.agents/skills/osuki-kit/SKILL.md) is a
-skill an agent can load before writing UI with these packages. It states the
-rules that produce a broken screen rather than an ugly one, points at the right
-doc for the task, and lists what to check before calling a screen done. Copy it
-into your own project's skills directory, or point your agent at the path.
-
-For changing the packages themselves rather than consuming them, there is
+skill an agent can load before writing UI with these packages. Copy it into your
+own project's skills directory, or point your agent at the path. For changing
+the packages themselves rather than consuming them, there is
 [`osuki-ui-architecture`](.agents/skills/osuki-ui-architecture/SKILL.md).
-
-## Theme
-
-Mount one provider:
-
-```tsx
-import { ThemeProvider } from "@osuki-dev/ui";
-
-export function Root() {
-	return (
-		<ThemeProvider>
-			<App />
-		</ThemeProvider>
-	);
-}
-```
-
-Override only the tokens you care about:
-
-```tsx
-<ThemeProvider
-	theme={{
-		colors: { primary: "#FF5A4A", background: "#FCFBFA" },
-		components: { Button: { radius: "pill" } },
-	}}
->
-	<App />
-</ThemeProvider>
-```
-
-Tokens are semantic, not literal: `background`, `surface`, `surfaceRaised`,
-`border`, `text`, `textMuted`, `primary`, `danger`, `success`, `warning`,
-`info`. Read them with the narrowest hook that works —
-`useThemeTokens()` for anything that only reads values, `useThemeMode()` only
-for controls that change light/dark.
-
-## Testing
-
-Components forward `testID`, and config-driven screens derive stable ids when
-you omit one:
-
-```tsx
-<Button testID="save-profile">SAVE</Button>
-<FormField config={{ key: "email", label: "Email", type: "email" }} />
-// the field's testID is form-field-email
-```
-
-A settings item with `id: "dark-mode"` inside a section with `id: "appearance"`
-becomes `settings-item-appearance-dark-mode`.
 
 ## The showcase app
 
@@ -131,11 +88,7 @@ it is where the screenshots above come from.
 ```sh
 bun install
 bun run dev:native
-```
 
-To build and launch on a booted simulator or emulator:
-
-```sh
 cd apps/native
 bun run ios       # or: bun run android
 ```
@@ -172,8 +125,7 @@ bun run check:docs-coverage    # every exported component is documented
 bun run smoke:public-packages  # both packages pack and install cleanly
 ```
 
-`check:docs-coverage` is not optional politeness: adding an export without
-documenting it fails the build.
+Adding an export without documenting it fails the build.
 
 ## Contributing
 

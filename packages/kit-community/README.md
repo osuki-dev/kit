@@ -18,6 +18,11 @@ Schema-driven UI templates for rapid application development. Build complete scr
 bun add @osuki-dev/kit-community
 ```
 
+Nothing is bundled. Beyond `@osuki-dev/ui` and its own peers, this package
+expects the host app to provide `zod`, `react-native-safe-area-context`,
+`react-native-reanimated`, and `@tanstack/react-form` (used by `TanstackForm`),
+so there is exactly one copy of each in the app.
+
 ## Templates
 
 ### 🏢 Business Templates
