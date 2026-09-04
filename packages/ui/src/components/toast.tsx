@@ -46,6 +46,7 @@ export interface ToastProviderProps {
 	placement?: ToastPlacement;
 	maxToasts?: number;
 	defaultDurationMs?: number;
+	maxWidth?: number;
 }
 
 const ToastContext = createContext<ToastController | undefined>(undefined);
@@ -142,6 +143,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 	placement = "top",
 	maxToasts = 3,
 	defaultDurationMs = 3600,
+	maxWidth,
 }) => {
 	const storeRef = useRef<ToastStore | null>(null);
 	if (!storeRef.current) storeRef.current = createToastStore({ maxToasts, defaultDurationMs });
@@ -155,7 +157,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 	return (
 		<ToastContext.Provider value={store.controller}>
 			{children}
-			<ToastViewport store={store} placement={placement} />
+			<ToastViewport store={store} placement={placement} maxWidth={maxWidth} />
 		</ToastContext.Provider>
 	);
 };
@@ -169,9 +171,10 @@ export function useToast(): ToastController {
 interface ToastViewportProps {
 	store: ToastStore;
 	placement: ToastPlacement;
+	maxWidth?: number;
 }
 
-const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement }) => {
+const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement, maxWidth }) => {
 	const theme = useThemeTokens();
 	const insets = useSafeAreaInsets();
 	const toasts = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
@@ -185,6 +188,7 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement }) => {
 			right: theme.spacing.md,
 			...(placement === "top" ? { top: verticalOffset } : { bottom: verticalOffset }),
 			gap: theme.spacing.sm,
+			alignItems: "flex-end",
 			zIndex: 1000,
 		}),
 		[placement, theme.spacing, verticalOffset],
@@ -195,7 +199,12 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement }) => {
 	return (
 		<View pointerEvents="box-none" style={viewportStyle}>
 			{toasts.map((toast) => (
-				<ToastCard key={toast.id} toast={toast} onDismiss={store.controller.dismissToast} />
+				<ToastCard
+					key={toast.id}
+					toast={toast}
+					maxWidth={maxWidth}
+					onDismiss={store.controller.dismissToast}
+				/>
 			))}
 		</View>
 	);
@@ -203,10 +212,11 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement }) => {
 
 interface ToastCardProps {
 	toast: ToastItem;
+	maxWidth?: number;
 	onDismiss: (id: string) => void;
 }
 
-const ToastCard: React.FC<ToastCardProps> = ({ toast, onDismiss }) => {
+const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, onDismiss }) => {
 	const theme = useThemeTokens();
 	const tokens = toastTokens[toast.variant];
 
@@ -217,6 +227,7 @@ const ToastCard: React.FC<ToastCardProps> = ({ toast, onDismiss }) => {
 			layout={Layout.springify().damping(24).stiffness(280)}
 			style={{
 				width: "100%",
+				maxWidth,
 				flexDirection: "row",
 				alignItems: "flex-start",
 				gap: theme.spacing.sm,
