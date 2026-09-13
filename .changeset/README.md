@@ -6,3 +6,17 @@ find the full documentation for it [in our repository](https://github.com/change
 
 We have a quick list of common questions to get you started engaging with this project in
 [our documentation](https://github.com/changesets/changesets/blob/main/docs/common-questions.md).
+
+## Why `onlyUpdatePeerDependentsWhenOutOfRange` is nested
+
+`config.json` carries that option inside
+`___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH`. That is the only place
+changesets reads it. Written at the top level it parses, validates against the
+schema, and is silently ignored — which is how it sat here until it was caught
+in #9.
+
+Ignored, it leaves the default peer-dependent rule in force: `@osuki-dev/ui` is
+a `peerDependency` of `@osuki-dev/kit-community`, so any minor or major bump to
+`ui` forces a **major** bump on `kit-community`, and `fixed` then drags `ui` to
+that same major. A `minor` changeset ships as a major. Do not "tidy" this key
+back up to the top level.

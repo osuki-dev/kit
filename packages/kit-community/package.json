@@ -88,7 +88,7 @@
 		"zod": "catalog:"
 	},
 	"peerDependencies": {
-		"@osuki-dev/ui": ">=1.0.1",
+		"@osuki-dev/ui": "^1.0.1",
 		"@tanstack/react-form": ">=1.33.1 <2.0.0",
 		"react": ">=19.2.3",
 		"react-native": ">=0.85.0",

@@ -34,6 +34,20 @@ The token case is easy to get wrong. Consumers key their theme overrides on
 token names, so renaming one breaks them exactly like removing an export. Say so
 in the changeset.
 
+### Check the version PR against the bump you wrote
+
+Read the version number in the `chore: version packages` PR before merging it,
+and reject it if it does not match the changesets it consumes. Until #10 it
+never did: `onlyUpdatePeerDependentsWhenOutOfRange` sat at the top level of
+`.changeset/config.json`, where changesets ignores it, so the default
+peer-dependent rule escalated **every** `minor` changeset to a major. #2 was a
+`minor` on `0.3.0` and shipped as `1.0.0` rather than `0.4.0`; #9 would have
+shipped the `minor` for #8 as `2.0.0` rather than `1.1.0`, and was closed
+unmerged. Patch changesets were never affected, which is why `1.0.1` looked
+right and the fault stayed hidden for two releases. `bun run check:changeset-config`
+now asserts the config shape in CI and before every release, but the number in
+the version PR is still the thing that ships — read it.
+
 ## What CI does
 
 On every push to `main`, `.github/workflows/release.yml` runs `check:ci` and
@@ -83,10 +97,11 @@ therefore builds explicitly rather than relying on either behavior:
 ## Peer ranges
 
 `@osuki-dev/kit-community` depends on `@osuki-dev/ui` with a caret range
-(`^0.2.0`). This is deliberate: changesets rewrites internal dependency ranges
+(`^1.0.1`). This is deliberate: changesets rewrites internal dependency ranges
 on every version bump, and it can only preserve an upper bound when the range
 uses a form it understands. A `>=0.2.0 <1.0.0` range was silently rewritten to
-`>=0.2.1`, which would have let a future major satisfy it.
+`>=0.2.1`, which would have let a future major satisfy it. It drifted back to a
+bare `>=1.0.1` by the 1.0.x line and was restored in #10.
 
 If you edit that range, re-run `bunx changeset version` on a probe changeset and
 confirm the result still has an upper bound.
