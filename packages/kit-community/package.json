@@ -1,6 +1,6 @@
 {
 	"name": "@osuki-dev/kit-community",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"private": false,
 	"description": "Open-source community screen templates for Osuki Expo and React Native apps.",
 	"keywords": [
@@ -79,7 +79,7 @@
 		"prepack": "bun run build"
 	},
 	"devDependencies": {
-		"@osuki-dev/ui": "^1.0.0",
+		"@osuki-dev/ui": "^1.1.0",
 		"@tanstack/react-form": "^1.33.1",
 		"@types/node": "^22.0.0",
 		"@types/react": "~19.2.18",
