@@ -309,6 +309,14 @@ If two screens need cards that look different, that is either a `variant` that
 already exists or a theme override. It is never a local style object, because
 the next card will not match it.
 
+The exception is a treatment that applies to every surface at once rather than
+to one call site -- an app that paints artwork behind the UI and lets the user
+set how opaque the surfaces over it are, for instance. That is still a single
+decision, so it is made in a single place: `ToastProvider`'s `toastStyle`,
+`KeyboardToolbar`'s `backgroundColor`, and the `style` every other primitive
+already merges last, applied from the app shell. A fill written into one screen
+is still the case above.
+
 ---
 
 ## 16. Keys are identity, not position

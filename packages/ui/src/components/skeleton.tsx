@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo } from "react";
-import { View, type DimensionValue, type ViewProps, type ViewStyle } from "react-native";
+import {
+	StyleSheet,
+	View,
+	type DimensionValue,
+	type StyleProp,
+	type ViewProps,
+	type ViewStyle,
+} from "react-native";
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -17,6 +24,13 @@ export interface SkeletonProps extends ViewProps {
 	lines?: number;
 	gap?: number;
 	motion?: "pulse" | "static";
+	/**
+	 * Merged last, so `style.backgroundColor` replaces the `border` token the
+	 * placeholder is filled with. With `lines` above 1 the override lands on each
+	 * line rather than on the wrapper, so a translucent fill is painted once and
+	 * the gaps between lines stay empty.
+	 */
+	style?: StyleProp<ViewStyle>;
 }
 
 const AnimatedView = Animated.createAnimatedComponent(View);
@@ -60,12 +74,18 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 		return <AnimatedView style={[baseStyle, animatedStyle, style]} {...props} />;
 	}
 
+	// A multi-line skeleton draws its fill on the lines, not on the wrapper, so a
+	// consumer's `backgroundColor` has to travel down to them. Leaving it on the
+	// wrapper as well would paint the gaps and double up a translucent fill.
+	const { backgroundColor: fillOverride, ...wrapperStyle } = StyleSheet.flatten(style) ?? {};
+	const lineFill = fillOverride === undefined ? undefined : { backgroundColor: fillOverride };
+
 	return (
-		<View style={[{ gap: gap ?? theme.spacing.sm }, style]} {...props}>
+		<View style={[{ gap: gap ?? theme.spacing.sm }, wrapperStyle]} {...props}>
 			{Array.from({ length: lineCount }).map((_, index) => (
 				<AnimatedView
 					key={index}
-					style={[baseStyle, animatedStyle, index === lineCount - 1 && { width: "72%" }]}
+					style={[baseStyle, animatedStyle, lineFill, index === lineCount - 1 && { width: "72%" }]}
 				/>
 			))}
 		</View>

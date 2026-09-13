@@ -379,6 +379,41 @@ assert.ok(
 	!toastSource.includes("useState<ToastItem[]"),
 	"ToastProvider does not subscribe to queue state",
 );
+
+// An app that paints its own artwork behind the UI has to be able to reach the
+// fill of every surface drawn on top of it. Where a component owns the fill in
+// an inline object, the consumer needs a named way in; src/surface-fill-overrides.test.ts
+// measures what the host element receives, and these only pin the API shape.
+const keyboardToolbarSource = readFileSync(
+	new URL("components/keyboard-toolbar.tsx", import.meta.url),
+	"utf8",
+);
+assert.ok(
+	toastSource.includes("toastStyle?: StyleProp<ViewStyle>"),
+	"ToastProvider exposes one app-wide style for every toast body",
+);
+assert.ok(
+	toastSource.includes("style?: StyleProp<ViewStyle>"),
+	"a single toast can carry its own style",
+);
+const toastCardSource = toastSource.slice(toastSource.indexOf("const ToastCard"));
+assert.ok(
+	toastCardSource.indexOf("backgroundColor: theme.colors[tokens.background]") <
+		toastCardSource.indexOf("toast.style"),
+	"the consumer's styles are merged after the variant fill, so a fill override wins",
+);
+assert.ok(
+	skeletonSource.includes("backgroundColor: fillOverride"),
+	"Skeleton routes a style fill override down to its lines",
+);
+assert.ok(
+	keyboardToolbarSource.includes("backgroundColor?: string"),
+	"KeyboardToolbar exposes a fill override, since its native props accept no style",
+);
+assert.ok(
+	!keyboardToolbarSource.includes("export type KeyboardToolbarProps = RNKeyboardToolbarProps;"),
+	"KeyboardToolbar's props are its own interface, not a bare re-export",
+);
 for (const [name, source, removedProps] of [
 	["Text", textSource, ["uppercase", "marquee", "marqueeAutoPlay"]],
 	["Badge", badgeSource, ["dot"]],

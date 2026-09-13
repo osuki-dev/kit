@@ -160,6 +160,9 @@ only `KeyboardToolbar` adds theming.
 | `KeyboardStickyView`      | Pins content to the keyboard's top edge   |
 | `KeyboardToolbar`         | Themed accessory bar above the keyboard   |
 
+`KeyboardToolbar` takes `backgroundColor?: string` because the underlying props
+accept no `style`; it replaces the toolbar fill in both colour modes.
+
 ### Platform Feedback
 
 | Component         | Description          | Props     |
