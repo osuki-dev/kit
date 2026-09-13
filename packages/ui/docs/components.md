@@ -162,6 +162,14 @@ screen it occupies.
 The dividing line between `Alert` and a toast: an alert describes the screen it
 is on and stays; a toast describes something that just happened and leaves.
 
+`ToastProvider` accepts `toastStyle`, merged onto every toast body after the
+variant fill, and `showToast` accepts a `style` merged after that for one toast.
+`Skeleton` merges `style` last as well. Both exist so an app that paints its own
+artwork behind the UI can reach the fill of the surfaces drawn over it -- see
+[the note on re-skinning](./conventions.md#15-style-adjusts-it-does-not-re-skin).
+With `lines` above 1, `Skeleton` puts a `backgroundColor` override on the lines
+rather than on the wrapper, so the gaps between them stay empty.
+
 ---
 
 ## Data display
@@ -195,6 +203,11 @@ unchanged; only `KeyboardToolbar` adds theming. All of them require
 | `KeyboardAwareScrollView` | Scrolls the focused field into view. Defaults to `bottomOffset={50}` and `extraKeyboardSpace={20}`. |
 | `KeyboardStickyView`      | Pins content to the keyboard's top edge.                                                            |
 | `KeyboardToolbar`         | Themed previous / next / done bar above the keyboard.                                               |
+
+`KeyboardToolbar` is the one wrapper whose native props accept no `style`, so it
+takes `backgroundColor?: string` instead. It replaces the `surfaceRaised` fill in
+both the light and the dark entry of the toolbar theme, and is applied after a
+`theme` you supply yourself.
 
 ---
 

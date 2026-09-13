@@ -35,8 +35,12 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `Alert`: inline status message for info, success, warning, and danger states.
 - `ToastProvider` and `useToast`: app-level transient notification queue. Mount
   one provider inside the app theme and safe-area roots; only its viewport
-  subscribes to queue updates.
+  subscribes to queue updates. `toastStyle` on the provider is merged onto every
+  toast body after the variant fill, and `showToast({ style })` is merged after
+  that for a single toast.
 - `Skeleton`: loading placeholder with explicit `motion="pulse" | "static"`.
+  `style` is merged last; with `lines` above 1 a `backgroundColor` override goes
+  to the lines rather than the wrapper, so the gaps stay empty.
 - `Spinner`: indeterminate loading.
 - `InlineActivity`: one-line busy row -- a small spinner and a caption naming
   what is being waited on. It belongs inside content that is already on screen;
@@ -112,7 +116,9 @@ unchanged; only `KeyboardToolbar` adds theming.
 - `KeyboardStickyView`: pins content to the top edge of the keyboard, for
   submit bars and composer actions.
 - `KeyboardToolbar`: accessory bar above the keyboard with previous/next/done
-  controls. Colors resolve from theme tokens rather than consumer styles.
+  controls. Colors resolve from theme tokens rather than consumer styles, except
+  for `backgroundColor`, which replaces the fill in both colour modes -- the
+  underlying props accept no `style`.
 
 ## Platform Feedback
 

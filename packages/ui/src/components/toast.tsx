@@ -7,7 +7,7 @@ import React, {
 	useSyncExternalStore,
 	type ReactNode,
 } from "react";
-import { Pressable, View, type ViewStyle } from "react-native";
+import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeOutUp, Layout } from "react-native-reanimated";
 import { useThemeTokens, type ColorToken } from "../theme";
@@ -26,6 +26,11 @@ export interface ToastOptions {
 		label: string;
 		onPress: () => void;
 	};
+	/**
+	 * Style merged onto this toast's body after the provider's `toastStyle`, so a
+	 * `backgroundColor` here replaces the variant fill for this toast only.
+	 */
+	style?: StyleProp<ViewStyle>;
 }
 
 export interface ToastItem extends Required<Pick<ToastOptions, "variant" | "durationMs">> {
@@ -33,6 +38,7 @@ export interface ToastItem extends Required<Pick<ToastOptions, "variant" | "dura
 	title?: string;
 	message: string;
 	action?: ToastOptions["action"];
+	style?: ToastOptions["style"];
 }
 
 export interface ToastController {
@@ -47,6 +53,13 @@ export interface ToastProviderProps {
 	maxToasts?: number;
 	defaultDurationMs?: number;
 	maxWidth?: number;
+	/**
+	 * Style merged last onto every toast body, so a `backgroundColor` here
+	 * replaces the variant fill for the whole app. Intended for a single
+	 * app-wide surface treatment -- a user-controlled background opacity over
+	 * theme artwork, for instance -- not for restyling individual toasts.
+	 */
+	toastStyle?: StyleProp<ViewStyle>;
 }
 
 const ToastContext = createContext<ToastController | undefined>(undefined);
@@ -95,6 +108,7 @@ function createToastStore(initialOptions: {
 			title: toast.title,
 			message: toast.message,
 			action: toast.action,
+			style: toast.style,
 			durationMs,
 		};
 		const next = [nextToast, ...snapshot];
@@ -144,6 +158,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 	maxToasts = 3,
 	defaultDurationMs = 3600,
 	maxWidth,
+	toastStyle,
 }) => {
 	const storeRef = useRef<ToastStore | null>(null);
 	if (!storeRef.current) storeRef.current = createToastStore({ maxToasts, defaultDurationMs });
@@ -157,7 +172,12 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 	return (
 		<ToastContext.Provider value={store.controller}>
 			{children}
-			<ToastViewport store={store} placement={placement} maxWidth={maxWidth} />
+			<ToastViewport
+				store={store}
+				placement={placement}
+				maxWidth={maxWidth}
+				toastStyle={toastStyle}
+			/>
 		</ToastContext.Provider>
 	);
 };
@@ -172,9 +192,15 @@ interface ToastViewportProps {
 	store: ToastStore;
 	placement: ToastPlacement;
 	maxWidth?: number;
+	toastStyle?: StyleProp<ViewStyle>;
 }
 
-const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement, maxWidth }) => {
+const ToastViewport: React.FC<ToastViewportProps> = ({
+	store,
+	placement,
+	maxWidth,
+	toastStyle,
+}) => {
 	const theme = useThemeTokens();
 	const insets = useSafeAreaInsets();
 	const toasts = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
@@ -203,6 +229,7 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement, maxWidt
 					key={toast.id}
 					toast={toast}
 					maxWidth={maxWidth}
+					style={toastStyle}
 					onDismiss={store.controller.dismissToast}
 				/>
 			))}
@@ -213,10 +240,12 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ store, placement, maxWidt
 interface ToastCardProps {
 	toast: ToastItem;
 	maxWidth?: number;
+	/** The provider's `toastStyle`; the toast's own style is merged after it. */
+	style?: StyleProp<ViewStyle>;
 	onDismiss: (id: string) => void;
 }
 
-const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, onDismiss }) => {
+const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, style, onDismiss }) => {
 	const theme = useThemeTokens();
 	const tokens = toastTokens[toast.variant];
 
@@ -225,19 +254,23 @@ const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, onDismiss }) => 
 			entering={FadeInDown.duration(180)}
 			exiting={FadeOutUp.duration(140)}
 			layout={Layout.springify().damping(24).stiffness(280)}
-			style={{
-				width: "100%",
-				maxWidth,
-				flexDirection: "row",
-				alignItems: "flex-start",
-				gap: theme.spacing.sm,
-				padding: theme.spacing.md,
-				borderRadius: theme.radius.lg,
-				backgroundColor: theme.colors[tokens.background],
-				borderWidth: 1,
-				borderColor: theme.colors.border,
-				...(theme.mode === "light" ? theme.shadow.soft : {}),
-			}}
+			style={[
+				{
+					width: "100%",
+					maxWidth,
+					flexDirection: "row",
+					alignItems: "flex-start",
+					gap: theme.spacing.sm,
+					padding: theme.spacing.md,
+					borderRadius: theme.radius.lg,
+					backgroundColor: theme.colors[tokens.background],
+					borderWidth: 1,
+					borderColor: theme.colors.border,
+					...(theme.mode === "light" ? theme.shadow.soft : {}),
+				},
+				style,
+				toast.style,
+			]}
 		>
 			<View style={{ paddingTop: 2 }}>
 				<Icon name={tokens.icon} size={18} color={theme.colors[tokens.foreground]} />
