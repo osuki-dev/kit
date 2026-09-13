@@ -1,5 +1,12 @@
 # @osuki-dev/kit-community Changelog
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`1f2b525`](https://github.com/osuki-dev/kit/commit/1f2b525f5cee239fb854016c420ad8600079357f)]:
+  - @osuki-dev/ui@2.0.0
+
 ## 1.0.1
 
 ### Patch Changes

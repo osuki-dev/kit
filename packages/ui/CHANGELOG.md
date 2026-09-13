@@ -1,5 +1,11 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0
+
+### Minor Changes
+
+- [#8](https://github.com/osuki-dev/kit/pull/8) [`1f2b525`](https://github.com/osuki-dev/kit/commit/1f2b525f5cee239fb854016c420ad8600079357f) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Let consumers override the fill of the three surfaces that owned it outright: `ToastProvider` takes `toastStyle` and `showToast` takes `style`, both merged onto the toast body after the variant fill; `Skeleton` sends a `style.backgroundColor` override to its lines instead of its wrapper when `lines` is above 1; and `KeyboardToolbar` takes `backgroundColor`, since its native props accept no `style`.
+
 ## 1.0.1
 
 ### Patch Changes
