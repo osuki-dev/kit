@@ -69,6 +69,7 @@ jobs:
         # PR; this rejects anything that reached main another way.
         run: |
           bun run check:ci
+          bun run check:changeset-config
           bun run smoke:public-packages
 
       - name: Create the version PR, or publish

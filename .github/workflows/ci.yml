@@ -40,6 +40,11 @@ jobs:
       - name: App-level UI contracts
         run: bun run check:app-contracts
 
+      - name: Changesets bumps what the changeset asked for
+        # A misplaced config key escalated every minor changeset to a major for
+        # two releases. See docs/releasing.md.
+        run: bun run check:changeset-config
+
       - name: Documentation covers every exported component
         # The roadmap makes "public docs cover every exported component" a
         # release condition. Nothing enforced it, and components shipped

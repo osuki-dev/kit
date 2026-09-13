@@ -26,6 +26,7 @@
 		"e2e:native:replay:android": "bun --filter native e2e:replay:android",
 		"e2e:generate": "bun --filter native e2e:generate",
 		"check:app-contracts": "bun scripts/check-app-contracts.ts",
+		"check:changeset-config": "bun scripts/check-changeset-config.ts",
 		"check:docs-coverage": "bun scripts/check-docs-coverage.ts",
 		"smoke:public-packages": "bun run build:packages && bun scripts/smoke-public-packages.ts",
 		"changeset": "changeset",
