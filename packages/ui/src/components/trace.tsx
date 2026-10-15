@@ -339,9 +339,10 @@ export function TraceBadge({ children, variant, style }: TraceBadgeProps) {
 export interface TraceContentProps extends ViewProps {
 	children?: ReactNode;
 	style?: StyleProp<ViewStyle>;
+	textStyle?: StyleProp<TextStyle>;
 }
 
-export function TraceContent({ children, style, ...props }: TraceContentProps) {
+export function TraceContent({ children, style, textStyle, ...props }: TraceContentProps) {
 	const theme = useThemeTokens();
 	const { state } = useTraceItem();
 
@@ -360,7 +361,21 @@ export function TraceContent({ children, style, ...props }: TraceContentProps) {
 			]}
 			{...props}
 		>
-			{children}
+			{typeof children === "string" ? (
+				<RNText
+					style={[
+						styles.contentText,
+						{
+							color: theme.colors.textMuted,
+						},
+						textStyle,
+					]}
+				>
+					{children}
+				</RNText>
+			) : (
+				children
+			)}
 		</View>
 	);
 }
@@ -479,6 +494,10 @@ const styles = StyleSheet.create({
 		paddingTop: 4,
 		paddingBottom: 6,
 		borderLeftWidth: 1.5,
+	},
+	contentText: {
+		fontSize: 13,
+		lineHeight: 18,
 	},
 	action: {
 		marginLeft: 4,

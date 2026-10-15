@@ -18,6 +18,7 @@
 		"check-types": "turbo check-types",
 		"test": "turbo test",
 		"dev:native": "turbo -F native dev",
+		"dev:showcase": "turbo -F showcase dev",
 		"e2e:native:ios": "bun --filter native e2e:ios",
 		"e2e:native:android": "bun --filter native e2e:android",
 		"e2e:native:generated:ios": "bun --filter native e2e:generated:ios",
