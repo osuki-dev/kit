@@ -38,17 +38,20 @@ import {
 	Timeline,
 	Dialog,
 	BottomSheet,
+	Divider,
+	PressableScale,
 	useTheme,
 	useToast,
 } from "@osuki-dev/ui";
 
 const PRIMITIVE_GROUPS = [
 	{ key: "all", label: "All (77)" },
+	{ key: "actions", label: "Buttons & Actions" },
 	{ key: "forms", label: "Forms & Controls" },
+	{ key: "typography", label: "Badges & Type" },
 	{ key: "visual", label: "Visual & Motion" },
 	{ key: "feedback", label: "Feedback & Overlays" },
 	{ key: "data", label: "Data & Display" },
-	{ key: "typography", label: "Foundations & Badges" },
 ] as const;
 
 export default function PrimitivesCatalogScreen() {
@@ -143,6 +146,198 @@ export default function PrimitivesCatalogScreen() {
 			</View>
 
 			<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+				{/* 0. CORE ACTIONS & BUTTONS */}
+				{isVisible("actions", "Button PressableScale TwoStepAction Compound") && (
+					<View style={styles.section}>
+						<Text variant="heading" colorKey="text" style={styles.sectionTitle}>
+							Buttons & Interactive Actions
+						</Text>
+						<Text variant="caption" colorKey="textMuted" style={styles.sectionDesc}>
+							Primary, secondary, destructive and ghost buttons with loading states, leading icons,
+							and Vercel-style compound background delegation.
+						</Text>
+
+						{/* Button Variants Card */}
+						<Card variant="raised" border="subtle" padding="md" style={styles.card}>
+							<Text variant="label" colorKey="textMuted" style={styles.cardLabel}>
+								BUTTON VARIANTS
+							</Text>
+							<View style={styles.buttonStack}>
+								<Button
+									variant="primary"
+									leftIcon="Sparkles"
+									onPress={() => showToast({ message: "Primary button pressed", variant: "info" })}
+								>
+									Primary Action
+								</Button>
+
+								<View style={styles.buttonRow}>
+									<View style={{ flex: 1 }}>
+										<Button
+											variant="secondary"
+											leftIcon="Layers"
+											onPress={() =>
+												showToast({ message: "Secondary button pressed", variant: "info" })
+											}
+										>
+											Secondary
+										</Button>
+									</View>
+									<View style={{ flex: 1 }}>
+										<Button
+											variant="destructive"
+											leftIcon="Trash2"
+											onPress={() =>
+												showToast({ message: "Destructive button pressed", variant: "danger" })
+											}
+										>
+											Destructive
+										</Button>
+									</View>
+								</View>
+
+								<Button
+									variant="ghost"
+									leftIcon="Compass"
+									onPress={() => showToast({ message: "Ghost button pressed", variant: "info" })}
+								>
+									Ghost Action
+								</Button>
+							</View>
+
+							<Divider style={{ marginVertical: 14 }} />
+
+							<Text variant="label" colorKey="textMuted" style={styles.cardLabel}>
+								STATES & ACCESSORIES
+							</Text>
+							<View style={styles.buttonStack}>
+								<Button
+									variant="primary"
+									loading={true}
+									loadingLabel="Engine Processing (Loading)..."
+								>
+									Submit
+								</Button>
+
+								<View style={styles.buttonRow}>
+									<View style={{ flex: 1 }}>
+										<Button variant="secondary" disabled leftIcon="Lock">
+											Disabled
+										</Button>
+									</View>
+									<View style={{ flex: 1 }}>
+										<Button
+											variant="secondary"
+											rightIcon="ArrowRight"
+											onPress={() => showToast({ message: "Next Step clicked", variant: "info" })}
+										>
+											Next Step
+										</Button>
+									</View>
+								</View>
+							</View>
+
+							<Divider style={{ marginVertical: 14 }} />
+
+							<Text variant="label" colorKey="textMuted" style={styles.cardLabel}>
+								COMPOUND BUTTON.ROOT & HAPTIC SCALE
+							</Text>
+							<View style={styles.buttonStack}>
+								<Button.Root
+									variant="primary"
+									onPress={() =>
+										showToast({ message: "Compound Button.Root tapped", variant: "info" })
+									}
+								>
+									<Button.Background />
+									<Button.Icon name="Sparkles" />
+									<Button.Label>Compound Button.Root</Button.Label>
+								</Button.Root>
+
+								<PressableScale
+									feedback="medium"
+									pressedScale={0.96}
+									onPress={() =>
+										showToast({
+											message: "PressableScale with spring feedback",
+											variant: "info",
+										})
+									}
+									style={[
+										styles.pressableScaleButton,
+										{ backgroundColor: colors.surfaceRaised, borderColor: colors.border },
+									]}
+								>
+									<Text variant="caption" colorKey="text" style={{ fontWeight: "700" }}>
+										PressableScale (Native Spring & Haptic)
+									</Text>
+								</PressableScale>
+							</View>
+						</Card>
+					</View>
+				)}
+
+				{/* 0.1 TYPOGRAPHY & BADGES */}
+				{isVisible("typography", "Badge Tag Text Typography") && (
+					<View style={styles.section}>
+						<Text variant="heading" colorKey="text" style={styles.sectionTitle}>
+							Typography Scale & Status Badges
+						</Text>
+						<Text variant="caption" colorKey="textMuted" style={styles.sectionDesc}>
+							Type tokens mapped to Osuki brand fonts, plus pill tags and semantic badges.
+						</Text>
+
+						<Card variant="raised" border="subtle" padding="md" style={styles.card}>
+							<Text variant="label" colorKey="textMuted" style={styles.cardLabel}>
+								SEMANTIC BADGES & TAGS
+							</Text>
+							<View style={styles.rowGap}>
+								<Badge variant="primary" display="label">
+									PRIMARY
+								</Badge>
+								<Badge variant="default" display="label">
+									DEFAULT
+								</Badge>
+								<Badge variant="warning" display="label">
+									WARNING
+								</Badge>
+								<Badge variant="success" display="label">
+									99+
+								</Badge>
+								<Tag variant="active">TAG ACTIVE</Tag>
+								<Tag variant="default">TAG DEFAULT</Tag>
+								<Tag variant="pill">TAG PILL</Tag>
+							</View>
+
+							<Divider style={{ marginVertical: 14 }} />
+
+							<Text variant="label" colorKey="textMuted" style={styles.cardLabel}>
+								TYPOGRAPHY TOKENS
+							</Text>
+							<View style={{ gap: 6 }}>
+								<Text variant="heading" colorKey="text">
+									Heading (20px / 700)
+								</Text>
+								<Text variant="subheading" colorKey="text">
+									Subheading (15px / 600)
+								</Text>
+								<Text variant="body" colorKey="text">
+									Body Text (15px / 400 steady reading font)
+								</Text>
+								<Text variant="bodySmall" colorKey="textMuted">
+									Body Small (13px / 400 muted subtitle)
+								</Text>
+								<Text variant="label" colorKey="primary">
+									LABEL TOKEN (11px / 700 UPPERCASE)
+								</Text>
+								<Text variant="caption" colorKey="textMuted">
+									Caption Token (12px / 400 footnote)
+								</Text>
+							</View>
+						</Card>
+					</View>
+				)}
+
 				{/* 1. VISUAL & MOTION PRIMITIVES */}
 				{isVisible(
 					"visual",
@@ -718,5 +913,20 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 8,
+	},
+	buttonStack: {
+		gap: 10,
+	},
+	buttonRow: {
+		flexDirection: "row",
+		gap: 10,
+	},
+	pressableScaleButton: {
+		paddingVertical: 12,
+		paddingHorizontal: 16,
+		borderRadius: 12,
+		borderWidth: 1,
+		alignItems: "center",
+		justifyContent: "center",
 	},
 });
