@@ -1,7 +1,43 @@
 // Core components
 export { Text, type TextProps } from "./text";
-export { Button, type ButtonProps, type ButtonVariant } from "./button";
-export { Card, type CardBorder, type CardProps, type CardVariant } from "./card";
+export {
+	Button,
+	ButtonRoot,
+	ButtonBackground,
+	ButtonLabel,
+	ButtonIcon,
+	ButtonSpinner,
+	useButton,
+	type ButtonProps,
+	type ButtonVariant,
+	type ButtonRootProps,
+	type ButtonBackgroundProps,
+	type ButtonLabelProps,
+	type ButtonIconProps,
+	type ButtonSpinnerProps,
+	type ButtonContextValue,
+} from "./button";
+export {
+	Card,
+	CardRoot,
+	CardBackground,
+	CardHeader,
+	CardContent,
+	CardFooter,
+	useCard,
+	type CardBorder,
+	type CardProps,
+	type CardVariant,
+	type CardRadius,
+	type CardPadding,
+	type CardRootProps,
+	type CardBackgroundProps,
+	type CardHeaderProps,
+	type CardContentProps,
+	type CardFooterProps,
+	type CardContextValue,
+	type CardMeta,
+} from "./card";
 export {
 	PressableCard,
 	type PressableCardProps,
@@ -16,11 +52,19 @@ export {
 	Screen,
 	ScrollScreen,
 	Surface,
+	SurfaceRoot,
+	SurfaceBackground,
+	SurfaceContent,
+	useSurface,
 	type ScreenProps,
 	type ScreenSafeArea,
 	type ScrollScreenProps,
 	type SurfaceProps,
 	type SurfaceVariant,
+	type SurfaceRootProps,
+	type SurfaceBackgroundProps,
+	type SurfaceContentProps,
+	type SurfaceContextValue,
 } from "./surface";
 export {
 	HapticsProvider,
@@ -63,7 +107,40 @@ export {
 	type ToastVariant,
 } from "./toast";
 
-export { Icon, type IconProps, type IconName } from "./icon";
+export {
+	Icon,
+	IconContext,
+	IconCustom,
+	IconGlyph,
+	IconProvider,
+	IconRoot,
+	calculateIconRotation,
+	createNanoIconSet,
+	toPascalCase,
+	useIconContext,
+	DEFAULT_CHROME_FALLBACKS,
+	ICON_DIRECTION_ANGLES,
+	THEME_ICON_NAMES,
+	type CommonIconName,
+	type IconComponent,
+	type IconContextValue,
+	type IconCustomProps,
+	type IconDirection,
+	type IconGlyphProps,
+	type IconName,
+	type IconProps,
+	type IconProviderProps,
+	type IconRenderMode,
+	type IconRenderProps,
+	type IconResolver,
+	type IconRootProps,
+	type NanoIconComponent,
+	type NanoIconConfig,
+	type NanoIconGlyph,
+	type NanoIconGlyphMap,
+	type NanoIconProps,
+	type ThemeIconName,
+} from "./icon";
 
 // Form controls
 export {
@@ -247,3 +324,125 @@ export {
 export { KeyboardAvoidingView, type KeyboardAvoidingViewProps } from "./keyboard-avoiding-view";
 export { KeyboardStickyView, type KeyboardStickyViewProps } from "./keyboard-sticky-view";
 export { KeyboardToolbar, type KeyboardToolbarProps } from "./keyboard-toolbar";
+
+// AI Elements
+export {
+	Trace,
+	TraceRoot,
+	TraceItem,
+	TraceHeader,
+	TraceTitle,
+	TraceBadge,
+	TraceContent,
+	TraceAction,
+	useTraceItem,
+	type TraceActionProps,
+	type TraceBadgeProps,
+	type TraceContentProps,
+	type TraceHeaderProps,
+	type TraceItemActions,
+	type TraceItemContextValue,
+	type TraceItemMeta,
+	type TraceItemProps,
+	type TraceItemState,
+	type TraceRootProps,
+	type TraceStepStatus,
+	type TraceTitleProps,
+} from "./trace";
+export {
+	CodeBlock,
+	CodeBlockActions,
+	CodeBlockContent,
+	CodeBlockCopyButton,
+	CodeBlockHeader,
+	CodeBlockLine,
+	CodeBlockRoot,
+	CodeBlockTitle,
+	useCodeBlock,
+	type CodeBlockActionsProps,
+	type CodeBlockContentProps,
+	type CodeBlockContextValue,
+	type CodeBlockCopyButtonProps,
+	type CodeBlockDiffType,
+	type CodeBlockHeaderProps,
+	type CodeBlockLineProps,
+	type CodeBlockMeta,
+	type CodeBlockRootProps,
+	type CodeBlockState,
+	type CodeBlockTitleProps,
+	type CodeBlockVariant,
+} from "./code-block";
+export {
+	Reasoning,
+	ReasoningContent,
+	ReasoningDuration,
+	ReasoningRoot,
+	ReasoningTrigger,
+	useReasoning,
+	type ReasoningActions,
+	type ReasoningContentProps,
+	type ReasoningContextValue,
+	type ReasoningDurationProps,
+	type ReasoningMeta,
+	type ReasoningRootProps,
+	type ReasoningState,
+	type ReasoningTriggerProps,
+} from "./reasoning";
+export {
+	ToolCall,
+	ToolCallHeader,
+	ToolCallName,
+	ToolCallPayload,
+	ToolCallResult,
+	ToolCallRoot,
+	ToolCallStatus,
+	useToolCall,
+	type ToolCallActions,
+	type ToolCallContextValue,
+	type ToolCallHeaderProps,
+	type ToolCallMeta,
+	type ToolCallNameProps,
+	type ToolCallPayloadProps,
+	type ToolCallResultProps,
+	type ToolCallRootProps,
+	type ToolCallState,
+	type ToolCallStatusProps,
+	type ToolCallStatusType,
+} from "./tool-call";
+export {
+	PromptInput,
+	PromptInputActions,
+	PromptInputAttachmentSlot,
+	PromptInputRoot,
+	PromptInputSubmitButton,
+	PromptInputTextarea,
+	usePromptInput,
+	type PromptInputActionHandlers,
+	type PromptInputActionsProps,
+	type PromptInputActionsType,
+	type PromptInputAttachmentSlotProps,
+	type PromptInputContextValue,
+	type PromptInputMeta,
+	type PromptInputRootProps,
+	type PromptInputState,
+	type PromptInputSubmitButtonProps,
+	type PromptInputTextareaProps,
+} from "./prompt-input";
+
+// Core and visual primitives
+export { Slider, type SliderProps } from "./slider";
+export { StatusDot, type StatusDotProps, type StatusDotTone } from "./status-dot";
+export { TwoStepAction, type TwoStepActionProps } from "./two-step-action";
+export { EdgeFade, type EdgeFadeProps, type EdgeFadeSide } from "./edge-fade";
+export {
+	GlassSurface,
+	type GlassSurfaceFace,
+	type GlassSurfaceProps,
+} from "./glass-surface";
+export { MarqueeText, type MarqueeTextProps } from "./marquee-text";
+export {
+	TransientPill,
+	type TransientPillProps,
+	type TransientPillTone,
+} from "./transient-pill";
+

@@ -211,6 +211,20 @@ both the light and the dark entry of the toolbar theme, and is applied after a
 
 ---
 
+## AI Elements
+
+Agentic UI primitives based on shadcn's 2026-10 AI Elements release and Vercel Composition Patterns.
+
+| Component     | What it solves                                                                                                                                                                                              |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Trace`       | Execution trace hierarchy with step status (`pending`, `running`, `success`, `error`), animated pulsing indicator for `running`, collapsible steps, and subcomponents: `Root`, `Item`, `Header`, `Title`, `Badge`, `Content`, `Action`. |
+| `CodeBlock`   | Code & logs viewer with variants (`default`, `diff`, `terminal`, `compact`), diff line highlights (`add`, `delete`, `normal`), copy button, and subcomponents: `Root`, `Header`, `Title`, `Actions`, `CopyButton`, `Content`, `Line`.    |
+| `Reasoning`   | Thought disclosure accordion with `durationSeconds`, streaming pulse/indicator, and subcomponents: `Root`, `Trigger`, `Duration`, `Content`.                                                               |
+| `ToolCall`    | Tool invocation card with collapsible input parameters and results, status pill, and subcomponents: `Root`, `Header`, `Name`, `Status`, `Payload`, `Result`.                                                       |
+| `PromptInput` | Rich prompt composer with auto-growing multiline input and action bar. Subcomponents: `Root`, `Textarea`, `Actions`, `AttachmentSlot`, `SubmitButton`.                                                                    |
+
+---
+
 ## Providers and hooks
 
 | Export                                                    | What it solves                                                                                                                     |
@@ -226,6 +240,7 @@ both the light and the dark entry of the toolbar theme, and is applied after a
 | `useToast()`                                              | `{ showToast, dismissToast, clearToasts }`.                                                                                        |
 | `useHaptics()`                                            | `{ enabled, feedback }`. A no-op without a provider, so components may call it unconditionally.                                    |
 | `useTabs()` / `useModal()` / `useDialog()` / `useSheet()` | The state of the surrounding composable namespace, for custom parts you write yourself. Each returns `{ state, actions, meta }`.   |
+| `useTraceItem()` / `useCodeBlock()` / `useReasoning()` / `useToolCall()` / `usePromptInput()` | AI Elements state of the surrounding composable namespace. Each returns `{ state, actions, meta }`. |
 | `useNavigationTheme()`                                    | React Navigation theme and screen options derived from the current tokens. Requires `expo-router`.                                 |
 
 ---

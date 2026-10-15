@@ -44,6 +44,18 @@ import {
 	Timeline,
 	Toggle,
 	Tooltip,
+	Slider,
+	StatusDot,
+	TwoStepAction,
+	EdgeFade,
+	GlassSurface,
+	MarqueeText,
+	TransientPill,
+	Trace,
+	CodeBlock,
+	Reasoning,
+	ToolCall,
+	PromptInput,
 	type ChoiceItem,
 	type DataTableSortState,
 	useThemeTokens,
@@ -144,6 +156,9 @@ export default function ComponentE2EScreen() {
 	const [choiceAnswer, setChoiceAnswer] = useState("NONE");
 	const [choiceLoadingId, setChoiceLoadingId] = useState<string | null>(null);
 	const [activityActive, setActivityActive] = useState(true);
+	const [e2eSliderValue, setE2eSliderValue] = useState(0.65);
+	const [e2eConfirmed, setE2eConfirmed] = useState(false);
+	const [e2ePrompt, setE2ePrompt] = useState("Explain React 19 composition patterns");
 
 	return (
 		<Container>
@@ -928,6 +943,160 @@ export default function ComponentE2EScreen() {
 								label={`E2E INLINE ACTIVITY ${activityActive ? "ACTIVE" : "IDLE"}`}
 								testID="e2e-inline-activity-toggled"
 							/>
+						</Card>
+
+						<Card variant="raised" border="subtle" padding="md" style={styles.section}>
+							<Text variant="heading" colorKey="text">
+								E2E V2.0.0 COMPOUND & VISUAL PRIMITIVES
+							</Text>
+
+							{/* Compound Button */}
+							<Button.Root variant="primary" testID="e2e-compound-button">
+								<Button.Icon name="Sparkles" />
+								<Button.Label>COMPOUND BUTTON</Button.Label>
+							</Button.Root>
+
+							{/* Slider */}
+							<View style={{ width: "100%", gap: 6 }}>
+								<Text variant="label" colorKey="textMuted">
+									Slider ({Math.round(e2eSliderValue * 100)}%)
+								</Text>
+								<Slider
+									value={e2eSliderValue}
+									onValueChange={setE2eSliderValue}
+									testID="e2e-slider"
+								/>
+							</View>
+
+							{/* StatusDot */}
+							<View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+								<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+									<StatusDot filled tone="success" pulse testID="e2e-status-dot-pulse" />
+									<Text variant="caption">Online (Pulse)</Text>
+								</View>
+								<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+									<StatusDot filled={false} tone="warning" testID="e2e-status-dot-hollow" />
+									<Text variant="caption">Connecting</Text>
+								</View>
+								<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+									<StatusDot filled tone="danger" testID="e2e-status-dot-offline" />
+									<Text variant="caption">Offline</Text>
+								</View>
+							</View>
+
+							{/* TwoStepAction */}
+							<TwoStepAction
+								label="E2E DELETE SESSION"
+								confirmLabel="TAP AGAIN TO CONFIRM DELETE"
+								detail="This session and 12 tool calls will be deleted."
+								onConfirm={() => setE2eConfirmed(true)}
+								testID="e2e-two-step-action"
+							/>
+							{e2eConfirmed ? (
+								<Text variant="caption" colorKey="danger">
+									Action confirmed!
+								</Text>
+							) : null}
+
+							{/* MarqueeText */}
+							<View style={{ width: 180, overflow: "hidden", borderWidth: 1, borderColor: "#ccc", padding: 4 }}>
+								<MarqueeText testID="e2e-marquee">
+									Long session title that scrolls smoothly on UI thread without truncation
+								</MarqueeText>
+							</View>
+
+							{/* GlassSurface */}
+							<GlassSurface face="floating" style={{ padding: 12, borderRadius: 12 }}>
+								<Text variant="bodySmall">GlassSurface Liquid/Blur Effect</Text>
+							</GlassSurface>
+						</Card>
+
+						<Card variant="raised" border="subtle" padding="md" style={styles.section}>
+							<Text variant="heading" colorKey="text">
+								E2E V2.0.0 SHADCN AI ELEMENTS
+							</Text>
+
+							{/* Reasoning */}
+							<Reasoning.Root durationSeconds={4} isStreaming={false}>
+								<Reasoning.Trigger>
+									<Text variant="label">Thought process</Text>
+								</Reasoning.Trigger>
+								<Reasoning.Content>
+									<Text variant="bodySmall" colorKey="textMuted">
+										1. Inspected requirements and determined composition patterns scale better.
+										2. Decomposed monolithic props into compound components.
+									</Text>
+								</Reasoning.Content>
+							</Reasoning.Root>
+
+							{/* Trace */}
+							<Trace.Root testID="e2e-trace">
+								<Trace.Item status="success">
+									<Trace.Header>
+										<Trace.Title>read_file: package.json</Trace.Title>
+										<Trace.Badge>24ms</Trace.Badge>
+									</Trace.Header>
+									<Trace.Content>
+										<Text variant="caption" colorKey="textMuted">
+											Read 97 lines from disk
+										</Text>
+									</Trace.Content>
+								</Trace.Item>
+								<Trace.Item status="running">
+									<Trace.Header>
+										<Trace.Title>compile_agent_flow</Trace.Title>
+										<Trace.Badge>in flight</Trace.Badge>
+									</Trace.Header>
+								</Trace.Item>
+							</Trace.Root>
+
+							{/* CodeBlock */}
+							<CodeBlock.Root variant="diff" testID="e2e-codeblock">
+								<CodeBlock.Header>
+									<CodeBlock.Title>button.tsx</CodeBlock.Title>
+									<CodeBlock.Actions>
+										<CodeBlock.CopyButton />
+									</CodeBlock.Actions>
+								</CodeBlock.Header>
+								<CodeBlock.Content>
+									<CodeBlock.Line type="delete">- export function Button(props: ButtonProps)</CodeBlock.Line>
+									<CodeBlock.Line type="add">+ export const Button = Object.assign(ButtonRoot, ...)</CodeBlock.Line>
+									<CodeBlock.Line type="normal">  return children;</CodeBlock.Line>
+								</CodeBlock.Content>
+							</CodeBlock.Root>
+
+							{/* ToolCall */}
+							<ToolCall.Root status="success" testID="e2e-toolcall">
+								<ToolCall.Header>
+									<ToolCall.Name>run_command</ToolCall.Name>
+									<ToolCall.Status />
+								</ToolCall.Header>
+								<ToolCall.Payload>
+									<Text variant="caption" colorKey="textMuted">
+										CommandLine: "git status"
+									</Text>
+								</ToolCall.Payload>
+								<ToolCall.Result>
+									<Text variant="caption" colorKey="text">
+										working tree clean
+									</Text>
+								</ToolCall.Result>
+							</ToolCall.Root>
+
+							{/* PromptInput */}
+							<PromptInput.Root
+								testID="e2e-prompt-input"
+								value={e2ePrompt}
+								onValueChange={setE2ePrompt}
+							>
+								<PromptInput.Textarea
+									placeholder="Ask AI anything..."
+								/>
+								<PromptInput.Actions>
+									<PromptInput.AttachmentSlot />
+									<PromptInput.SubmitButton onPress={() => {}} />
+								</PromptInput.Actions>
+							</PromptInput.Root>
 						</Card>
 					</ResponsiveContainer>
 				</KeyboardAwareScrollView>

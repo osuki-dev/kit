@@ -163,6 +163,19 @@ only `KeyboardToolbar` adds theming.
 `KeyboardToolbar` takes `backgroundColor?: string` because the underlying props
 accept no `style`; it replaces the toolbar fill in both colour modes.
 
+### AI Elements
+
+Primitives based on shadcn's 2026-10 AI Elements release for agent execution traces, code/log rendering, reasoning/thought disclosure, tool invocation cards, and prompt composer inputs.
+
+| Component     | Description                          | Parts / Props                                                                  |
+| ------------- | ------------------------------------ | ------------------------------------------------------------------------------ |
+| `Trace`       | Agent execution trace hierarchy      | `Root`, `Item`, `Header`, `Title`, `Badge`, `Content`, `Action`, `status`      |
+| `CodeBlock`   | Code & logs viewer with diff support | `Root`, `Header`, `Title`, `Actions`, `CopyButton`, `Content`, `Line`, `variant` |
+| `Reasoning`   | Thought disclosure component         | `Root`, `Trigger`, `Duration`, `Content`, `durationSeconds`, `isStreaming`    |
+| `ToolCall`    | Tool invocation card                 | `Root`, `Header`, `Name`, `Status`, `Payload`, `Result`                        |
+| `PromptInput` | Rich prompt composer input           | `Root`, `Textarea`, `Actions`, `AttachmentSlot`, `SubmitButton`                |
+
+
 ### Platform Feedback
 
 | Component         | Description          | Props     |

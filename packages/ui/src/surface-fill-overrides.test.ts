@@ -43,6 +43,7 @@ mock.module("react-native", () => ({
 	},
 	Text: "Text",
 	View: "View",
+	Image: "Image",
 	useColorScheme: () => "light",
 	useWindowDimensions: () => ({ width: 390, height: 844, scale: 3, fontScale: 1 }),
 }));
