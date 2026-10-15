@@ -79,3 +79,14 @@ export type {
 	ThemeStorageAdapter,
 } from "./types";
 export * from "./responsive-theme";
+export {
+	SurfaceDecoratorContext,
+	SurfaceDecoratorProvider,
+	useSurfaceDecorator,
+	LRUCache,
+	surfaceColorCache,
+	getCachedTransformedColor,
+	type SurfaceMeta,
+	type SurfaceDecoratorContextValue,
+	type SurfaceDecoratorProviderProps,
+} from "./decorator-context";

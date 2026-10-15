@@ -1,63 +1,148 @@
-import React, { useMemo } from "react";
-import { Pressable, View, type PressableProps, type ViewStyle } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
-import { Text } from "./text";
+import React, { createContext, useContext, useMemo } from "react";
+import {
+	Pressable,
+	StyleSheet,
+	View,
+	type PressableProps,
+	type StyleProp,
+	type ViewProps,
+	type ViewStyle,
+} from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import {
+	getCachedTransformedColor,
+	useSurfaceDecorator,
+	useThemeTokens,
+	type SurfaceMeta,
+} from "../theme";
 import { useHaptics } from "./haptics";
 import { Icon, type IconName } from "./icon";
-import { Spinner } from "./spinner";
+import { Spinner, type SpinnerProps } from "./spinner";
+import { Text, type TextProps } from "./text";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
 
-export interface ButtonProps extends Omit<PressableProps, "style"> {
-	variant?: ButtonVariant;
-	children: string;
-	disabled?: boolean;
-	loading?: boolean;
-	loadingLabel?: string;
-	leftIcon?: IconName;
-	rightIcon?: IconName;
-	style?: ViewStyle;
+export interface ButtonContextValue {
+	variant: ButtonVariant;
+	disabled: boolean;
+	loading: boolean;
+	slot: string;
+	baseColor: string;
+	resolvedBackgroundColor: string;
+	textColor: string;
+	iconColor: string;
+	borderRadius: number;
+	meta: SurfaceMeta;
+}
+
+const ButtonContext = createContext<ButtonContextValue | null>(null);
+
+export function useButton(): ButtonContextValue {
+	const context = useContext(ButtonContext);
+	if (!context) {
+		throw new Error("Button compound components must be used within Button.Root");
+	}
+	return context;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export const Button: React.FC<ButtonProps> = ({
+const styles = StyleSheet.create({
+	baseRoot: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		position: "relative",
+	},
+	background: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+	},
+	contentRow: {
+		minWidth: 0,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	label: {
+		flexShrink: 1,
+		minWidth: 0,
+		textAlign: "center",
+	},
+});
+
+export interface ButtonRootProps extends Omit<PressableProps, "style" | "children"> {
+	variant?: ButtonVariant;
+	disabled?: boolean;
+	loading?: boolean;
+	slot?: string;
+	style?: StyleProp<ViewStyle>;
+	children?: React.ReactNode;
+}
+
+export function ButtonRoot({
 	variant = "primary",
-	children,
 	disabled = false,
 	loading = false,
-	loadingLabel,
-	leftIcon,
-	rightIcon,
+	slot,
 	style,
 	onPressIn,
 	onPressOut,
+	children,
 	...rest
-}) => {
+}: ButtonRootProps) {
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
+	const decorator = useSurfaceDecorator();
 	const pressProgress = useSharedValue(0);
+
 	const button = theme.components.Button;
 	const variantTokens = button[variant];
 	const isDisabled = disabled || loading;
+	const borderRadius = theme.radius[button.radius];
+
+	const backgroundToken = disabled ? "surfaceRaised" : variantTokens.background;
+	const baseColor =
+		backgroundToken === "transparent" ? "transparent" : theme.colors[backgroundToken];
+
+	const resolvedSlot = slot ?? `buttons.${variant}.background`;
+
+	const surfaceMeta: SurfaceMeta = useMemo(
+		() => ({
+			slot: resolvedSlot,
+			variant,
+			baseColor,
+			disabled: isDisabled,
+			borderRadius,
+		}),
+		[resolvedSlot, variant, baseColor, isDisabled, borderRadius],
+	);
+
+	const resolvedBackgroundColor = useMemo(() => {
+		if (decorator?.transformBackground && baseColor !== "transparent") {
+			return getCachedTransformedColor(baseColor, surfaceMeta, decorator.transformBackground);
+		}
+		return baseColor;
+	}, [baseColor, decorator, surfaceMeta]);
+
+	const textColor = disabled ? theme.colors.textDisabled : theme.colors[variantTokens.foreground];
+	const iconColor = loading ? theme.colors.textDisabled : textColor;
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [{ translateY: pressProgress.value }, { scale: 1 - pressProgress.value * 0.012 }],
 	}));
 
-	const buttonStyle = useMemo<ViewStyle>(() => {
-		const backgroundToken = disabled ? "surfaceRaised" : variantTokens.background;
+	const buttonRootStyle = useMemo<ViewStyle>(() => {
 		return {
 			minHeight: button.height,
 			paddingVertical: theme.spacing[button.paddingY],
 			paddingHorizontal: theme.spacing[button.paddingX],
-			borderRadius: theme.radius[button.radius],
-			alignItems: "center",
-			justifyContent: "center",
+			borderRadius,
 			opacity: loading ? 0.68 : 1,
-			backgroundColor:
-				backgroundToken === "transparent" ? "transparent" : theme.colors[backgroundToken],
+			gap: theme.spacing.sm,
 			...(!isDisabled && variantTokens.background !== "transparent" && theme.mode === "light"
 				? theme.shadow.pill
 				: {}),
@@ -67,20 +152,19 @@ export const Button: React.FC<ButtonProps> = ({
 			}),
 		};
 	}, [
-		button,
-		disabled,
+		button.height,
+		button.paddingX,
+		button.paddingY,
+		borderRadius,
 		isDisabled,
 		loading,
 		theme.colors,
 		theme.mode,
-		theme.radius,
 		theme.shadow.pill,
 		theme.spacing,
-		variantTokens,
+		variantTokens.background,
+		variantTokens.border,
 	]);
-
-	const textColor = disabled ? theme.colors.textDisabled : theme.colors[variantTokens.foreground];
-	const iconColor = loading ? theme.colors.textDisabled : textColor;
 
 	const handlePressIn: PressableProps["onPressIn"] = (event) => {
 		if (!isDisabled) {
@@ -103,47 +187,182 @@ export const Button: React.FC<ButtonProps> = ({
 		onPressOut?.(event);
 	};
 
+	const contextValue = useMemo<ButtonContextValue>(
+		() => ({
+			variant,
+			disabled: isDisabled,
+			loading,
+			slot: resolvedSlot,
+			baseColor,
+			resolvedBackgroundColor,
+			textColor,
+			iconColor,
+			borderRadius,
+			meta: surfaceMeta,
+		}),
+		[
+			variant,
+			isDisabled,
+			loading,
+			resolvedSlot,
+			baseColor,
+			resolvedBackgroundColor,
+			textColor,
+			iconColor,
+			borderRadius,
+			surfaceMeta,
+		],
+	);
+
 	return (
-		<AnimatedPressable
-			style={[buttonStyle, animatedStyle, style]}
-			disabled={isDisabled}
-			accessibilityRole="button"
-			accessibilityState={{ disabled: isDisabled, busy: loading }}
-			onPressIn={handlePressIn}
-			onPressOut={handlePressOut}
+		<ButtonContext.Provider value={contextValue}>
+			<AnimatedPressable
+				style={[styles.baseRoot, buttonRootStyle, animatedStyle, style]}
+				disabled={isDisabled}
+				accessibilityRole="button"
+				accessibilityState={{ disabled: isDisabled, busy: loading }}
+				onPressIn={handlePressIn}
+				onPressOut={handlePressOut}
+				{...rest}
+			>
+				{children}
+			</AnimatedPressable>
+		</ButtonContext.Provider>
+	);
+}
+
+export interface ButtonBackgroundProps extends ViewProps {
+	children?: React.ReactNode;
+}
+
+export function ButtonBackground({ style, children, ...props }: ButtonBackgroundProps) {
+	const { resolvedBackgroundColor, borderRadius, meta } = useButton();
+	const decorator = useSurfaceDecorator();
+
+	return (
+		<View
+			collapsable={true}
+			pointerEvents="none"
+			style={[
+				styles.background,
+				{
+					backgroundColor: resolvedBackgroundColor,
+					borderRadius,
+				},
+				style,
+			]}
+			{...props}
+		>
+			{decorator?.renderDecoration?.(meta)}
+			{children}
+		</View>
+	);
+}
+
+export interface ButtonLabelProps extends Omit<TextProps, "children"> {
+	children?: React.ReactNode;
+}
+
+export function ButtonLabel({ style, children, ...props }: ButtonLabelProps) {
+	const { textColor } = useButton();
+	const flattenedStyle = StyleSheet.flatten([styles.label, style]);
+
+	return (
+		<Text
+			variant="button"
+			color={textColor}
+			transform="uppercase"
+			numberOfLines={1}
+			adjustsFontSizeToFit
+			minimumFontScale={0.72}
+			style={flattenedStyle}
+			{...props}
+		>
+			{children}
+		</Text>
+	);
+}
+
+export interface ButtonIconProps {
+	name: IconName;
+	size?: number;
+	color?: string;
+	style?: StyleProp<ViewStyle>;
+}
+
+export function ButtonIcon({ name, size = 17, color, style }: ButtonIconProps) {
+	const { iconColor } = useButton();
+	return <Icon name={name} size={size} color={color ?? iconColor} style={style} />;
+}
+
+export interface ButtonSpinnerProps extends Partial<SpinnerProps> {}
+
+export function ButtonSpinner({ size = "sm", color, testID, ...props }: ButtonSpinnerProps) {
+	const { iconColor } = useButton();
+	return <Spinner size={size} color={color ?? iconColor} testID={testID} {...props} />;
+}
+
+export interface ButtonProps extends Omit<PressableProps, "style"> {
+	variant?: ButtonVariant;
+	children?: React.ReactNode;
+	disabled?: boolean;
+	loading?: boolean;
+	loadingLabel?: string;
+	leftIcon?: IconName;
+	rightIcon?: IconName;
+	slot?: string;
+	style?: ViewStyle;
+}
+
+export function Button({
+	variant = "primary",
+	children,
+	disabled = false,
+	loading = false,
+	loadingLabel,
+	leftIcon,
+	rightIcon,
+	slot,
+	style,
+	onPressIn,
+	onPressOut,
+	...rest
+}: ButtonProps) {
+	const theme = useThemeTokens();
+
+	return (
+		<ButtonRoot
+			variant={variant}
+			disabled={disabled}
+			loading={loading}
+			slot={slot}
+			style={style}
+			onPressIn={onPressIn}
+			onPressOut={onPressOut}
 			{...rest}
 		>
-			<View
-				style={{
-					minWidth: 0,
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "center",
-					gap: theme.spacing.sm,
-				}}
-			>
+			<ButtonBackground />
+			<View style={[styles.contentRow, { gap: theme.spacing.sm }]}>
 				{loading ? (
-					<Spinner
-						size="sm"
-						color={iconColor}
-						testID={rest.testID ? `${rest.testID}-spinner` : undefined}
-					/>
+					<ButtonSpinner testID={rest.testID ? `${rest.testID}-spinner` : undefined} />
 				) : leftIcon ? (
-					<Icon name={leftIcon} size={17} color={iconColor} />
+					<ButtonIcon name={leftIcon} />
 				) : null}
-				<Text
-					variant="button"
-					color={textColor}
-					transform="uppercase"
-					numberOfLines={1}
-					adjustsFontSizeToFit
-					minimumFontScale={0.72}
-					style={{ flexShrink: 1, minWidth: 0, textAlign: "center" }}
-				>
-					{loading && loadingLabel ? loadingLabel : children}
-				</Text>
-				{!loading && rightIcon ? <Icon name={rightIcon} size={17} color={iconColor} /> : null}
+				{typeof children === "string" ? (
+					<ButtonLabel>{loading && loadingLabel ? loadingLabel : children}</ButtonLabel>
+				) : loading && loadingLabel ? (
+					<ButtonLabel>{loadingLabel}</ButtonLabel>
+				) : (
+					children
+				)}
+				{!loading && rightIcon ? <ButtonIcon name={rightIcon} /> : null}
 			</View>
-		</AnimatedPressable>
+		</ButtonRoot>
 	);
-};
+}
+
+Button.Root = ButtonRoot;
+Button.Background = ButtonBackground;
+Button.Label = ButtonLabel;
+Button.Icon = ButtonIcon;
+Button.Spinner = ButtonSpinner;
