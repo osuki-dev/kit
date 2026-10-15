@@ -157,11 +157,7 @@ export interface CodeBlockHeaderProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-export function CodeBlockHeader({
-	children,
-	showTerminalDots,
-	style,
-}: CodeBlockHeaderProps) {
+export function CodeBlockHeader({ children, showTerminalDots, style }: CodeBlockHeaderProps) {
 	const theme = useThemeTokens();
 	const { meta } = useCodeBlock();
 
@@ -173,9 +169,7 @@ export function CodeBlockHeader({
 				styles.header,
 				{
 					borderBottomColor:
-						meta.variant === "terminal" && theme.mode === "light"
-							? "#202836"
-							: theme.colors.border,
+						meta.variant === "terminal" && theme.mode === "light" ? "#202836" : theme.colors.border,
 				},
 				style,
 			]}
@@ -285,11 +279,7 @@ export interface CodeBlockContentProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-export function CodeBlockContent({
-	children,
-	scrollable = true,
-	style,
-}: CodeBlockContentProps) {
+export function CodeBlockContent({ children, scrollable = true, style }: CodeBlockContentProps) {
 	const content = <View style={[styles.contentInner, style]}>{children}</View>;
 
 	if (!scrollable) {
@@ -351,7 +341,16 @@ export function CodeBlockLine({
 					textColor: isTerminal && theme.mode === "light" ? "#FCFBFA" : theme.colors.text,
 				};
 		}
-	}, [isTerminal, meta.variant, theme.colors.danger, theme.colors.success, theme.colors.text, theme.colors.textMuted, theme.mode, type]);
+	}, [
+		isTerminal,
+		meta.variant,
+		theme.colors.danger,
+		theme.colors.success,
+		theme.colors.text,
+		theme.colors.textMuted,
+		theme.mode,
+		type,
+	]);
 
 	return (
 		<View style={[styles.line, { backgroundColor: lineHighlight.bg }, style]}>

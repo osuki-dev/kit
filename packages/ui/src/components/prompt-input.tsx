@@ -141,8 +141,10 @@ export function PromptInputRoot({
 	);
 }
 
-export interface PromptInputTextareaProps
-	extends Omit<TextInputProps, "value" | "onChangeText" | "multiline" | "style"> {
+export interface PromptInputTextareaProps extends Omit<
+	TextInputProps,
+	"value" | "onChangeText" | "multiline" | "style"
+> {
 	minRows?: number;
 	maxRows?: number;
 	minHeight?: number;
@@ -333,15 +335,18 @@ export function PromptInputSubmitButton({
 			]}
 		>
 			{meta.loading ? (
-				<Spinner size="sm" color={isDisabled ? theme.colors.textDisabled : theme.colors.onPrimary} />
+				<Spinner
+					size="sm"
+					color={isDisabled ? theme.colors.textDisabled : theme.colors.onPrimary}
+				/>
 			) : (
-				children ?? (
+				(children ?? (
 					<Icon
 						name="ArrowUp"
 						size={16}
 						color={isDisabled ? theme.colors.textDisabled : theme.colors.onPrimary}
 					/>
-				)
+				))
 			)}
 		</Pressable>
 	);

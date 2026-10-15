@@ -215,33 +215,33 @@ both the light and the dark entry of the toolbar theme, and is applied after a
 
 Agentic UI primitives based on shadcn's 2026-10 AI Elements release and Vercel Composition Patterns.
 
-| Component     | What it solves                                                                                                                                                                                              |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Component     | What it solves                                                                                                                                                                                                                          |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Trace`       | Execution trace hierarchy with step status (`pending`, `running`, `success`, `error`), animated pulsing indicator for `running`, collapsible steps, and subcomponents: `Root`, `Item`, `Header`, `Title`, `Badge`, `Content`, `Action`. |
-| `CodeBlock`   | Code & logs viewer with variants (`default`, `diff`, `terminal`, `compact`), diff line highlights (`add`, `delete`, `normal`), copy button, and subcomponents: `Root`, `Header`, `Title`, `Actions`, `CopyButton`, `Content`, `Line`.    |
-| `Reasoning`   | Thought disclosure accordion with `durationSeconds`, streaming pulse/indicator, and subcomponents: `Root`, `Trigger`, `Duration`, `Content`.                                                               |
-| `ToolCall`    | Tool invocation card with collapsible input parameters and results, status pill, and subcomponents: `Root`, `Header`, `Name`, `Status`, `Payload`, `Result`.                                                       |
-| `PromptInput` | Rich prompt composer with auto-growing multiline input and action bar. Subcomponents: `Root`, `Textarea`, `Actions`, `AttachmentSlot`, `SubmitButton`.                                                                    |
+| `CodeBlock`   | Code & logs viewer with variants (`default`, `diff`, `terminal`, `compact`), diff line highlights (`add`, `delete`, `normal`), copy button, and subcomponents: `Root`, `Header`, `Title`, `Actions`, `CopyButton`, `Content`, `Line`.   |
+| `Reasoning`   | Thought disclosure accordion with `durationSeconds`, streaming pulse/indicator, and subcomponents: `Root`, `Trigger`, `Duration`, `Content`.                                                                                            |
+| `ToolCall`    | Tool invocation card with collapsible input parameters and results, status pill, and subcomponents: `Root`, `Header`, `Name`, `Status`, `Payload`, `Result`.                                                                            |
+| `PromptInput` | Rich prompt composer with auto-growing multiline input and action bar. Subcomponents: `Root`, `Textarea`, `Actions`, `AttachmentSlot`, `SubmitButton`.                                                                                  |
 
 ---
 
 ## Providers and hooks
 
-| Export                                                    | What it solves                                                                                                                     |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `ThemeProvider`                                           | Supplies tokens and colour mode. Required. Props: `mode`, `defaultMode`, `theme`, `storageAdapter`, `storageKey`.                  |
-| `FontLoader`                                              | Loads app-owned font files before the theme maps them onto roles. Props: `fonts`, `fallback`.                                      |
-| `ToastProvider`                                           | Required before `useToast()`.                                                                                                      |
-| `HapticsProvider`                                         | Opts the whole app into haptics once. Props: `enabled`, `feedback`.                                                                |
-| `useThemeTokens()`                                        | Tokens only. The hook to use inside a component, because it does not re-render on mode-action identity changes.                    |
-| `useThemeMode()`                                          | `{ mode, resolvedMode, setMode, toggleMode }`.                                                                                     |
-| `useTheme()`                                              | Both of the above merged. For settings screens and app shells.                                                                     |
-| `useResponsiveTheme()`                                    | `{ breakpoint, isMobile, isTablet, isDesktop, isLandscape, containerMaxWidth, pagePadding, gridColumns, gap, formMaxWidth, ... }`. |
-| `useToast()`                                              | `{ showToast, dismissToast, clearToasts }`.                                                                                        |
-| `useHaptics()`                                            | `{ enabled, feedback }`. A no-op without a provider, so components may call it unconditionally.                                    |
-| `useTabs()` / `useModal()` / `useDialog()` / `useSheet()` | The state of the surrounding composable namespace, for custom parts you write yourself. Each returns `{ state, actions, meta }`.   |
-| `useTraceItem()` / `useCodeBlock()` / `useReasoning()` / `useToolCall()` / `usePromptInput()` | AI Elements state of the surrounding composable namespace. Each returns `{ state, actions, meta }`. |
-| `useNavigationTheme()`                                    | React Navigation theme and screen options derived from the current tokens. Requires `expo-router`.                                 |
+| Export                                                                                        | What it solves                                                                                                                     |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `ThemeProvider`                                                                               | Supplies tokens and colour mode. Required. Props: `mode`, `defaultMode`, `theme`, `storageAdapter`, `storageKey`.                  |
+| `FontLoader`                                                                                  | Loads app-owned font files before the theme maps them onto roles. Props: `fonts`, `fallback`.                                      |
+| `ToastProvider`                                                                               | Required before `useToast()`.                                                                                                      |
+| `HapticsProvider`                                                                             | Opts the whole app into haptics once. Props: `enabled`, `feedback`.                                                                |
+| `useThemeTokens()`                                                                            | Tokens only. The hook to use inside a component, because it does not re-render on mode-action identity changes.                    |
+| `useThemeMode()`                                                                              | `{ mode, resolvedMode, setMode, toggleMode }`.                                                                                     |
+| `useTheme()`                                                                                  | Both of the above merged. For settings screens and app shells.                                                                     |
+| `useResponsiveTheme()`                                                                        | `{ breakpoint, isMobile, isTablet, isDesktop, isLandscape, containerMaxWidth, pagePadding, gridColumns, gap, formMaxWidth, ... }`. |
+| `useToast()`                                                                                  | `{ showToast, dismissToast, clearToasts }`.                                                                                        |
+| `useHaptics()`                                                                                | `{ enabled, feedback }`. A no-op without a provider, so components may call it unconditionally.                                    |
+| `useTabs()` / `useModal()` / `useDialog()` / `useSheet()`                                     | The state of the surrounding composable namespace, for custom parts you write yourself. Each returns `{ state, actions, meta }`.   |
+| `useTraceItem()` / `useCodeBlock()` / `useReasoning()` / `useToolCall()` / `usePromptInput()` | AI Elements state of the surrounding composable namespace. Each returns `{ state, actions, meta }`.                                |
+| `useNavigationTheme()`                                                                        | React Navigation theme and screen options derived from the current tokens. Requires `expo-router`.                                 |
 
 ---
 

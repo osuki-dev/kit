@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { useThemeTokens } from "../theme";
 
-const isDev = typeof __DEV__ !== "undefined" ? Boolean(__DEV__) : process.env.NODE_ENV !== "production";
+const isDev =
+	typeof __DEV__ !== "undefined" ? Boolean(__DEV__) : process.env.NODE_ENV !== "production";
 
 /**
  * Direction names for directional icons (e.g. arrows, chevrons, indicators).
@@ -450,14 +451,11 @@ export const IconCustom: React.FC<IconCustomProps> = ({
 	const color = propColor ?? context?.inheritedColor ?? colors.text;
 	const strokeWidth = propStrokeWidth ?? context?.inheritedStrokeWidth ?? iconography.strokeWidth;
 	const direction = propDirection ?? context?.inheritedDirection;
-	const renderMode = propRenderMode ?? context?.inheritedRenderMode ?? context?.renderMode ?? "template";
+	const renderMode =
+		propRenderMode ?? context?.inheritedRenderMode ?? context?.renderMode ?? "template";
 
 	const resolvedColor =
-		renderMode === "original"
-			? undefined
-			: typeof color === "string"
-				? color
-				: colors.text;
+		renderMode === "original" ? undefined : typeof color === "string" ? color : colors.text;
 
 	const renderProps: IconRenderProps = {
 		size,
@@ -568,17 +566,12 @@ export const IconGlyph: React.FC<IconGlyphProps> = ({
 	const color = propColor ?? context?.inheritedColor ?? colors.text;
 	const strokeWidth = propStrokeWidth ?? context?.inheritedStrokeWidth ?? iconography.strokeWidth;
 	const direction = propDirection ?? context?.inheritedDirection;
-	const sourceDirection =
-		propSourceDirection ?? context?.sourceDirections?.[name] ?? "up";
+	const sourceDirection = propSourceDirection ?? context?.sourceDirections?.[name] ?? "up";
 	const renderMode =
 		propRenderMode ?? context?.inheritedRenderMode ?? context?.renderMode ?? "template";
 
 	const resolvedColor =
-		renderMode === "original"
-			? undefined
-			: typeof color === "string"
-				? color
-				: colors.text;
+		renderMode === "original" ? undefined : typeof color === "string" ? color : colors.text;
 
 	const deg = calculateIconRotation(direction, sourceDirection);
 
@@ -856,8 +849,7 @@ export interface NanoIconConfig {
 	sourceDirection?: IconDirection;
 }
 
-export interface NanoIconProps<TName extends string = string>
-	extends Omit<ViewProps, "children"> {
+export interface NanoIconProps<TName extends string = string> extends Omit<ViewProps, "children"> {
 	name: TName;
 	size?: number;
 	color?: ColorValue | ColorValue[];
@@ -868,8 +860,9 @@ export interface NanoIconProps<TName extends string = string>
 	strokeWidth?: number;
 }
 
-export interface NanoIconComponent<TName extends string = string>
-	extends React.FC<NanoIconProps<TName>> {
+export interface NanoIconComponent<TName extends string = string> extends React.FC<
+	NanoIconProps<TName>
+> {
 	glyphMap: NanoIconGlyphMap;
 	fontFamily: string;
 	hasIcon: (name: string) => boolean;
@@ -906,11 +899,7 @@ export function createNanoIconSet<TName extends string = string>(
 			: (configOrFontFamily ?? {});
 
 	const fontFamily =
-		config.fontFamily ??
-		glyphMap?.m?.f ??
-		glyphMap?.fontFamily ??
-		glyphMap?.name ??
-		"nano-icons";
+		config.fontFamily ?? glyphMap?.m?.f ?? glyphMap?.fontFamily ?? glyphMap?.name ?? "nano-icons";
 
 	const glyphs = glyphMap?.g ?? glyphMap?.glyphs ?? glyphMap ?? {};
 
@@ -944,11 +933,7 @@ export function createNanoIconSet<TName extends string = string>(
 
 		const defaultColor = colors.text;
 		const resolvedColor =
-			renderMode === "original"
-				? undefined
-				: typeof color === "string"
-					? color
-					: defaultColor;
+			renderMode === "original" ? undefined : typeof color === "string" ? color : defaultColor;
 
 		// Delegate to native component if available
 		if (NativeNanoIcon) {
@@ -967,12 +952,7 @@ export function createNanoIconSet<TName extends string = string>(
 					accessible={viewProps.accessible ?? false}
 					{...viewProps}
 				>
-					<NativeNanoIcon
-						name={name}
-						size={size}
-						color={resolvedColor}
-						tintMode={tintMode}
-					/>
+					<NativeNanoIcon name={name} size={size} color={resolvedColor} tintMode={tintMode} />
 				</View>
 			);
 		}

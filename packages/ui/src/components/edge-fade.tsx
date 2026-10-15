@@ -23,13 +23,7 @@ export interface EdgeFadeProps {
  * Renders a soft gradient edge indicator for scroll regions using native
  * CSS linear-gradient background.
  */
-export const EdgeFade: React.FC<EdgeFadeProps> = ({
-	edge,
-	color,
-	size = 24,
-	style,
-	testID,
-}) => {
+export const EdgeFade: React.FC<EdgeFadeProps> = ({ edge, color, size = 24, style, testID }) => {
 	const horizontal = edge === "left" || edge === "right";
 	const direction = horizontal ? "to right" : "to bottom";
 	const isOpening = edge === "top" || edge === "left";

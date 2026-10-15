@@ -434,15 +434,6 @@ export { Slider, type SliderProps } from "./slider";
 export { StatusDot, type StatusDotProps, type StatusDotTone } from "./status-dot";
 export { TwoStepAction, type TwoStepActionProps } from "./two-step-action";
 export { EdgeFade, type EdgeFadeProps, type EdgeFadeSide } from "./edge-fade";
-export {
-	GlassSurface,
-	type GlassSurfaceFace,
-	type GlassSurfaceProps,
-} from "./glass-surface";
+export { GlassSurface, type GlassSurfaceFace, type GlassSurfaceProps } from "./glass-surface";
 export { MarqueeText, type MarqueeTextProps } from "./marquee-text";
-export {
-	TransientPill,
-	type TransientPillProps,
-	type TransientPillTone,
-} from "./transient-pill";
-
+export { TransientPill, type TransientPillProps, type TransientPillTone } from "./transient-pill";

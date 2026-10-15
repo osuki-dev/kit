@@ -30,7 +30,8 @@ mock.module("react-native", () => ({
 		absoluteFill: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 },
 		absoluteFillObject: {},
 		create: (styles: unknown) => styles,
-		flatten: (styles: unknown) => (Array.isArray(styles) ? Object.assign({}, ...styles) : styles ?? {}),
+		flatten: (styles: unknown) =>
+			Array.isArray(styles) ? Object.assign({}, ...styles) : (styles ?? {}),
 		hairlineWidth: 0.5,
 	},
 	Text: "Text",
@@ -85,7 +86,6 @@ mock.module("expo-router/react-navigation", () => ({
 	DarkTheme: { dark: true, colors: {}, fonts: {} },
 	DefaultTheme: { dark: false, colors: {}, fonts: {} },
 }));
-
 
 const React = (await import("react")).default;
 const { Slider } = await import("./components/slider");
@@ -206,7 +206,6 @@ test("MarqueeText renders single-line scrolling component", () => {
 	});
 	assert.ok(marquee);
 });
-
 
 test("TransientPill renders floating indicator badge", () => {
 	const pill = React.createElement(TransientPill, {

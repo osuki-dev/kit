@@ -161,19 +161,16 @@ test("Compound icon parts and primary Icon component", () => {
 
 test("IconProvider injects custom resolvers and passes through", () => {
 	let customResolverInvoked = false;
-	const provider = React.createElement(
-		IconProvider,
-		{
-			resolve: (name: string) => {
-				if (name === "chrome.scan") {
-					customResolverInvoked = true;
-					return React.createElement("View", { testID: "custom-scan" });
-				}
-				return null;
-			},
-			children: React.createElement(Icon, { name: "chrome.scan" }),
+	const provider = React.createElement(IconProvider, {
+		resolve: (name: string) => {
+			if (name === "chrome.scan") {
+				customResolverInvoked = true;
+				return React.createElement("View", { testID: "custom-scan" });
+			}
+			return null;
 		},
-	);
+		children: React.createElement(Icon, { name: "chrome.scan" }),
+	});
 	assert.ok(provider);
 	assert.equal(customResolverInvoked, false);
 });

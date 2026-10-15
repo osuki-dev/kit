@@ -90,7 +90,10 @@ export const Slider: React.FC<SliderProps> = ({
 	const clampedMin = Math.min(minimumValue, maximumValue);
 	const clampedMax = Math.max(minimumValue, maximumValue);
 	const range = clampedMax - clampedMin || 1;
-	const clampedValue = Math.min(clampedMax, Math.max(clampedMin, Number.isFinite(value) ? value : clampedMin));
+	const clampedValue = Math.min(
+		clampedMax,
+		Math.max(clampedMin, Number.isFinite(value) ? value : clampedMin),
+	);
 
 	// iOS SwiftUI native implementation
 	const draftRef = useRef(clampedValue);
@@ -141,7 +144,10 @@ export const Slider: React.FC<SliderProps> = ({
 					changedRef.current = true;
 					onValueChange?.(next);
 				},
-				onPanResponderMove: (evt: GestureResponderEvent, _gestureState: PanResponderGestureState) => {
+				onPanResponderMove: (
+					evt: GestureResponderEvent,
+					_gestureState: PanResponderGestureState,
+				) => {
 					if (disabled) return;
 					const next = calculateValueFromPageX(evt.nativeEvent.pageX);
 					draftRef.current = next;
@@ -169,7 +175,10 @@ export const Slider: React.FC<SliderProps> = ({
 		const percentage = Math.round(((clampedValue - clampedMin) / range) * 100);
 		return (
 			<Host
-				style={StyleSheet.flatten([{ height: 44, alignSelf: "stretch", justifyContent: "center" }, style])}
+				style={StyleSheet.flatten([
+					{ height: 44, alignSelf: "stretch", justifyContent: "center" },
+					style,
+				])}
 				colorScheme={theme.mode}
 				ignoreSafeArea="all"
 				layoutDirection={I18nManager.isRTL ? "rightToLeft" : "leftToRight"}

@@ -131,16 +131,7 @@ export function CardRoot({
 				borderRadius,
 			},
 		}),
-		[
-			variant,
-			border,
-			radius,
-			padding,
-			slot,
-			baseColor,
-			resolvedBackgroundColor,
-			borderRadius,
-		],
+		[variant, border, radius, padding, slot, baseColor, resolvedBackgroundColor, borderRadius],
 	);
 
 	return (

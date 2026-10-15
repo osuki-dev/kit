@@ -13,7 +13,21 @@ const componentDocs = read("docs/ui/components.md");
 const packageReadme = read("packages/ui/README.md");
 
 // Compound children are documented under their parent, not as separate entries.
-const compoundParents = ["Dialog", "Modal", "Sheet", "Tabs"];
+const compoundParents = [
+	"Dialog",
+	"Modal",
+	"Sheet",
+	"Tabs",
+	"Button",
+	"Card",
+	"Surface",
+	"Icon",
+	"CodeBlock",
+	"PromptInput",
+	"Reasoning",
+	"ToolCall",
+	"Trace",
+];
 const isCompoundChild = (name: string) =>
 	compoundParents.some(
 		(parent) => name !== parent && name !== `${parent}s` && name.startsWith(parent),
@@ -35,6 +49,8 @@ function exportedComponents(source: string) {
 					.pop()
 					?.trim() ?? "";
 			if (!/^[A-Z]/.test(name)) continue;
+			// Ignore SCREAMING_SNAKE_CASE constants and Context objects
+			if (/^[A-Z0-9_]+$/.test(name) || name.endsWith("Context")) continue;
 			if (isCompoundChild(name)) continue;
 			names.add(name);
 		}

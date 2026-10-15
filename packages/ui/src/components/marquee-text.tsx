@@ -1,10 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import {
-	StyleSheet,
-	View,
-	type LayoutChangeEvent,
-	type TextStyle,
-} from "react-native";
+import { StyleSheet, View, type LayoutChangeEvent, type TextStyle } from "react-native";
 import Animated, {
 	Easing,
 	cancelAnimation,
@@ -107,11 +102,7 @@ export const MarqueeText: React.FC<MarqueeTextProps> = memo(function MarqueeText
 	return (
 		<View testID={testID} style={styles.box} onLayout={onBoxLayout}>
 			<Animated.View style={[styles.track, travelAnimatedStyle]}>
-				<Text
-					numberOfLines={1}
-					style={resolvedLineStyle}
-					onLayout={onLineLayout}
-				>
+				<Text numberOfLines={1} style={resolvedLineStyle} onLayout={onLineLayout}>
 					{children}
 				</Text>
 			</Animated.View>

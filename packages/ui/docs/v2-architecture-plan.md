@@ -4,6 +4,7 @@ The comprehensive architecture specification and execution plan is documented in
 [v2-composition-theming-architecture.md](../../docs/specs/v2-composition-theming-architecture.md)
 
 ### Key Summary
+
 - **Version**: 2.0.0 (Full Rearchitecture)
 - **Branch**: `feat/composition-theming-icons` in `/home/ryu/Work/kit`
 - **Core Pillars**:

@@ -32,7 +32,8 @@ mock.module("react-native", () => ({
 		absoluteFill: {},
 		absoluteFillObject: {},
 		create: (styles: unknown) => styles,
-		flatten: (styles: unknown) => (Array.isArray(styles) ? Object.assign({}, ...styles) : styles ?? {}),
+		flatten: (styles: unknown) =>
+			Array.isArray(styles) ? Object.assign({}, ...styles) : (styles ?? {}),
 		hairlineWidth: 1,
 	},
 	Text: "Text",
@@ -75,34 +76,14 @@ mock.module("expo-router/react-navigation", () => ({
 
 const React = (await import("react")).default;
 const { defaultTheme } = await import("./theme");
-const {
-	Button,
-	ButtonRoot,
-	ButtonBackground,
-	ButtonLabel,
-	ButtonIcon,
-	ButtonSpinner,
-} = await import("./components/button");
-const {
-	Card,
-	CardRoot,
-	CardBackground,
-	CardHeader,
-	CardContent,
-	CardFooter,
-} = await import("./components/card");
-const {
-	Surface,
-	SurfaceRoot,
-	SurfaceBackground,
-	SurfaceContent,
-} = await import("./components/surface");
-const {
-	SurfaceDecoratorProvider,
-	useSurfaceDecorator,
-	LRUCache,
-	getCachedTransformedColor,
-} = await import("./theme/decorator-context");
+const { Button, ButtonRoot, ButtonBackground, ButtonLabel, ButtonIcon, ButtonSpinner } =
+	await import("./components/button");
+const { Card, CardRoot, CardBackground, CardHeader, CardContent, CardFooter } =
+	await import("./components/card");
+const { Surface, SurfaceRoot, SurfaceBackground, SurfaceContent } =
+	await import("./components/surface");
+const { SurfaceDecoratorProvider, useSurfaceDecorator, LRUCache, getCachedTransformedColor } =
+	await import("./theme/decorator-context");
 
 test("LRUCache stores, retrieves, refreshes and evicts", () => {
 	const cache = new LRUCache<string, number>(2);
@@ -176,17 +157,14 @@ test("Button exposes compound subcomponents and functions as facade", () => {
 test("SurfaceDecoratorContext provides decorator value to consumers", () => {
 	const decoration = React.createElement("mock-decoration");
 	let inspectedSlot = "";
-	const provider = React.createElement(
-		SurfaceDecoratorProvider,
-		{
-			children: React.createElement(Consumer),
-			transformBackground: (_base: string, meta: { slot?: string }) => {
-				inspectedSlot = meta.slot ?? "";
-				return "#FF0000";
-			},
-			renderDecoration: () => decoration,
+	const provider = React.createElement(SurfaceDecoratorProvider, {
+		children: React.createElement(Consumer),
+		transformBackground: (_base: string, meta: { slot?: string }) => {
+			inspectedSlot = meta.slot ?? "";
+			return "#FF0000";
 		},
-	);
+		renderDecoration: () => decoration,
+	});
 
 	function Consumer() {
 		const decorator = useSurfaceDecorator();

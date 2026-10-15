@@ -212,7 +212,11 @@ export function ReasoningDuration({ children, style }: ReasoningDurationProps) {
 	const { meta } = useReasoning();
 
 	if (children !== undefined) {
-		return <RNText style={[styles.durationText, { color: theme.colors.textSubtle }, style]}>{children}</RNText>;
+		return (
+			<RNText style={[styles.durationText, { color: theme.colors.textSubtle }, style]}>
+				{children}
+			</RNText>
+		);
 	}
 
 	if (meta.isStreaming) {
