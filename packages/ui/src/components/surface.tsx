@@ -147,13 +147,7 @@ export interface SurfaceProps extends ViewProps {
 	slot?: string;
 }
 
-export function Surface({
-	variant = "surface",
-	slot,
-	style,
-	children,
-	...props
-}: SurfaceProps) {
+export function Surface({ variant = "surface", slot, style, children, ...props }: SurfaceProps) {
 	return (
 		<SurfaceRoot variant={variant} slot={slot} style={style} {...props}>
 			<SurfaceBackground />

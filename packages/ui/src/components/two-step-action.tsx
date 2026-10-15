@@ -155,9 +155,7 @@ export const TwoStepAction: React.FC<TwoStepActionProps> = memo(function TwoStep
 			testID={testID}
 			accessibilityRole="button"
 			accessibilityLabel={
-				isArmed
-					? (confirmAccessibilityLabel ?? confirmLabel)
-					: (accessibilityLabel ?? label)
+				isArmed ? (confirmAccessibilityLabel ?? confirmLabel) : (accessibilityLabel ?? label)
 			}
 			accessibilityHint={isArmed ? detail : undefined}
 			accessibilityState={{ disabled, expanded: isArmed }}
@@ -216,11 +214,7 @@ export const TwoStepAction: React.FC<TwoStepActionProps> = memo(function TwoStep
 			) : null}
 			<Animated.View
 				pointerEvents="none"
-				style={[
-					styles.drain,
-					{ backgroundColor: theme.colors.danger },
-					drainStyle,
-				]}
+				style={[styles.drain, { backgroundColor: theme.colors.danger }, drainStyle]}
 			/>
 		</PressableScale>
 	);

@@ -7,6 +7,7 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `Button`: primary action control. `variant` selects
   `"primary" | "secondary" | "ghost" | "destructive"`; `loading` is an
   orthogonal state and does not change the variant.
+- `TwoStepAction`: double-tap inline confirmation control with animated drain timer bar.
 
 ## Forms
 
@@ -26,6 +27,8 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `FieldGroup`: shared label, helper, required, and error wrapper.
 - `Toggle`: binary control.
 - `SegmentedControl`: compact choice between a small set of options.
+- `Slider`: continuous range slider with native SwiftUI on iOS and gesture PanResponder fallback on Android/Web.
+- `PromptInput`: compound AI composer. Compose `PromptInput.Root`, `PromptInput.Textarea`, `PromptInput.Actions`, and `PromptInput.SubmitButton`.
 - `Tabs`: compound page or section switching with underline and pill variants.
   Compose `Tabs.Root`, `Tabs.List`, `Tabs.Trigger`, `Tabs.Label`, and optional
   `Tabs.Badge`; shared context exposes stable `state`, `actions`, and `meta`.
@@ -53,8 +56,12 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `ErrorView`: reusable failure state with optional retry action.
 - `Badge` and `Tag`: compact metadata and status labels; Badge uses the explicit
   `display="label" | "dot"` presentation.
+- `StatusDot`: animated status indicator with pulse ripple animations and tone variants.
 - `ProgressBar`: continuous progress indicator with explicit `valueDisplay` and
   `shape` variants.
+- `Trace`: execution chain tree for agent workflows (`Trace.Root`, `Trace.Item`, `Trace.Badge`).
+- `ToolCall`: agent function execution card (`ToolCall.Root`, `ToolCall.Payload`, `ToolCall.Result`).
+- `Reasoning`: thought process accordion drawer (`Reasoning.Root`, `Reasoning.Trigger`, `Reasoning.Content`).
 
 ## Overlays
 
@@ -103,6 +110,11 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `MetricCard`
 - `Avatar`, `AvatarGroup`, `Image`, `Icon`
 - `Text`: uses explicit `transform`, `overflowMode`, and `marqueePlayback` modes.
+- `MarqueeText`: hardware-accelerated auto-scrolling single-line text for overflowing titles.
+- `EdgeFade`: directional linear-gradient mask for scrollable boundaries.
+- `GlassSurface`: multi-tier adaptive glass container (Apple Liquid Glass -> blur -> translucent view).
+- `TransientPill`: anchored floating indicator badge.
+- `CodeBlock`: syntax-highlighted code viewer with diff line support, terminal mode, and copy action.
 - `Toolbar`
 
 ## Keyboard

@@ -90,6 +90,7 @@ version installed:
 | `EmptyState`    | Reusable no-data state               | `title`, `message`, `actionLabel`       |
 | `ErrorView`     | Reusable failure state               | `message`, `onRetry`                    |
 | `LoadingView`   | Full-section loading state           | `label`, `size`                         |
+| `TwoStepAction` | Double-tap inline confirmation       | `label`, `confirmLabel`, `onConfirm`    |
 
 ### Data Display
 
@@ -116,6 +117,9 @@ version installed:
 | `ChoiceList`           | Pickable option list      | `items`, `onSelect`, `loadingId`                    |
 | `Divider`              | Visual separator          | `variant` (full/inset/middle)                       |
 | `Image`                | Cached remote/local image | `source`, `contentFit`, `cachePolicy`, `transition` |
+| `StatusDot`            | Pulse and tone dot        | `tone`, `variant`, `size`                           |
+| `MarqueeText`          | Auto-scrolling title text | `children`, `speed`, `spacing`                      |
+| `TransientPill`        | Anchored floating badge   | `label`, `tone`, `visible`                          |
 
 ### Form Controls
 
@@ -134,6 +138,7 @@ version installed:
 | `Textarea`         | Notes and messages    | `label`, `error`, `helper`     |
 | `SearchInput`      | Search/filter input   | `value`, `onChangeText`        |
 | `Tabs`             | Section switching     | `Root`, `List`, `Trigger`      |
+| `Slider`           | Continuous range      | `value`, `onValueChange`       |
 
 ### Layout
 
@@ -146,6 +151,8 @@ version installed:
 | `Pagination`          | Page controls     | `page`, `pageCount`, `onPageChange`       |
 | `PressableCard`       | Tappable card     | `variant` (default/raised/flat), `border` |
 | `PressableScale`      | Press-dip target  | `pressedScale`, `feedback`                |
+| `EdgeFade`            | Boundary fade     | `edge`, `size`, `color`                   |
+| `GlassSurface`        | Adaptive glass    | `variant`, `blurIntensity`                |
 
 ### Keyboard
 
@@ -167,14 +174,13 @@ accept no `style`; it replaces the toolbar fill in both colour modes.
 
 Primitives based on shadcn's 2026-10 AI Elements release for agent execution traces, code/log rendering, reasoning/thought disclosure, tool invocation cards, and prompt composer inputs.
 
-| Component     | Description                          | Parts / Props                                                                  |
-| ------------- | ------------------------------------ | ------------------------------------------------------------------------------ |
-| `Trace`       | Agent execution trace hierarchy      | `Root`, `Item`, `Header`, `Title`, `Badge`, `Content`, `Action`, `status`      |
+| Component     | Description                          | Parts / Props                                                                    |
+| ------------- | ------------------------------------ | -------------------------------------------------------------------------------- |
+| `Trace`       | Agent execution trace hierarchy      | `Root`, `Item`, `Header`, `Title`, `Badge`, `Content`, `Action`, `status`        |
 | `CodeBlock`   | Code & logs viewer with diff support | `Root`, `Header`, `Title`, `Actions`, `CopyButton`, `Content`, `Line`, `variant` |
-| `Reasoning`   | Thought disclosure component         | `Root`, `Trigger`, `Duration`, `Content`, `durationSeconds`, `isStreaming`    |
-| `ToolCall`    | Tool invocation card                 | `Root`, `Header`, `Name`, `Status`, `Payload`, `Result`                        |
-| `PromptInput` | Rich prompt composer input           | `Root`, `Textarea`, `Actions`, `AttachmentSlot`, `SubmitButton`                |
-
+| `Reasoning`   | Thought disclosure component         | `Root`, `Trigger`, `Duration`, `Content`, `durationSeconds`, `isStreaming`       |
+| `ToolCall`    | Tool invocation card                 | `Root`, `Header`, `Name`, `Status`, `Payload`, `Result`                          |
+| `PromptInput` | Rich prompt composer input           | `Root`, `Textarea`, `Actions`, `AttachmentSlot`, `SubmitButton`                  |
 
 ### Platform Feedback
 

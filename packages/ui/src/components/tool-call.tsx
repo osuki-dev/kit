@@ -98,12 +98,10 @@ export function ToolCallRoot({
 	const theme = useThemeTokens();
 
 	const [uncontrolledExpanded, setUncontrolledExpanded] = useState(defaultExpanded);
-	const [uncontrolledPayloadExpanded, setUncontrolledPayloadExpanded] = useState(
-		defaultPayloadExpanded,
-	);
-	const [uncontrolledResultExpanded, setUncontrolledResultExpanded] = useState(
-		defaultResultExpanded,
-	);
+	const [uncontrolledPayloadExpanded, setUncontrolledPayloadExpanded] =
+		useState(defaultPayloadExpanded);
+	const [uncontrolledResultExpanded, setUncontrolledResultExpanded] =
+		useState(defaultResultExpanded);
 
 	const controlled = controlledExpanded !== undefined;
 	const expanded = controlled ? controlledExpanded : uncontrolledExpanded;
@@ -114,9 +112,7 @@ export function ToolCallRoot({
 			: uncontrolledPayloadExpanded;
 
 	const resultExpanded =
-		controlledResultExpanded !== undefined
-			? controlledResultExpanded
-			: uncontrolledResultExpanded;
+		controlledResultExpanded !== undefined ? controlledResultExpanded : uncontrolledResultExpanded;
 
 	const setExpanded = useCallback(
 		(nextExpanded: boolean) => {
@@ -423,10 +419,7 @@ export function ToolCallPayload({
 				>
 					{typeof children === "string" ? (
 						<RNText
-							style={[
-								styles.codeText,
-								{ color: theme.colors.text, fontFamily: monospaceFont },
-							]}
+							style={[styles.codeText, { color: theme.colors.text, fontFamily: monospaceFont }]}
 						>
 							{children}
 						</RNText>

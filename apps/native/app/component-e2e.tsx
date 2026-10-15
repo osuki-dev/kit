@@ -999,7 +999,15 @@ export default function ComponentE2EScreen() {
 							) : null}
 
 							{/* MarqueeText */}
-							<View style={{ width: 180, overflow: "hidden", borderWidth: 1, borderColor: "#ccc", padding: 4 }}>
+							<View
+								style={{
+									width: 180,
+									overflow: "hidden",
+									borderWidth: 1,
+									borderColor: "#ccc",
+									padding: 4,
+								}}
+							>
 								<MarqueeText testID="e2e-marquee">
 									Long session title that scrolls smoothly on UI thread without truncation
 								</MarqueeText>
@@ -1009,6 +1017,26 @@ export default function ComponentE2EScreen() {
 							<GlassSurface face="floating" style={{ padding: 12, borderRadius: 12 }}>
 								<Text variant="bodySmall">GlassSurface Liquid/Blur Effect</Text>
 							</GlassSurface>
+
+							{/* EdgeFade */}
+							<View
+								style={{
+									height: 40,
+									position: "relative",
+									backgroundColor: "#eee",
+									justifyContent: "center",
+									paddingHorizontal: 12,
+								}}
+							>
+								<Text variant="caption">Scrollable content with EdgeFade</Text>
+								<EdgeFade edge="left" size={20} color="#eeeeee" />
+								<EdgeFade edge="right" size={20} color="#eeeeee" />
+							</View>
+
+							{/* TransientPill */}
+							<View style={{ position: "relative", padding: 8 }}>
+								<TransientPill label="New feature" tone="primary" />
+							</View>
 						</Card>
 
 						<Card variant="raised" border="subtle" padding="md" style={styles.section}>
@@ -1023,8 +1051,8 @@ export default function ComponentE2EScreen() {
 								</Reasoning.Trigger>
 								<Reasoning.Content>
 									<Text variant="bodySmall" colorKey="textMuted">
-										1. Inspected requirements and determined composition patterns scale better.
-										2. Decomposed monolithic props into compound components.
+										1. Inspected requirements and determined composition patterns scale better. 2.
+										Decomposed monolithic props into compound components.
 									</Text>
 								</Reasoning.Content>
 							</Reasoning.Root>
@@ -1059,9 +1087,13 @@ export default function ComponentE2EScreen() {
 									</CodeBlock.Actions>
 								</CodeBlock.Header>
 								<CodeBlock.Content>
-									<CodeBlock.Line type="delete">- export function Button(props: ButtonProps)</CodeBlock.Line>
-									<CodeBlock.Line type="add">+ export const Button = Object.assign(ButtonRoot, ...)</CodeBlock.Line>
-									<CodeBlock.Line type="normal">  return children;</CodeBlock.Line>
+									<CodeBlock.Line type="delete">
+										- export function Button(props: ButtonProps)
+									</CodeBlock.Line>
+									<CodeBlock.Line type="add">
+										+ export const Button = Object.assign(ButtonRoot, ...)
+									</CodeBlock.Line>
+									<CodeBlock.Line type="normal"> return children;</CodeBlock.Line>
 								</CodeBlock.Content>
 							</CodeBlock.Root>
 
@@ -1089,9 +1121,7 @@ export default function ComponentE2EScreen() {
 								value={e2ePrompt}
 								onValueChange={setE2ePrompt}
 							>
-								<PromptInput.Textarea
-									placeholder="Ask AI anything..."
-								/>
+								<PromptInput.Textarea placeholder="Ask AI anything..." />
 								<PromptInput.Actions>
 									<PromptInput.AttachmentSlot />
 									<PromptInput.SubmitButton onPress={() => {}} />

@@ -4,20 +4,23 @@
 > **Status**: In Active Execution (`feat/composition-theming-icons`)  
 > **Target Package**: `packages/ui` (`@osuki-dev/ui`)  
 > **Author**: Antigravity Core Architecture Team  
-> **Date**: October 2026  
+> **Date**: October 2026
 
 ---
 
 ## 1. 架构愿景与重构背景 (Executive Summary)
 
 ### 1.1 现状与技术债复盘
+
 在 1.x 架构中，`@osuki-dev/ui` 采用了单体封闭式组件（Monolithic & Closed Components）设计：
+
 1. **组件高度封闭**：如 `Button` 仅接受 `children: string`、`leftIcon?: IconName`，`Card` 仅接受静态 `variant` 与 `children`。内部视图层级、按下动效、Icon 与 Spinner 均硬编码在组件内部。
 2. **主题装饰能力缺失**：组件样式直接绑定静态 `theme.colors[...]`，无法接入动态背景透明度策略（`useSurfaceBackground`）、主题插画图层（`ThemeArtworkLayer`）、环境动画（Skia Ambient Effects）。
 3. **业务端被迫复制平行组件**：`muqun/app` 为了实现主题包与插画背景，不得不维护大量 `themed-*` 影子组件（`themed-button.tsx`, `themed-card.tsx`, `themed-surface.tsx`, `themed-input.tsx` 等），把内部动效、Haptics、排版代码整体复制并强行插入 `<ThemeArtworkLayer>`，导致极高维护成本和版本漂移。
 4. **图标引擎笨重**：强制全量打包 `lucide-react-native` 与 `react-native-svg`，在长列表和会话流中造成巨大的 React 虚拟 DOM 树开销与主线程 Microhangs。
 
 ### 1.2 2.0.0 核心目标
+
 - **完全解耦与可组合性 (Zero-Prop Composition)**：全面践行 [Vercel Composition Patterns](file:///home/ryu/.agents/skills/vercel-composition-patterns/AGENTS.md)，采用复合组件（Compound Components）与依赖注入模式。
 - **开放自定义表面与背景装饰体系 (Surface Decorator Injection)**：UI 库提供通用契约，用户、AI 会话界面、API 客户端想加背景图片、装饰物、渐变层、主题包插画，均无需修改底层组件代码。
 - **极速图标引擎 (NanoIcons First)**：集成 [`react-native-nano-icons`](https://github.com/software-mansion-labs/react-native-nano-icons)，直接利用原生文本引擎（CoreText / Canvas）绘制分层字形，性能提升数倍；提供全开放的 Custom Icon Resolver 链条。
@@ -46,6 +49,7 @@
 ```
 
 #### 复合组件清单：
+
 - **`Surface`**：`Surface.Root`, `Surface.Background`, `Surface.Content`
 - **`Card`**：`Card.Root`, `Card.Background`, `Card.Header`, `Card.Content`, `Card.Footer`
 - **`Button`**：`Button.Root`, `Button.Background`, `Button.Label`, `Button.Icon`, `Button.Spinner`
@@ -65,43 +69,50 @@
 
 ```ts
 export interface SurfaceMeta {
-  slot?: string;
-  variant?: string;
-  baseColor: string;
-  disabled?: boolean;
-  selected?: boolean;
-  borderRadius?: number;
+	slot?: string;
+	variant?: string;
+	baseColor: string;
+	disabled?: boolean;
+	selected?: boolean;
+	borderRadius?: number;
 }
 
 export interface SurfaceDecoratorContextValue {
-  /** 动态背景色换算（如业务透明度策略计算） */
-  transformBackground?: (baseColor: string, meta: SurfaceMeta) => string;
-  /** 装饰层/插画/背景图插槽渲染 */
-  renderDecoration?: (meta: SurfaceMeta) => React.ReactNode;
+	/** 动态背景色换算（如业务透明度策略计算） */
+	transformBackground?: (baseColor: string, meta: SurfaceMeta) => string;
+	/** 装饰层/插画/背景图插槽渲染 */
+	renderDecoration?: (meta: SurfaceMeta) => React.ReactNode;
 }
 ```
 
 #### 消费示例：
+
 1. **默认环境**：不挂 Provider 时，组件直接展示标准 Token 纯色。
 2. **App 端接入主题包**：
+
 ```tsx
-<SurfaceDecoratorContext value={{
-  transformBackground: (baseColor) => surfaceBackground(baseColor),
-  renderDecoration: (meta) => meta.slot ? <ThemedSurfaceArtwork slot={meta.slot} baseColor={meta.baseColor} /> : null,
-}}>
-  <App />
+<SurfaceDecoratorContext
+	value={{
+		transformBackground: (baseColor) => surfaceBackground(baseColor),
+		renderDecoration: (meta) =>
+			meta.slot ? <ThemedSurfaceArtwork slot={meta.slot} baseColor={meta.baseColor} /> : null,
+	}}
+>
+	<App />
 </SurfaceDecoratorContext>
 ```
+
 3. **AI / API 定制背景图**：
+
 ```tsx
 <Card.Root>
-  <Card.Background>
-    <Image source={{ uri: customBgUrl }} style={StyleSheet.absoluteFill} />
-    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
-  </Card.Background>
-  <Card.Content>
-    <Text>Custom Themed Card</Text>
-  </Card.Content>
+	<Card.Background>
+		<Image source={{ uri: customBgUrl }} style={StyleSheet.absoluteFill} />
+		<LinearGradient colors={["transparent", "rgba(0,0,0,0.8)"]} style={StyleSheet.absoluteFill} />
+	</Card.Background>
+	<Card.Content>
+		<Text>Custom Themed Card</Text>
+	</Card.Content>
 </Card.Root>
 ```
 
@@ -110,6 +121,7 @@ export interface SurfaceDecoratorContextValue {
 ### 支柱三：高性能 NanoIcons 与可定制图标解析系统
 
 #### 1. 渲染性能分层
+
 - **Layer 1（Native Glyph Stack）**：通过 `react-native-nano-icons` 在构建期将 SVG 编译为分层 TTF 字体与 `.glyphmap.json`，运行时由 iOS CoreText / Android Canvas 直接绘制字形，绕过 React Native 虚拟 DOM 和 SVG XML 解析。
 - **Layer 2（Custom Theme Resolvers）**：通过 `IconProvider` 注入解析链：
   - `Theme Manifest Icons`（支持 `chrome.send`, `chrome.back`, `chrome.scan` 等动态资产覆盖）
@@ -150,11 +162,13 @@ export interface SurfaceDecoratorContextValue {
 ### 支柱六：原生样式与极致性能原则 (Native Styles & Performance)
 
 #### 1. 为什么坚决使用原生 `StyleSheet`？
+
 - **零 JS 解析负担**：RN `StyleSheet.create` 在初始化时完成样式扁平化和 ID 分配，通过 JSI 映射到底层 C++ Yoga 节点。
 - **杜绝运行时 Microhang**：在 AI 流式输出（高频 Token 触发每秒几十次重绘）场景下，CSS-in-JS 或类名计算会占用 JS 单线程并引发高频垃圾回收（GC），造成掉帧和微卡顿。
 - **原生视图扁平化 (View Flattening)**：复合组件的 Background 与装饰层容器必须显式配置 `collapsable={true}`，让原生渲染树自动折叠无事件容器，保持 Native 视图层级极浅。
 
 #### 2. 全局颜色与对比度高速缓存 (LRU Cache)
+
 - 将 WCAG 4.5:1 / 3:1 对比度与透明度算力移出组件 render 循环，使用全局 LRU Cache 缓存 `(baseColor, alpha) => calculatedFill`。
 
 ---
@@ -166,10 +180,12 @@ packages/ui/package.json (2.0.0)
 ```
 
 ### 1. 彻底移除的强依赖
+
 - 移除 `lucide-react-native` 全量依赖（改为解耦并按需注入）。
 - `react-native-svg` 降级为可选。
 
 ### 2. 可选 Peer Dependencies 矩阵
+
 - `react-native-nano-icons` (推荐，高性能字形引擎)
 - `expo-glass-effect` (可选，iOS 26 Liquid Glass)
 - `expo-blur` (可选，毛玻璃)
@@ -188,6 +204,7 @@ packages/ui/package.json (2.0.0)
 - **绝对边界**: 严禁修改 `/home/ryu/Work/muqun/app` 代码，所有工作集中在 `kit/packages/ui`。
 
 ### 阶段与任务拆分：
+
 1. **Track 1: 装饰器系统与核心复合组件**
    - 实现 `packages/ui/src/theme/decorator-context.ts` 与 LRU 缓存。
    - 重构 `surface.tsx`, `card.tsx`, `button.tsx` 为复合组件。
@@ -207,6 +224,7 @@ packages/ui/package.json (2.0.0)
 ## 5. 后续接手 AI 指南 (Handover Guide for AI Agents)
 
 任何后续接手此仓库的 AI 代理，应遵循以下规则：
+
 1. **阅读规范**：在修改或扩展任何组件前，查阅本文件与 `/home/ryu/.agents/skills/vercel-composition-patterns/AGENTS.md`。
 2. **坚持复合模式**：严禁往核心组件中增加布尔模式开关（如 `isThemed`, `showDiff`, `hasIcon`），必须通过复合子部件或 Context 接口进行扩展。
 3. **保持零路径污染**：`packages/ui` 内严禁出现任何 `@/` 应用层路径，必须使用相对路径保持完全独立。

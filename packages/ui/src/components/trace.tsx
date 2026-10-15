@@ -190,7 +190,10 @@ export function TraceHeader({
 					<View
 						style={[
 							styles.pendingDot,
-							{ borderColor: theme.colors.borderStrong, backgroundColor: theme.colors.surfaceRaised },
+							{
+								borderColor: theme.colors.borderStrong,
+								backgroundColor: theme.colors.surfaceRaised,
+							},
 						]}
 					/>
 				);

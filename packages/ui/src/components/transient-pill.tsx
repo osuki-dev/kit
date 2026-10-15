@@ -81,11 +81,7 @@ export const TransientPill: React.FC<TransientPillProps> = ({
 	const currentTone = toneStyles[tone];
 
 	return (
-		<View
-			pointerEvents="none"
-			style={[styles.anchor, { bottom: bottomInset }]}
-			testID={testID}
-		>
+		<View pointerEvents="none" style={[styles.anchor, { bottom: bottomInset }]} testID={testID}>
 			<Animated.View style={animatedStyle}>
 				<View
 					style={[

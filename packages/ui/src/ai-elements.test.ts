@@ -134,8 +134,12 @@ const dispatcher = {
 	useLayoutEffect: () => {},
 	useMemo: (factory: () => unknown) => (factory as () => unknown)(),
 	useRef: (initial: unknown) => ({ current: initial }),
-	useState: (initial: unknown) => [typeof initial === "function" ? (initial as () => unknown)() : initial, () => {}],
-	useSyncExternalStore: (_subscribe: unknown, getSnapshot: () => unknown) => (getSnapshot as () => unknown)(),
+	useState: (initial: unknown) => [
+		typeof initial === "function" ? (initial as () => unknown)() : initial,
+		() => {},
+	],
+	useSyncExternalStore: (_subscribe: unknown, getSnapshot: () => unknown) =>
+		(getSnapshot as () => unknown)(),
 };
 
 function renderOnce(node: unknown): AnyElement {

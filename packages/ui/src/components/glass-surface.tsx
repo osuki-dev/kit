@@ -70,15 +70,14 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
 }) => {
 	const theme = useThemeTokens();
 	const isDark = theme.mode === "dark";
-	const resolvedRadius =
-		borderRadius ?? (face === "sheet" ? theme.radius.lg : theme.radius.md);
+	const resolvedRadius = borderRadius ?? (face === "sheet" ? theme.radius.lg : theme.radius.md);
 
 	const isLiquidGlassLive =
 		Platform.OS === "ios" &&
 		Boolean(
 			glassModule?.GlassView &&
-				glassModule?.isLiquidGlassAvailable?.() &&
-				glassModule?.isGlassEffectAPIAvailable?.(),
+			glassModule?.isLiquidGlassAvailable?.() &&
+			glassModule?.isGlassEffectAPIAvailable?.(),
 		);
 
 	if (isLiquidGlassLive && glassModule?.GlassView) {
@@ -98,11 +97,7 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
 					animationDuration: 0.15,
 				}}
 				tintColor={tint ?? defaultTint}
-				style={[
-					styles.base,
-					{ borderRadius: resolvedRadius },
-					style,
-				]}
+				style={[styles.base, { borderRadius: resolvedRadius }, style]}
 			>
 				{children}
 			</GlassView>
@@ -135,11 +130,7 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
 
 	// Graceful fallback to translucent styled View
 	const fallbackBackground =
-		tint ??
-		withAlpha(
-			face === "sheet" ? theme.colors.surfaceRaised : theme.colors.surface,
-			0.82,
-		);
+		tint ?? withAlpha(face === "sheet" ? theme.colors.surfaceRaised : theme.colors.surface, 0.82);
 
 	return (
 		<View
