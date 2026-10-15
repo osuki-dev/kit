@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 // Keep these here rather than inside packages/ui: a published package must not
 // read application source, and doing so previously coupled the public package
 // to a private app.
-const appRootLayouts = ["apps/native/app/_layout.tsx"] as const;
+const appRootLayouts = ["apps/native/app/_layout.tsx", "apps/showcase/app/_layout.tsx"] as const;
 
 const repoRoot = new URL("..", import.meta.url);
 
