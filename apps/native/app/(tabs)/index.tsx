@@ -531,6 +531,46 @@ function HomeHeader({
 				</View>
 			</Animated.View>
 
+			<Pressable onPress={() => router.push("/kit-showcase")} testID="home-kit-showcase-banner">
+				<Card
+					variant="raised"
+					border="subtle"
+					padding="md"
+					style={{
+						marginHorizontal: bleed,
+						borderRadius: 16,
+						backgroundColor: colors.surface,
+					}}
+				>
+					<View style={{ flexDirection: "row", alignItems: "center" }}>
+						<View
+							style={{
+								width: 44,
+								height: 44,
+								borderRadius: 12,
+								backgroundColor: colors.primary,
+								alignItems: "center",
+								justifyContent: "center",
+							}}
+						>
+							<Icon name="Sparkles" size={24} color={colors.onPrimary} />
+						</View>
+						<View style={{ flex: 1, marginLeft: 12 }}>
+							<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+								<Text variant="subheading" colorKey="text">
+									Kit 2.0.0 Showcase & Demo
+								</Text>
+								<Tag variant="active">77 Primitives</Tag>
+							</View>
+							<Text variant="caption" colorKey="textMuted">
+								Interactive playground for AI Elements, Nano Icons & Templates
+							</Text>
+						</View>
+						<Icon name="ChevronRight" size={20} color={colors.textMuted} />
+					</View>
+				</Card>
+			</Pressable>
+
 			{rotatingProduct ? (
 				<View style={styles.featuredSection}>
 					<View style={[styles.featuredHeader, { paddingHorizontal: bleed }]}>

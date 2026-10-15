@@ -123,6 +123,31 @@ export default function SettingsPage() {
 	const sections = useMemo<SettingsSectionConfig[]>(
 		() => [
 			{
+				id: "design-system",
+				title: "Kit 2.0.0 Design System & Showcase",
+				items: [
+					{
+						id: "kit-showcase",
+						type: "link",
+						label: "Kit Component Showcase & Demo",
+						description:
+							"Live interactive playground for all 77 primitives, AI Elements & templates",
+						icon: "Layers",
+						value: "2.0.0",
+						onPress: () => router.push("/kit-showcase"),
+					},
+					{
+						id: "component-e2e",
+						type: "link",
+						label: "E2E Test Regression Screen",
+						description: "Automated regression verification tree",
+						icon: "CheckCircle",
+						value: "77 Primitives",
+						onPress: () => router.push("/component-e2e"),
+					},
+				],
+			},
+			{
 				id: "appearance",
 				title: t("settings.appearance"),
 				items: [
