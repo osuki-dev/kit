@@ -13,7 +13,7 @@ import Animated, {
 	withRepeat,
 	withTiming,
 } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 
 export type SkeletonVariant = "text" | "rect" | "circle";
 
@@ -48,6 +48,15 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 	const theme = useThemeTokens();
 	const opacity = useSharedValue(0.62);
 	const lineCount = Math.max(1, lines);
+	const fillMeta = useMemo(
+		() => ({
+			slot: "skeleton.fill",
+			variant,
+			baseColor: theme.colors.border,
+		}),
+		[theme.colors.border, variant],
+	);
+	const fill = useResolvedSurfaceFill(theme.colors.border, fillMeta);
 
 	useEffect(() => {
 		if (motion === "static") {
@@ -65,9 +74,9 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 			height: height ?? (variant === "text" ? 14 : variant === "circle" ? 40 : 64),
 			borderRadius:
 				variant === "circle" ? 999 : variant === "text" ? theme.radius.pill : theme.radius.md,
-			backgroundColor: theme.colors.border,
+			backgroundColor: fill,
 		}),
-		[height, theme.colors.border, theme.radius, variant, width],
+		[fill, height, theme.radius, variant, width],
 	);
 
 	if (lineCount === 1) {

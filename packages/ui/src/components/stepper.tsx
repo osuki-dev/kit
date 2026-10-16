@@ -18,7 +18,7 @@ export interface StepperProps extends Omit<ViewProps, "children"> {
 	formatValue?: (value: number) => string;
 }
 
-export const Stepper: React.FC<StepperProps> = ({
+const StepperControl: React.FC<StepperProps> = ({
 	value,
 	onChange,
 	min = Number.NEGATIVE_INFINITY,
@@ -109,13 +109,13 @@ interface StepperButtonProps {
 	testID?: string;
 }
 
-const StepperButton: React.FC<StepperButtonProps> = ({
+export function StepperButton({
 	icon,
 	label,
 	disabled,
 	onPress,
 	testID,
-}) => {
+}: StepperButtonProps) {
 	const theme = useThemeTokens();
 
 	return (
@@ -137,4 +137,9 @@ const StepperButton: React.FC<StepperButtonProps> = ({
 			<Icon name={icon} size={18} color={theme.colors.text} />
 		</Pressable>
 	);
-};
+}
+
+export const Stepper = Object.assign(StepperControl, {
+	Root: StepperControl,
+	Button: StepperButton,
+});

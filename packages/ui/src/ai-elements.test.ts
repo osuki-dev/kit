@@ -50,6 +50,7 @@ mock.module("react-native-reanimated", () => ({
 	withRepeat: (anim: unknown) => anim,
 	withTiming: (to: unknown) => to,
 	cancelAnimation: () => {},
+	withDelay: (_delay: unknown, animation: unknown) => animation,
 }));
 
 mock.module("react-native-safe-area-context", () => ({

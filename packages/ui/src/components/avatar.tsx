@@ -52,18 +52,20 @@ const fontSizeMap: Record<AvatarSize, number> = {
  * <Avatar source={require('./avatar.png')} size="xl" />
  * ```
  */
-export const Avatar: React.FC<AvatarProps> = ({
-	source,
-	initials,
+export function AvatarRoot({
 	size = "md",
-	isOnline,
 	style,
 	testID,
-}) => {
+	children,
+}: {
+	size?: AvatarSize;
+	style?: ViewStyle;
+	testID?: string;
+	children?: React.ReactNode;
+}) {
 	const { colors } = useThemeTokens();
 
 	const dimension = sizeMap[size];
-	const fontSize = fontSizeMap[size];
 
 	const containerStyle: ViewStyle = {
 		width: dimension,
@@ -77,48 +79,44 @@ export const Avatar: React.FC<AvatarProps> = ({
 		alignItems: "center",
 	};
 
-	const statusIndicatorSize = Math.max(8, dimension * 0.25);
-	const statusStyle: ViewStyle = {
-		position: "absolute",
-		bottom: 0,
-		right: 0,
-		width: statusIndicatorSize,
-		height: statusIndicatorSize,
-		borderRadius: statusIndicatorSize / 2,
-		backgroundColor: colors.success,
-		borderWidth: 2,
-		borderColor: colors.surface,
-	};
+	return (
+		<View testID={testID} style={[containerStyle, style]}>
+			{children}
+		</View>
+	);
+}
 
-	const renderContent = () => {
-		if (source) {
-			const imageSource = typeof source === "string" ? { uri: source } : source;
-			return (
-				<Image
-					source={imageSource}
-					style={{ width: dimension, height: dimension }}
-					resizeMode="cover"
-					testID={testID ? `${testID}-image` : undefined}
-				/>
-			);
-		}
+export function AvatarImage({
+	source,
+	size = "md",
+	testID,
+}: {
+	source: ImageSourcePropType | string;
+	size?: AvatarSize;
+	testID?: string;
+}) {
+	const dimension = sizeMap[size];
+	const imageSource = typeof source === "string" ? { uri: source } : source;
+	return (
+		<Image
+			source={imageSource}
+			style={{ width: dimension, height: dimension }}
+			resizeMode="cover"
+			testID={testID}
+		/>
+	);
+}
 
-		if (initials) {
-			return (
-				<Text
-					style={{
-						fontSize,
-						color: colors.text,
-					}}
-					weight="bold"
-					transform="uppercase"
-				>
-					{initials.slice(0, 2).toUpperCase()}
-				</Text>
-			);
-		}
-
-		// Default placeholder
+export function AvatarFallback({
+	initials,
+	size = "md",
+}: {
+	initials?: string;
+	size?: AvatarSize;
+}) {
+	const { colors } = useThemeTokens();
+	const dimension = sizeMap[size];
+	if (!initials) {
 		return (
 			<View
 				style={{
@@ -129,12 +127,51 @@ export const Avatar: React.FC<AvatarProps> = ({
 				}}
 			/>
 		);
-	};
-
+	}
 	return (
-		<View testID={testID} style={[containerStyle, style]}>
-			{renderContent()}
-			{isOnline && <View testID={testID ? `${testID}-status` : undefined} style={statusStyle} />}
-		</View>
+		<Text style={{ fontSize: fontSizeMap[size], color: colors.text }} weight="bold" transform="uppercase">
+			{initials.slice(0, 2).toUpperCase()}
+		</Text>
 	);
-};
+}
+
+export function AvatarStatus({ testID, size = "md" }: { testID?: string; size?: AvatarSize }) {
+	const { colors } = useThemeTokens();
+	const dimension = sizeMap[size];
+	const statusIndicatorSize = Math.max(8, dimension * 0.25);
+	return (
+		<View
+			testID={testID}
+			style={{
+				position: "absolute",
+				bottom: 0,
+				right: 0,
+				width: statusIndicatorSize,
+				height: statusIndicatorSize,
+				borderRadius: statusIndicatorSize / 2,
+				backgroundColor: colors.success,
+				borderWidth: 2,
+				borderColor: colors.surface,
+			}}
+		/>
+	);
+}
+
+function AvatarFacade({ source, initials, size = "md", isOnline, style, testID }: AvatarProps) {
+	let face: React.ReactNode = <AvatarFallback size={size} />;
+	if (source) face = <AvatarImage source={source} size={size} testID={testID ? `${testID}-image` : undefined} />;
+	else if (initials) face = <AvatarFallback initials={initials} size={size} />;
+	return (
+		<AvatarRoot size={size} style={style} testID={testID}>
+			{face}
+			{isOnline ? <AvatarStatus size={size} testID={testID ? `${testID}-status` : undefined} /> : null}
+		</AvatarRoot>
+	);
+}
+
+export const Avatar = Object.assign(AvatarFacade, {
+	Root: AvatarRoot,
+	Image: AvatarImage,
+	Fallback: AvatarFallback,
+	Status: AvatarStatus,
+});

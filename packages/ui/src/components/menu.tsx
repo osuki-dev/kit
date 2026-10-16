@@ -31,7 +31,7 @@ export interface MenuProps extends Omit<ViewProps, "style" | "children"> {
 	style?: ViewStyle;
 }
 
-export const Menu: React.FC<MenuProps> = ({
+const MenuView: React.FC<MenuProps> = ({
 	items,
 	onSelect,
 	selectedId,
@@ -128,23 +128,15 @@ export const Menu: React.FC<MenuProps> = ({
 								style={{ gap: theme.spacing.xs }}
 								testID={testID ? `${testID}-items` : undefined}
 							>
-								{items.map((item) => {
-									const selected = item.id === selectedId;
-									return (
-										<SheetListItem
-											key={item.id}
-											role="menuitem"
-											label={item.label}
-											description={item.description}
-											icon={item.icon}
-											selected={selected}
-											disabled={item.disabled}
-											tone={item.tone}
-											onPress={() => handleSelect(item)}
-											testID={testID ? `${testID}-item-${item.id}` : undefined}
-										/>
-									);
-								})}
+								{items.map((item) => (
+									<MenuRow
+										key={item.id}
+										item={item}
+										selected={item.id === selectedId}
+										onPress={() => handleSelect(item)}
+										testID={testID ? `${testID}-item-${item.id}` : undefined}
+									/>
+								))}
 							</View>
 						</ScrollView>
 					</Sheet.Body>
@@ -153,3 +145,34 @@ export const Menu: React.FC<MenuProps> = ({
 		</Sheet.Root>
 	);
 };
+
+export function MenuRow({
+	item,
+	selected,
+	onPress,
+	testID,
+}: {
+	item: MenuItem;
+	selected: boolean;
+	onPress: () => void;
+	testID?: string;
+}) {
+	return (
+		<SheetListItem
+			role="menuitem"
+			label={item.label}
+			description={item.description}
+			icon={item.icon}
+			selected={selected}
+			disabled={item.disabled}
+			tone={item.tone}
+			onPress={onPress}
+			testID={testID}
+		/>
+	);
+}
+
+export const Menu = Object.assign(MenuView, {
+	Root: MenuView,
+	Item: MenuRow,
+});

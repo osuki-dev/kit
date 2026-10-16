@@ -55,7 +55,7 @@ export interface DataTableProps<TData>
 
 const defaultColumnWidth = 144;
 
-export function DataTable<TData>({
+function DataTableView<TData>({
 	columns,
 	data,
 	getRowId,
@@ -109,7 +109,7 @@ export function DataTable<TData>({
 				testID={testID ? `${testID}-row-${rowId}` : undefined}
 			>
 				{columns.map((column) => (
-					<Cell key={column.id} column={column} row={row} />
+					<DataTableCell key={column.id} column={column} row={row} />
 				))}
 			</View>
 		);
@@ -143,7 +143,7 @@ export function DataTable<TData>({
 						testID={testID ? `${testID}-header` : undefined}
 					>
 						{columns.map((column) => (
-							<HeaderCell
+							<DataTableHeader
 								key={column.id}
 								column={column}
 								sort={sort}
@@ -207,7 +207,7 @@ export function DataTable<TData>({
 	);
 }
 
-function HeaderCell<TData>({
+export function DataTableHeader<TData>({
 	column,
 	sort,
 	onPress,
@@ -246,7 +246,7 @@ function HeaderCell<TData>({
 	);
 }
 
-function Cell<TData, TValue>({
+export function DataTableCell<TData, TValue>({
 	column,
 	row,
 }: {
@@ -298,3 +298,13 @@ function columnStyle<TData, TValue>(column: DataTableColumn<TData, TValue>): Vie
 		paddingVertical: 8,
 	};
 }
+
+export const DataTable = Object.assign(DataTableView, {
+	Root: DataTableView,
+	Header: DataTableHeader,
+	Cell: DataTableCell,
+}) as typeof DataTableView & {
+	Root: typeof DataTableView;
+	Header: typeof DataTableHeader;
+	Cell: typeof DataTableCell;
+};

@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableOpacity, View, type TouchableOpacityProps, type ViewStyle } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Text } from "./text";
 import { useHaptics } from "./haptics";
 
@@ -45,7 +45,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
  * <Tag variant="pill" onPress={selectFilter}>FILTER</Tag>
  * ```
  */
-export const Tag: React.FC<TagProps> = ({
+export const TagRoot: React.FC<Omit<TagProps, "children"> & { children?: React.ReactNode }> = ({
 	children,
 	variant = "default",
 	disabled = false,
@@ -80,22 +80,24 @@ export const Tag: React.FC<TagProps> = ({
 
 	const isPill = variant === "pill" || variant === "active" || variant === "default";
 	const isActive = variant === "active";
+	const baseColor = isActive ? colors.surface : colors.surfaceRaised;
+	const fill = useResolvedSurfaceFill(baseColor, {
+		slot: "tags.background",
+		variant,
+		baseColor,
+		borderRadius: isPill ? 999 : 4,
+	});
 
 	const tagStyles: ViewStyle = {
 		paddingVertical: 4,
 		paddingHorizontal: 12,
 		borderRadius: isPill ? 999 : 4,
-		backgroundColor: isActive ? colors.surface : colors.surfaceRaised,
+		backgroundColor: fill,
 		...(isActive && mode === "light" ? shadow.pill : {}),
 		alignSelf: "flex-start",
+		maxWidth: "100%",
 		opacity: disabled ? 0.4 : 1,
 	};
-
-	const tagContent = (
-		<Text variant="caption" color={isActive ? colors.text : colors.textMuted} transform="uppercase">
-			{children}
-		</Text>
-	);
 
 	if (onPress) {
 		return (
@@ -110,10 +112,36 @@ export const Tag: React.FC<TagProps> = ({
 				style={[tagStyles, animatedStyle, style]}
 				{...rest}
 			>
-				{tagContent}
+				{children}
 			</AnimatedTouchableOpacity>
 		);
 	}
 
-	return <View style={[tagStyles, style]}>{tagContent}</View>;
+	return <View style={[tagStyles, style]}>{children}</View>;
 };
+
+export function TagLabel({ children }: { children?: React.ReactNode }) {
+	const { colors } = useThemeTokens();
+	return (
+		<Text variant="caption" color={colors.text} transform="uppercase">
+			{children}
+		</Text>
+	);
+}
+
+function TagFacade({ children, variant = "default", ...props }: TagProps) {
+	const { colors } = useThemeTokens();
+	const muted = variant !== "active";
+	return (
+		<TagRoot variant={variant} {...props}>
+			<Text variant="caption" color={muted ? colors.textMuted : colors.text} transform="uppercase">
+				{children}
+			</Text>
+		</TagRoot>
+	);
+}
+
+export const Tag = Object.assign(TagFacade, {
+	Root: TagRoot,
+	Label: TagLabel,
+});

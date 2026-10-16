@@ -10,9 +10,11 @@ import {
 } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import {
-	getCachedTransformedColor,
+	readStringFill,
+	useResolvedSurfaceFill,
 	useSurfaceDecorator,
 	useThemeTokens,
+	withoutStringFill,
 	type SurfaceMeta,
 } from "../theme";
 import { useHaptics } from "./haptics";
@@ -96,17 +98,20 @@ export function ButtonRoot({
 }: ButtonRootProps) {
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
-	const decorator = useSurfaceDecorator();
 	const pressProgress = useSharedValue(0);
 
 	const button = theme.components.Button;
 	const variantTokens = button[variant];
 	const isDisabled = disabled || loading;
-	const borderRadius = theme.radius[button.radius];
+	const flatStyle = StyleSheet.flatten(style);
+	const fillOverride = readStringFill(style);
+	const borderRadius =
+		typeof flatStyle?.borderRadius === "number" ? flatStyle.borderRadius : theme.radius[button.radius];
 
 	const backgroundToken = disabled ? "surfaceRaised" : variantTokens.background;
-	const baseColor =
+	const tokenColor =
 		backgroundToken === "transparent" ? "transparent" : theme.colors[backgroundToken];
+	const baseColor = fillOverride ?? tokenColor;
 
 	const resolvedSlot = slot ?? `buttons.${variant}.background`;
 
@@ -121,12 +126,7 @@ export function ButtonRoot({
 		[resolvedSlot, variant, baseColor, isDisabled, borderRadius],
 	);
 
-	const resolvedBackgroundColor = useMemo(() => {
-		if (decorator?.transformBackground && baseColor !== "transparent") {
-			return getCachedTransformedColor(baseColor, surfaceMeta, decorator.transformBackground);
-		}
-		return baseColor;
-	}, [baseColor, decorator, surfaceMeta]);
+	const resolvedBackgroundColor = useResolvedSurfaceFill(baseColor, surfaceMeta);
 
 	const textColor = disabled ? theme.colors.textDisabled : theme.colors[variantTokens.foreground];
 	const iconColor = loading ? theme.colors.textDisabled : textColor;
@@ -143,11 +143,8 @@ export function ButtonRoot({
 			borderRadius,
 			opacity: loading ? 0.68 : 1,
 			gap: theme.spacing.sm,
-			...(!isDisabled && variantTokens.background !== "transparent" && theme.mode === "light"
-				? theme.shadow.pill
-				: {}),
 			...(variantTokens.border && {
-				borderWidth: 1,
+				borderWidth: StyleSheet.hairlineWidth,
 				borderColor: theme.colors[variantTokens.border],
 			}),
 		};
@@ -156,13 +153,9 @@ export function ButtonRoot({
 		button.paddingX,
 		button.paddingY,
 		borderRadius,
-		isDisabled,
 		loading,
 		theme.colors,
-		theme.mode,
-		theme.shadow.pill,
 		theme.spacing,
-		variantTokens.background,
 		variantTokens.border,
 	]);
 
@@ -217,7 +210,7 @@ export function ButtonRoot({
 	return (
 		<ButtonContext.Provider value={contextValue}>
 			<AnimatedPressable
-				style={[styles.baseRoot, buttonRootStyle, animatedStyle, style]}
+				style={[styles.baseRoot, buttonRootStyle, animatedStyle, withoutStringFill(style)]}
 				disabled={isDisabled}
 				accessibilityRole="button"
 				accessibilityState={{ disabled: isDisabled, busy: loading }}
@@ -236,8 +229,11 @@ export interface ButtonBackgroundProps extends ViewProps {
 }
 
 export function ButtonBackground({ style, children, ...props }: ButtonBackgroundProps) {
-	const { resolvedBackgroundColor, borderRadius, meta } = useButton();
+	const { resolvedBackgroundColor, borderRadius, meta, variant, disabled } = useButton();
+	const theme = useThemeTokens();
 	const decorator = useSurfaceDecorator();
+	const variantTokens = theme.components.Button[variant];
+	const lift = !disabled && variantTokens.background !== "transparent" && theme.mode === "light";
 
 	return (
 		<View
@@ -248,13 +244,20 @@ export function ButtonBackground({ style, children, ...props }: ButtonBackground
 				{
 					backgroundColor: resolvedBackgroundColor,
 					borderRadius,
+					...(lift ? theme.shadow.pill : {}),
 				},
 				style,
 			]}
 			{...props}
 		>
-			{decorator?.renderDecoration?.(meta)}
-			{children}
+			<View
+				collapsable
+				pointerEvents="none"
+				style={[styles.background, { borderRadius, overflow: "hidden" }]}
+			>
+				{decorator?.renderDecoration?.(meta)}
+				{children}
+			</View>
 		</View>
 	);
 }
@@ -311,7 +314,7 @@ export interface ButtonProps extends Omit<PressableProps, "style"> {
 	leftIcon?: IconName;
 	rightIcon?: IconName;
 	slot?: string;
-	style?: ViewStyle;
+	style?: StyleProp<ViewStyle>;
 }
 
 export function Button({

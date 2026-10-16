@@ -17,7 +17,7 @@ export interface TooltipProps extends Omit<ViewProps, "children"> {
 	bubbleStyle?: ViewStyle;
 }
 
-export const Tooltip: React.FC<TooltipProps> = ({
+const TooltipView: React.FC<TooltipProps> = ({
 	content,
 	children,
 	title,
@@ -42,32 +42,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 	};
 
 	const bubble = shown ? (
-		<View
-			testID={testID ? `${testID}-bubble` : undefined}
-			style={[
-				{
-					maxWidth: 280,
-					alignSelf: "flex-start",
-					gap: theme.spacing.xs,
-					paddingHorizontal: theme.spacing.md,
-					paddingVertical: theme.spacing.sm,
-					borderRadius: theme.radius.md,
-					backgroundColor: theme.colors.surfaceRaised,
-					borderWidth: 1,
-					borderColor: theme.colors.border,
-				},
-				bubbleStyle,
-			]}
-		>
-			{title && (
-				<Text variant="label" colorKey="text">
-					{title}
-				</Text>
-			)}
-			<Text variant="caption" colorKey="textMuted">
-				{content}
-			</Text>
-		</View>
+		<TooltipContent title={title} content={content} testID={testID} bubbleStyle={bubbleStyle} />
 	) : null;
 
 	return (
@@ -100,3 +75,50 @@ export const Tooltip: React.FC<TooltipProps> = ({
 		</View>
 	);
 };
+
+export function TooltipContent({
+	title,
+	content,
+	testID,
+	bubbleStyle,
+}: {
+	title?: string;
+	content: string;
+	testID?: string;
+	bubbleStyle?: ViewStyle;
+}) {
+	const theme = useThemeTokens();
+	return (
+		<View
+			testID={testID ? `${testID}-bubble` : undefined}
+			style={[
+				{
+					maxWidth: 280,
+					alignSelf: "flex-start",
+					gap: theme.spacing.xs,
+					paddingHorizontal: theme.spacing.md,
+					paddingVertical: theme.spacing.sm,
+					borderRadius: theme.radius.md,
+					backgroundColor: theme.colors.surfaceRaised,
+					borderWidth: 1,
+					borderColor: theme.colors.border,
+				},
+				bubbleStyle,
+			]}
+		>
+			{title ? (
+				<Text variant="label" colorKey="text">
+					{title}
+				</Text>
+			) : null}
+			<Text variant="caption" colorKey="textMuted">
+				{content}
+			</Text>
+		</View>
+	);
+}
+
+export const Tooltip = Object.assign(TooltipView, {
+	Root: TooltipView,
+	Content: TooltipContent,
+});

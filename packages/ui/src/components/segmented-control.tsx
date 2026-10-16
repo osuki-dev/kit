@@ -1,63 +1,44 @@
-import React from "react";
-import { Platform, TouchableOpacity, View, type ViewProps, type ViewStyle } from "react-native";
+import React, { memo, useCallback, useMemo } from "react";
+import {
+	Platform,
+	Pressable,
+	StyleSheet,
+	View,
+	type ViewProps,
+	type ViewStyle,
+} from "react-native";
 import ExpoSegmentedControl from "@expo/ui/community/segmented-control";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
+import {
+	readStringFill,
+	useResolvedSurfaceFill,
+	useSurfaceDecorator,
+	useThemeTokens,
+	withoutStringFill,
+} from "../theme";
 import { Text } from "./text";
 import { useHaptics } from "./haptics";
 
 export interface SegmentedControlOption {
-	/** Option label (displayed) */
 	label: string;
-	/** Option value */
 	value: string;
-	/** Disabled state */
 	disabled?: boolean;
 }
 
 export interface SegmentedControlProps extends Omit<ViewProps, "style"> {
-	/** Available options */
 	options: SegmentedControlOption[];
-	/** Currently selected value */
 	value: string;
-	/** Selection callback */
 	onChange: (value: string) => void;
-	/** Container style variant */
 	variant?: "pill" | "rounded";
-	/** Additional styles */
 	style?: ViewStyle;
 }
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
-
 /**
- * Segmented Control component
+ * One track fill, then a selected chip.
  *
- * Osuki Design Rules:
- * - Container: 1px solid border-visible, pill or 8px rounded
- * - Active: text-display bg, black text (inverted)
- * - Inactive: transparent, text-secondary
- * - Text: semantic label font, ALL CAPS, label size
- * - Height: 36-44px, max 2-4 segments
- * - Transition: 200ms ease-out
- *
- * Features:
- * - Press scale animation (0.96) on segments
- * - Smooth spring animations
- * - Disabled state disables animations
- *
- * @example
- * ```tsx
- * <SegmentedControl
- *   options={[
- *     { label: 'DAY', value: 'day' },
- *     { label: 'WEEK', value: 'week' },
- *     { label: 'MONTH', value: 'month' },
- *   ]}
- *   value={selectedPeriod}
- *   onChange={setSelectedPeriod}
- * />
- * ```
+ * Unselected options stay clear, so the track is the only paint behind them.
+ * Both colors go through the surface decorator once. A system control is used
+ * on iOS only when nothing is decorating fills — that widget cannot take a
+ * custom opacity.
  */
 export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	options,
@@ -68,75 +49,124 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	testID,
 	...rest
 }) => {
-	const { colors, mode, shadow } = useThemeTokens();
-	const haptics = useHaptics();
+	const { colors, mode, radius, shadow } = useThemeTokens();
+	const decorator = useSurfaceDecorator();
+	const { feedback } = useHaptics();
 	const selectedIndex = Math.max(
 		0,
 		options.findIndex((option) => option.value === value),
 	);
 	const hasDisabledOptions = options.some((option) => option.disabled);
+	const trackBase = readStringFill(style) ?? colors.surfaceRaised;
+	const selectedBase = colors.surface;
 
-	const containerStyles: ViewStyle = {
-		flexDirection: "row",
-		height: 44,
-		borderRadius: variant === "pill" ? 999 : 14,
-		backgroundColor: colors.surfaceRaised,
-		padding: 4,
-		overflow: "hidden",
-		...(mode === "light" ? shadow.soft : {}),
-	};
+	let trackRadius = radius.lg;
+	let optionRadius = radius.md;
+	if (variant === "pill") {
+		trackRadius = radius.pill;
+		optionRadius = radius.pill;
+	}
 
-	// The native control only fits this container on iOS.
-	//
-	// `@expo/ui/community/segmented-control` renders the platform's own widget.
-	// On iOS that is `UISegmentedControl`, which is compact and chromeless enough
-	// to sit inside the decorative track above. On Android it is Material's
-	// `SegmentedButtonRow`, which draws a full outlined track of its own: its own
-	// border, its own dividers between segments and its own selected fill. Nested
-	// in this one you get two tracks, and Material's row wants more height than
-	// the 36pt this container leaves it, so the selected segment overflows top and
-	// bottom while the labels overflow the parent's rounded clip on the right.
-	//
-	// The branch below is not a fallback -- it is this design system's own
-	// rendering of the control, and it is what the rules in the doc comment
-	// describe. Android takes it.
-	if (Platform.OS === "ios" && !hasDisabledOptions) {
+	const trackMeta = useMemo(
+		() => ({
+			slot: "segmented.track",
+			variant,
+			baseColor: trackBase,
+			borderRadius: trackRadius,
+		}),
+		[trackBase, trackRadius, variant],
+	);
+	const selectedMeta = useMemo(
+		() => ({
+			slot: "segmented.selected",
+			variant,
+			baseColor: selectedBase,
+			selected: true,
+			borderRadius: optionRadius,
+		}),
+		[optionRadius, selectedBase, variant],
+	);
+	const trackFill = useResolvedSurfaceFill(trackBase, trackMeta);
+	const selectedFill = useResolvedSurfaceFill(selectedBase, selectedMeta);
+
+	const select = useCallback(
+		(next: string) => {
+			feedback("selection");
+			onChange(next);
+		},
+		[feedback, onChange],
+	);
+
+	const trackStyle = useMemo(() => {
+		const next: ViewStyle = {
+			borderRadius: trackRadius,
+			backgroundColor: trackFill,
+		};
+		if (mode === "light") Object.assign(next, shadow.soft);
+		return next;
+	}, [mode, shadow.soft, trackFill, trackRadius]);
+
+	const decorated =
+		decorator?.transformBackground !== undefined || decorator?.renderDecoration !== undefined;
+	const useSystemControl = Platform.OS === "ios" && !hasDisabledOptions && !decorated;
+
+	if (useSystemControl) {
 		return (
-			<View accessibilityRole="tablist" testID={testID} style={[containerStyles, style]} {...rest}>
+			<View
+				accessibilityRole="tablist"
+				testID={testID}
+				style={[styles.track, trackStyle, withoutStringFill(style)]}
+				{...rest}
+			>
 				<ExpoSegmentedControl
 					values={options.map((option) => option.label)}
 					selectedIndex={selectedIndex}
 					onChange={(event) => {
 						const nextOption = options[event.nativeEvent.selectedSegmentIndex];
-						if (nextOption) {
-							haptics.feedback("selection");
-							onChange(nextOption.value);
-						}
+						if (nextOption) select(nextOption.value);
 					}}
 					tintColor={colors.primary}
-					style={{ flex: 1, minHeight: 36 }}
+					style={styles.systemControl}
 					testID={testID ? `${testID}-native` : undefined}
 				/>
 			</View>
 		);
 	}
 
-	return (
-		<View accessibilityRole="tablist" testID={testID} style={[containerStyles, style]} {...rest}>
-			{options.map((option) => {
-				const isActive = option.value === value;
-				const isDisabled = option.disabled || false;
+	let decoration: React.ReactNode = null;
+	if (decorator?.renderDecoration) {
+		decoration = (
+			<View collapsable pointerEvents="none" style={styles.decoration}>
+				{decorator.renderDecoration(trackMeta)}
+			</View>
+		);
+	}
 
+	return (
+		<View
+			accessibilityRole="tablist"
+			testID={testID}
+			style={[styles.track, trackStyle, withoutStringFill(style)]}
+			{...rest}
+		>
+			{decoration}
+			{options.map((option) => {
+				const selected = option.value === value;
+				const disabled = option.disabled ?? false;
+				let fill = "transparent";
+				if (selected) fill = selectedFill;
 				return (
 					<Segment
 						key={option.value}
+						value={option.value}
 						label={option.label}
-						isActive={isActive}
-						isDisabled={isDisabled}
-						onPress={() => onChange(option.value)}
-						colors={colors}
-						mode={mode}
-						shadow={shadow}
+						selected={selected}
+						disabled={disabled}
+						fill={fill}
+						radius={optionRadius}
+						raised={selected && mode === "light"}
+						shadow={shadow.pill}
+						onSelect={select}
 						testID={testID ? `${testID}-option-${option.value}` : undefined}
 					/>
 				);
@@ -146,83 +176,94 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 };
 
 interface SegmentProps {
+	value: string;
 	label: string;
-	isActive: boolean;
-	isDisabled: boolean;
-	onPress: () => void;
-	colors: {
-		text: string;
-		background: string;
-		textMuted: string;
-		surface: string;
-	};
-	mode: string;
-	shadow: {
-		pill: ViewStyle;
-	};
+	selected: boolean;
+	disabled: boolean;
+	fill: string;
+	radius: number;
+	raised: boolean;
+	shadow: ViewStyle;
+	onSelect: (value: string) => void;
 	testID?: string;
 }
 
-const Segment: React.FC<SegmentProps> = ({
+const Segment = memo(function Segment({
+	value,
 	label,
-	isActive,
-	isDisabled,
-	onPress,
-	colors,
-	mode,
+	selected,
+	disabled,
+	fill,
+	radius,
+	raised,
 	shadow,
+	onSelect,
 	testID,
-}) => {
-	const haptics = useHaptics();
-	const scale = useSharedValue(1);
+}: SegmentProps) {
+	const { colors } = useThemeTokens();
+	const handlePress = useCallback(() => {
+		onSelect(value);
+	}, [onSelect, value]);
 
-	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ scale: scale.value }],
-	}));
+	let textColor = colors.textMuted;
+	if (selected) textColor = colors.text;
 
-	const handlePressIn = () => {
-		if (!isDisabled) {
-			haptics.feedback("selection");
-			scale.value = withSpring(0.96, {
-				stiffness: 400,
-				damping: 25,
-			});
-		}
-	};
+	return (
+		<Pressable
+			accessibilityRole="tab"
+			accessibilityLabel={label}
+			accessibilityState={{ selected, disabled }}
+			disabled={disabled}
+			hitSlop={SEGMENT_HIT_SLOP}
+			onPress={handlePress}
+			style={({ pressed }) => {
+				const next: ViewStyle = {
+					borderRadius: radius,
+					backgroundColor: fill,
+					opacity: segmentOpacity(disabled, pressed),
+				};
+				if (raised) Object.assign(next, shadow);
+				return [styles.segment, next];
+			}}
+			testID={testID}
+		>
+			<Text variant="label" color={textColor} transform="uppercase">
+				{label}
+			</Text>
+		</Pressable>
+	);
+});
 
-	const handlePressOut = () => {
-		scale.value = withSpring(1, {
-			stiffness: 300,
-			damping: 20,
-		});
-	};
+function segmentOpacity(disabled: boolean, pressed: boolean) {
+	if (disabled) return 0.4;
+	if (pressed) return 0.72;
+	return 1;
+}
 
-	const segmentStyles: ViewStyle = {
+const styles = StyleSheet.create({
+	track: {
+		flexDirection: "row",
+		height: 44,
+		padding: 4,
+		overflow: "hidden",
+	},
+	segment: {
 		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
-		borderRadius: 999,
-		backgroundColor: isActive ? colors.surface : "transparent",
-		...(isActive && mode === "light" ? shadow.pill : {}),
-		opacity: isDisabled ? 0.4 : 1,
-	};
+		minWidth: 0,
+	},
+	systemControl: {
+		flex: 1,
+		minHeight: 36,
+	},
+	decoration: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+	},
+});
 
-	return (
-		<AnimatedTouchableOpacity
-			style={[segmentStyles, animatedStyle]}
-			testID={testID}
-			onPress={onPress}
-			disabled={isDisabled}
-			accessibilityRole="tab"
-			accessibilityLabel={`E2E SEGMENT ${label}`}
-			accessibilityState={{ selected: isActive, disabled: isDisabled }}
-			onPressIn={handlePressIn}
-			onPressOut={handlePressOut}
-			activeOpacity={1}
-		>
-			<Text variant="label" color={isActive ? colors.text : colors.textMuted} transform="uppercase">
-				{label}
-			</Text>
-		</AnimatedTouchableOpacity>
-	);
-};
+const SEGMENT_HIT_SLOP = { top: 4, bottom: 4 };

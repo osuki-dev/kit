@@ -8,8 +8,11 @@ import {
 	Button,
 	Badge,
 	Icon,
+	SegmentedControl,
+	Slider,
 	SurfaceDecoratorProvider,
 	useTheme,
+	withAlpha,
 	type IconDirection,
 } from "@osuki-dev/ui";
 
@@ -45,6 +48,8 @@ export default function ThemingAndIconsScreen() {
 	const { colors, mode, toggleMode } = useTheme();
 
 	const [activeThemeKey, setActiveThemeKey] = useState<string>("default");
+	const [surfaceOpacity, setSurfaceOpacity] = useState(1);
+	const [segment, setSegment] = useState("overview");
 	const [iconDirection, setIconDirection] = useState<IconDirection>("up");
 
 	const activeTheme = useMemo(
@@ -53,13 +58,14 @@ export default function ThemingAndIconsScreen() {
 	);
 
 	const decoratorContext = useMemo(() => {
-		if (activeTheme.bg) {
-			return {
-				transformBackground: () => activeTheme.bg!,
-			};
-		}
-		return {};
-	}, [activeTheme]);
+		return {
+			transformBackground: (baseColor: string) => {
+				const color = activeTheme.bg ?? baseColor;
+				if (surfaceOpacity >= 0.999) return color;
+				return withAlpha(color, surfaceOpacity);
+			},
+		};
+	}, [activeTheme.bg, surfaceOpacity]);
 
 	const currentDegrees = useMemo(() => {
 		switch (iconDirection) {
@@ -173,6 +179,28 @@ export default function ThemingAndIconsScreen() {
 								);
 							})}
 						</ScrollView>
+
+						<View style={styles.opacityBlock}>
+							<Text variant="caption" style={{ color: cardMutedColor }}>
+								SURFACE OPACITY {Math.round(surfaceOpacity * 100)}%
+							</Text>
+							<Slider
+								value={surfaceOpacity}
+								minimumValue={0.4}
+								maximumValue={1}
+								onValueChange={setSurfaceOpacity}
+							/>
+							<SegmentedControl
+								variant="pill"
+								value={segment}
+								onChange={setSegment}
+								options={[
+									{ value: "overview", label: "Overview" },
+									{ value: "tokens", label: "Tokens" },
+									{ value: "engine", label: "Engine" },
+								]}
+							/>
+						</View>
 
 						{/* Compound Card with active decorator */}
 						<Card.Root
@@ -425,6 +453,10 @@ const styles = StyleSheet.create({
 		width: 8,
 		height: 8,
 		borderRadius: 4,
+	},
+	opacityBlock: {
+		gap: 8,
+		marginTop: 4,
 	},
 	decoratorCard: {
 		borderRadius: 16,

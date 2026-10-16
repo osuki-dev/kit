@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { CompositionGallery } from "../../components/composition-gallery";
 import { View, ScrollView, StyleSheet, Pressable } from "react-native";
 import {
 	Screen,
@@ -304,6 +305,8 @@ export default function PrimitivesCatalogScreen() {
 								<Badge variant="success" display="label">
 									99+
 								</Badge>
+							</View>
+							<View style={styles.rowGap}>
 								<Tag variant="active">TAG ACTIVE</Tag>
 								<Tag variant="default">TAG DEFAULT</Tag>
 								<Tag variant="pill">TAG PILL</Tag>
@@ -768,6 +771,7 @@ export default function PrimitivesCatalogScreen() {
 						</Card>
 					</View>
 				)}
+				{selectedGroup === "all" ? <CompositionGallery /> : null}
 			</ScrollView>
 
 			{/* Dialog Overlay */}
@@ -852,6 +856,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	rowGap: {
+		width: "100%",
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 10,

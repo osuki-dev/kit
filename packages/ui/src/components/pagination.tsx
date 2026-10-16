@@ -14,7 +14,7 @@ export interface PaginationProps extends ViewProps {
 	label?: string;
 }
 
-export const Pagination: React.FC<PaginationProps> = ({
+const PaginationView: React.FC<PaginationProps> = ({
 	page,
 	pageCount,
 	onPageChange,
@@ -105,13 +105,13 @@ interface PaginationButtonProps {
 	testID?: string;
 }
 
-const PaginationButton: React.FC<PaginationButtonProps> = ({
+export function PaginationButton({
 	icon,
 	label,
 	disabled,
 	onPress,
 	testID,
-}) => {
+}: PaginationButtonProps) {
 	const theme = useThemeTokens();
 
 	return (
@@ -135,4 +135,9 @@ const PaginationButton: React.FC<PaginationButtonProps> = ({
 			<Icon name={icon} size={18} color={theme.colors.textMuted} />
 		</Pressable>
 	);
-};
+}
+
+export const Pagination = Object.assign(PaginationView, {
+	Root: PaginationView,
+	Button: PaginationButton,
+});

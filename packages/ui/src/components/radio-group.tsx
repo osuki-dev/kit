@@ -23,7 +23,7 @@ export interface RadioGroupProps extends Omit<ViewProps, "style" | "children"> {
 	style?: ViewStyle;
 }
 
-export const RadioGroup: React.FC<RadioGroupProps> = ({
+export const RadioGroupRoot: React.FC<RadioGroupProps> = ({
 	options,
 	value,
 	onChange,
@@ -177,3 +177,8 @@ const RadioOption: React.FC<RadioOptionProps> = ({ option, selected, onSelect, s
 		</Pressable>
 	);
 };
+
+export const RadioGroup = Object.assign(RadioGroupRoot, {
+	Root: RadioGroupRoot,
+	Item: RadioOption,
+});

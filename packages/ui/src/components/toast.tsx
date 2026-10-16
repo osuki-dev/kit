@@ -272,45 +272,84 @@ const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, style, onDismiss
 				toast.style,
 			]}
 		>
-			<View style={{ paddingTop: 2 }}>
-				<Icon name={tokens.icon} size={18} color={theme.colors[tokens.foreground]} />
-			</View>
+			<ToastIcon name={tokens.icon} color={theme.colors[tokens.foreground]} />
 			<View style={{ flex: 1, minWidth: 0, gap: theme.spacing.xs }}>
-				{toast.title && (
-					<Text variant="bodySmall" weight="bold">
-						{toast.title}
-					</Text>
-				)}
-				<Text variant="bodySmall" colorKey="textMuted">
-					{toast.message}
-				</Text>
-				{toast.action && (
-					<Pressable
-						accessibilityRole="button"
-						onPress={toast.action.onPress}
-						style={{ alignSelf: "flex-start", paddingTop: theme.spacing.xs }}
-					>
-						<Text variant="label" colorKey="primary">
-							{toast.action.label}
-						</Text>
-					</Pressable>
-				)}
+				<ToastTitle title={toast.title} />
+				<ToastMessage message={toast.message} />
+				<ToastAction action={toast.action} />
 			</View>
-			<Pressable
-				accessibilityRole="button"
-				accessibilityLabel="Dismiss notification"
-				onPress={() => onDismiss(toast.id)}
-				hitSlop={10}
-				style={{
-					width: 44,
-					height: 44,
-					alignItems: "center",
-					justifyContent: "center",
-					borderRadius: theme.radius.pill,
-				}}
-			>
-				<Icon name="X" size={16} color={theme.colors.textMuted} />
-			</Pressable>
+			<ToastDismiss onPress={() => onDismiss(toast.id)} />
 		</Animated.View>
 	);
 };
+
+export function ToastIcon({ name, color }: { name: IconName; color: string }) {
+	return (
+		<View style={{ paddingTop: 2 }}>
+			<Icon name={name} size={18} color={color} />
+		</View>
+	);
+}
+
+export function ToastTitle({ title }: { title?: string }) {
+	if (!title) return null;
+	return (
+		<Text variant="bodySmall" weight="bold">
+			{title}
+		</Text>
+	);
+}
+
+export function ToastMessage({ message }: { message: string }) {
+	return (
+		<Text variant="bodySmall" colorKey="textMuted">
+			{message}
+		</Text>
+	);
+}
+
+export function ToastAction({ action }: { action?: { label: string; onPress: () => void } }) {
+	const theme = useThemeTokens();
+	if (!action) return null;
+	return (
+		<Pressable
+			accessibilityRole="button"
+			onPress={action.onPress}
+			style={{ alignSelf: "flex-start", paddingTop: theme.spacing.xs }}
+		>
+			<Text variant="label" colorKey="primary">
+				{action.label}
+			</Text>
+		</Pressable>
+	);
+}
+
+export function ToastDismiss({ onPress }: { onPress: () => void }) {
+	const theme = useThemeTokens();
+	return (
+		<Pressable
+			accessibilityRole="button"
+			accessibilityLabel="Dismiss notification"
+			onPress={onPress}
+			hitSlop={10}
+			style={{
+				width: 44,
+				height: 44,
+				alignItems: "center",
+				justifyContent: "center",
+				borderRadius: theme.radius.pill,
+			}}
+		>
+			<Icon name="X" size={16} color={theme.colors.textMuted} />
+		</Pressable>
+	);
+}
+
+export const Toast = Object.assign(ToastCard, {
+	Root: ToastCard,
+	Icon: ToastIcon,
+	Title: ToastTitle,
+	Message: ToastMessage,
+	Action: ToastAction,
+	Dismiss: ToastDismiss,
+});

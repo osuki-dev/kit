@@ -8,10 +8,13 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
   `"primary" | "secondary" | "ghost" | "destructive"`; `loading` is an
   orthogonal state and does not change the variant.
 - `TwoStepAction`: double-tap inline confirmation control with animated drain timer bar.
+- `ButtonGroup`: joins adjacent actions into one clipped control. Children stay normal buttons.
+- `Collapsible`: one disclosure. Compose `Collapsible.Root`, `Collapsible.Trigger`, and `Collapsible.Content`.
+- `Accordion`: stacked disclosures. `type` is `"single"` or `"multiple"`. Compose `Accordion.Root`, `Accordion.Item`, `Accordion.Trigger`, and `Accordion.Content`.
 
 ## Forms
 
-- `Input`: single-line text input.
+- `Input`: single-line text input. Its fill goes through the surface decorator once, and its placeholder is drawn with `Text` so a custom font matches the value.
 - `Textarea`: multi-line text input for notes, descriptions, support messages,
   and profile content.
 - `SearchInput`: search-specific input with leading icon, clear action, and
@@ -24,7 +27,12 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `RadioGroup`: single-select choice list with optional descriptions.
 - `OtpInput`: one-time-code entry cells for auth and verification flows.
 - `Stepper`: numeric increment/decrement control.
-- `FieldGroup`: shared label, helper, required, and error wrapper.
+- `FieldGroup`: shared label, helper, required, and error wrapper. It is built from `Field`.
+- `Field`: composable label, description, control, and error. Compose `Field.Root`, `Field.Label`, `Field.Description`, and `Field.Error`.
+- `InputGroup`: one chrome around a field and its addons. Compose `InputGroup.Root`, `InputGroup.Addon`, and `InputGroup.Input`.
+- `Combobox`: searchable picker. Options filter as the reader types, anchored in a `Popover`.
+- `Command`: filterable action list. Compose `Command.Root`, `Command.Input`, `Command.List`, `Command.Item`, and `Command.Empty`.
+- `Calendar`: month grid for a single day or a range. `DateInput` remains the field that opens a platform picker.
 - `Toggle`: binary control.
 - `SegmentedControl`: compact choice between a small set of options.
 - `Slider`: continuous range slider with native SwiftUI on iOS and gesture PanResponder fallback on Android/Web.
@@ -79,6 +87,7 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
   tuning instead of overriding the sheet container from product code.
 - `ActionSheet`: bottom-sheet backed list of contextual actions.
 - `Tooltip`: compact contextual help for icon buttons and dense controls.
+- `Popover`: content anchored to a trigger. Compose `Popover.Root`, `Popover.Trigger`, and `Popover.Content`. It is the small panel, not a sheet.
 
 ## Layout And Display
 
@@ -116,6 +125,8 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
 - `TransientPill`: anchored floating indicator badge.
 - `CodeBlock`: syntax-highlighted code viewer with diff line support, terminal mode, and copy action.
 - `Toolbar`
+- `Attachment`: a file or image row with preview, title, status, and remove. `status` is `"idle" | "uploading" | "ready" | "error"`.
+- `Message` and `Bubble`: one turn in a conversation. `align` is `"start"` or `"end"`. `Bubble` is the content shell. `MessageScroller` keeps the latest turn in view until the reader scrolls away.
 
 ## Keyboard
 

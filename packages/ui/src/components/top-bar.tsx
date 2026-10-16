@@ -26,7 +26,7 @@ export interface TopBarProps extends Omit<ViewProps, "style" | "children"> {
 	style?: ViewStyle;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({
+const TopBarView: React.FC<TopBarProps> = ({
 	title,
 	subtitle,
 	onBack,
@@ -72,7 +72,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 		<View style={[containerStyle, style]} testID={testID} {...props}>
 			{leading ??
 				(onBack ? (
-					<TopBarIconButton
+					<TopBarActionButton
 						icon="ChevronLeft"
 						label={backLabel}
 						onPress={onBack}
@@ -91,7 +91,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 			</View>
 			{trailing}
 			{actions?.map((action) => (
-				<TopBarIconButton
+				<TopBarActionButton
 					key={action.label}
 					icon={action.icon}
 					label={action.label}
@@ -112,13 +112,13 @@ interface TopBarIconButtonProps {
 	testID?: string;
 }
 
-const TopBarIconButton: React.FC<TopBarIconButtonProps> = ({
+export function TopBarActionButton({
 	icon,
 	label,
 	onPress,
 	disabled = false,
 	testID,
-}) => {
+}: TopBarIconButtonProps) {
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
 	const handlePress = () => {
@@ -147,4 +147,9 @@ const TopBarIconButton: React.FC<TopBarIconButtonProps> = ({
 			<Icon name={icon} size={22} color={theme.colors.text} />
 		</Pressable>
 	);
-};
+}
+
+export const TopBar = Object.assign(TopBarView, {
+	Root: TopBarView,
+	Action: TopBarActionButton,
+});

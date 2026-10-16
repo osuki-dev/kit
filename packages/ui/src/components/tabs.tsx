@@ -6,8 +6,21 @@ import React, {
 	useState,
 	type ReactNode,
 } from "react";
-import { Pressable, View, type PressableProps, type ViewProps, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import {
+	Pressable,
+	StyleSheet,
+	View,
+	type PressableProps,
+	type ViewProps,
+	type ViewStyle,
+} from "react-native";
+import {
+	readStringFill,
+	useResolvedSurfaceFill,
+	useSurfaceDecorator,
+	useThemeTokens,
+	withoutStringFill,
+} from "../theme";
 import { useHaptics } from "./haptics";
 import { Text } from "./text";
 
@@ -36,6 +49,7 @@ export interface TabsContextValue {
 
 const TabsContext = createContext<TabsContextValue | undefined>(undefined);
 const TabsTriggerContext = createContext(false);
+const TabsTrackContext = createContext<string | null>(null);
 
 export interface TabsRootProps {
 	children: ReactNode;
@@ -84,20 +98,26 @@ export function useTabs(): TabsContextValue {
 export function TabsList({ style, ...props }: ViewProps) {
 	const theme = useThemeTokens();
 	const { meta } = useTabs();
+	const explicitTrack = readStringFill(style);
+	const trackBase = explicitTrack ?? theme.colors.surfaceRaised;
 	const listStyle = useMemo<ViewStyle>(
 		() => ({
 			flexDirection: "row",
 			alignItems: "center",
 			gap: meta.variant === "pill" ? theme.spacing.xs : 0,
-			borderBottomWidth: meta.variant === "underline" ? 1 : 0,
+			borderBottomWidth: meta.variant === "underline" ? StyleSheet.hairlineWidth : 0,
 			borderBottomColor: theme.colors.border,
-			backgroundColor: meta.variant === "pill" ? theme.colors.surfaceRaised : "transparent",
+			backgroundColor: "transparent",
 			borderRadius: meta.variant === "pill" ? theme.radius.pill : 0,
 			padding: meta.variant === "pill" ? theme.spacing.xs : 0,
 		}),
-		[meta.variant, theme.colors, theme.radius.pill, theme.spacing.xs],
+		[meta.variant, theme.colors.border, theme.radius.pill, theme.spacing.xs],
 	);
-	return <View accessibilityRole="tablist" style={[listStyle, style]} {...props} />;
+	return (
+		<TabsTrackContext.Provider value={meta.variant === "pill" ? trackBase : null}>
+			<View accessibilityRole="tablist" style={[listStyle, withoutStringFill(style)]} {...props} />
+		</TabsTrackContext.Provider>
+	);
 }
 
 export interface TabsTriggerProps extends Omit<PressableProps, "children"> {
@@ -116,10 +136,32 @@ export function TabsTrigger({
 }: TabsTriggerProps) {
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
+	const decorator = useSurfaceDecorator();
 	const { state, actions, meta } = useTabs();
+	const trackBase = useContext(TabsTrackContext);
 	const selected = state.value === value;
+	const radius = meta.variant === "pill" ? theme.radius.pill : 0;
+	const baseColor =
+		meta.variant === "pill"
+			? selected
+				? theme.colors.surface
+				: (trackBase ?? theme.colors.surfaceRaised)
+			: "transparent";
+	const surfaceMeta = useMemo(
+		() => ({
+			slot: selected ? "tabs.selected" : "tabs.track",
+			variant: meta.variant,
+			baseColor,
+			selected,
+			disabled,
+			borderRadius: radius,
+		}),
+		[baseColor, disabled, meta.variant, radius, selected],
+	);
+	const fill = useResolvedSurfaceFill(baseColor, surfaceMeta);
 	const triggerStyle = useMemo<ViewStyle>(
 		() => ({
+			position: "relative",
 			minHeight: meta.size === "compact" ? 40 : 48,
 			flex: 1,
 			minWidth: 0,
@@ -128,13 +170,24 @@ export function TabsTrigger({
 			flexDirection: "row",
 			gap: theme.spacing.xs,
 			paddingHorizontal: theme.spacing.sm,
-			borderRadius: meta.variant === "pill" ? theme.radius.pill : 0,
-			backgroundColor: meta.variant === "pill" && selected ? theme.colors.surface : "transparent",
+			borderRadius: radius,
+			overflow: "hidden",
+			backgroundColor: fill,
 			borderBottomWidth: meta.variant === "underline" && selected ? 2 : 0,
 			borderBottomColor: theme.colors.primary,
 			opacity: disabled ? 0.44 : 1,
 		}),
-		[disabled, meta, selected, theme.colors, theme.radius.pill, theme.spacing],
+		[
+			disabled,
+			fill,
+			meta.size,
+			meta.variant,
+			radius,
+			selected,
+			theme.colors.primary,
+			theme.spacing.xs,
+			theme.spacing.sm,
+		],
 	);
 	return (
 		<Pressable
@@ -154,6 +207,11 @@ export function TabsTrigger({
 			]}
 			{...props}
 		>
+			{decorator?.renderDecoration ? (
+				<View collapsable pointerEvents="none" style={StyleSheet.absoluteFill}>
+					{decorator.renderDecoration(surfaceMeta)}
+				</View>
+			) : null}
 			<TabsTriggerContext.Provider value={selected}>{children}</TabsTriggerContext.Provider>
 		</Pressable>
 	);
@@ -187,6 +245,17 @@ export interface TabsBadgeProps {
 export function TabsBadge({ children }: TabsBadgeProps) {
 	const theme = useThemeTokens();
 	const selected = useContext(TabsTriggerContext);
+	const baseColor = selected ? theme.colors.primary : theme.colors.borderStrong;
+	const badgeMeta = useMemo(
+		() => ({
+			slot: "tabs.badge",
+			variant: selected ? "selected" : "idle",
+			baseColor,
+			selected,
+		}),
+		[baseColor, selected],
+	);
+	const fill = useResolvedSurfaceFill(baseColor, badgeMeta);
 	return (
 		<View
 			style={{
@@ -196,7 +265,7 @@ export function TabsBadge({ children }: TabsBadgeProps) {
 				paddingHorizontal: theme.spacing.xs,
 				alignItems: "center",
 				justifyContent: "center",
-				backgroundColor: selected ? theme.colors.primary : theme.colors.borderStrong,
+				backgroundColor: fill,
 			}}
 		>
 			<Text variant="caption" colorKey="onPrimary" numberOfLines={1}>

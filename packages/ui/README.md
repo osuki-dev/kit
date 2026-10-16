@@ -74,6 +74,19 @@ version installed:
 | `OtpInput`      | One-time-code entry cells            | `length`, `value`, `onChange`           |
 | `Stepper`       | Numeric stepper control              | `value`, `min`, `max`, `onChange`       |
 | `FieldGroup`    | Form field wrapper                   | `label`, `helper`, `error`              |
+| `Field`         | Composable form field                | `Root`, `Label`, `Description`, `Error` |
+| `InputGroup`    | Field with addons                    | `Root`, `Addon`, `Input`                |
+| `Combobox`      | Searchable picker                    | `options`, `value`, `onChange`          |
+| `Command`       | Filterable action list               | `Root`, `Input`, `Item`, `Empty`        |
+| `Calendar`      | Month grid                           | `mode`, `value`, `onChange`             |
+| `ButtonGroup`   | Joined actions                       | `children`                              |
+| `Collapsible`   | Single disclosure                    | `Root`, `Trigger`, `Content`            |
+| `Accordion`     | Stacked disclosures                  | `type`, `Item`, `Trigger`, `Content`    |
+| `Popover`       | Anchored panel                       | `Root`, `Trigger`, `Content`            |
+| `Attachment`    | File or image row                    | `title`, `status`, `onRemove`           |
+| `Message`       | Conversation turn                    | `align`, `Author`, `Bubble`, `Time`     |
+| `Bubble`        | Message content shell                | `children`                              |
+| `MessageScroller` | Conversation scroll                | `follow`                                |
 | `Tabs`          | Composable section switching         | `Root`, `List`, `Trigger`, `Label`      |
 | `Alert`         | Inline status messages               | `variant`, `title`, `message`           |
 | `ToastProvider` | App-level toast notifications        | `placement`, `maxToasts`                |
