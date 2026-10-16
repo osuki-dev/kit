@@ -408,9 +408,10 @@ test("splitFieldStyle keeps placement on the wrapper and type on the field", () 
 });
 
 test("withHugSlack adds a trailing thin space on Android only", () => {
-	assert.equal(withHugSlack("广", "android"), "广\u2009");
-	assert.equal(withHugSlack("广\u2009", "android"), "广\u2009");
+	const wide = "\u5e7f";
+	assert.equal(withHugSlack(wide, "android"), `${wide}\u2009`);
+	assert.equal(withHugSlack(`${wide}\u2009`, "android"), `${wide}\u2009`);
 	assert.equal(withHugSlack("", "android"), "");
-	assert.equal(withHugSlack("广", "ios"), "广");
+	assert.equal(withHugSlack(wide, "ios"), wide);
 	assert.equal(withHugSlack(12, "android"), "12\u2009");
 });
