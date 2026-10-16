@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
-import { View, type ViewProps, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import React from "react";
+import { type ViewProps } from "react-native";
 import { Text } from "./text";
+import { Field } from "./field";
 
 export interface FieldGroupProps extends ViewProps {
 	label?: string;
@@ -13,6 +13,7 @@ export interface FieldGroupProps extends ViewProps {
 	children: React.ReactNode;
 }
 
+/** Convenience field: label, control, and one supporting line. Built from `Field`. */
 export const FieldGroup: React.FC<FieldGroupProps> = ({
 	label,
 	description,
@@ -25,44 +26,23 @@ export const FieldGroup: React.FC<FieldGroupProps> = ({
 	testID,
 	...props
 }) => {
-	const theme = useThemeTokens();
-	const containerStyle = useMemo<ViewStyle>(
-		() => ({
-			width: "100%",
-			gap: theme.spacing.sm,
-			opacity: disabled ? 0.56 : 1,
-		}),
-		[disabled, theme.spacing.sm],
-	);
-	const supportingText = error ?? helper;
-
+	let support = helper;
+	let supportTestId = testID ? `${testID}-helper` : undefined;
+	if (error) {
+		support = error;
+		supportTestId = testID ? `${testID}-error` : undefined;
+	}
 	return (
-		<View style={[containerStyle, style]} testID={testID} {...props}>
-			{(label || description) && (
-				<View style={{ gap: theme.spacing.xs }}>
-					{label && (
-						<Text variant="label" colorKey="textMuted">
-							{label}
-							{required && <Text colorKey="danger"> *</Text>}
-						</Text>
-					)}
-					{description && (
-						<Text variant="caption" colorKey="textSubtle">
-							{description}
-						</Text>
-					)}
-				</View>
-			)}
+		<Field.Root disabled={disabled} required={required} style={style} testID={testID} {...props}>
+			{label ? <Field.Label>{label}</Field.Label> : null}
+			{description ? <Field.Description>{description}</Field.Description> : null}
 			{children}
-			{supportingText && (
-				<Text
-					variant="caption"
-					colorKey={error ? "danger" : "textDisabled"}
-					testID={testID ? `${testID}-${error ? "error" : "helper"}` : undefined}
-				>
-					{supportingText}
+			{error ? <Field.Error testID={supportTestId}>{error}</Field.Error> : null}
+			{!error && support ? (
+				<Text variant="caption" colorKey="textDisabled" testID={supportTestId}>
+					{support}
 				</Text>
-			)}
-		</View>
+			) : null}
+		</Field.Root>
 	);
 };

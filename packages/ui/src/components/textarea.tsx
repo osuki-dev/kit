@@ -47,3 +47,5 @@ export const Textarea: React.FC<TextareaProps> = ({
 		/>
 	);
 };
+
+Object.assign(Textarea, { Root: Input.Root });

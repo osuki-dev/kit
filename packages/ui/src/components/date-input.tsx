@@ -4,7 +4,7 @@ import { useThemeTokens } from "../theme";
 import { BottomSheet } from "./bottom-sheet";
 import { Button } from "./button";
 import { FieldGroup } from "./field-group";
-import { Icon } from "./icon";
+import { Icon, type IconName } from "./icon";
 import { Input, type InputVariant } from "./input";
 import { Text } from "./text";
 
@@ -59,7 +59,7 @@ function getKeyboardType(mode: DateInputMode) {
 	return mode === "datetime" ? "default" : "numbers-and-punctuation";
 }
 
-export const DateInput: React.FC<DateInputProps> = ({
+const DateInputView: React.FC<DateInputProps> = ({
 	mode = "date",
 	value = "",
 	onChange,
@@ -147,23 +147,17 @@ export const DateInput: React.FC<DateInputProps> = ({
 			testID={testID}
 			{...props}
 		>
-			<Pressable
-				accessibilityRole="button"
-				accessibilityLabel={label ?? resolvedPlaceholder}
-				accessibilityState={{ expanded: open, disabled }}
+			<DateInputTrigger
+				label={label ?? resolvedPlaceholder}
+				valueText={value || resolvedPlaceholder}
+				hasValue={Boolean(value)}
+				iconName={iconName}
+				expanded={open}
 				disabled={disabled}
 				onPress={openSheet}
 				style={triggerStyle}
 				testID={testID ? `${testID}-trigger` : undefined}
-			>
-				<Icon name={iconName} size={18} color={theme.colors.textMuted} />
-				<View style={{ flex: 1, minWidth: 0, justifyContent: "center" }}>
-					<Text variant="body" colorKey={value ? "text" : "textDisabled"} numberOfLines={1}>
-						{value || resolvedPlaceholder}
-					</Text>
-				</View>
-				<Icon name="ChevronDown" size={18} color={theme.colors.textMuted} />
-			</Pressable>
+			/>
 
 			<BottomSheet
 				visible={open}
@@ -213,3 +207,55 @@ export const DateInput: React.FC<DateInputProps> = ({
 		</FieldGroup>
 	);
 };
+
+export function DateInputTrigger({
+	label,
+	valueText,
+	hasValue,
+	iconName,
+	expanded,
+	disabled,
+	onPress,
+	style,
+	testID,
+}: {
+	label: string;
+	valueText: string;
+	hasValue: boolean;
+	iconName: IconName;
+	expanded: boolean;
+	disabled: boolean;
+	onPress: () => void;
+	style: ViewStyle;
+	testID?: string;
+}) {
+	const theme = useThemeTokens();
+
+	return (
+		<Pressable
+			accessibilityRole="button"
+			accessibilityLabel={label}
+			accessibilityState={{ disabled, expanded }}
+			disabled={disabled}
+			onPress={onPress}
+			style={style}
+			testID={testID}
+		>
+			<Icon name={iconName} size={18} color={theme.colors.textMuted} />
+			<Text
+				variant="body"
+				colorKey={hasValue ? "text" : "textMuted"}
+				numberOfLines={1}
+				style={{ flex: 1 }}
+			>
+				{valueText}
+			</Text>
+			<Icon name="ChevronDown" size={18} color={theme.colors.textSubtle} />
+		</Pressable>
+	);
+}
+
+export const DateInput = Object.assign(DateInputView, {
+	Root: DateInputView,
+	Trigger: DateInputTrigger,
+});

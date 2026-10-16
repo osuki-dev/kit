@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import {
 	Platform,
-	TextInput,
+	StyleSheet,
 	View,
 	type TextInputProps,
 	type ViewStyle,
@@ -15,11 +15,39 @@ import Animated, {
 	useSharedValue,
 	withTiming,
 } from "react-native-reanimated";
-import { resolveFontStyle, useThemeTokens } from "../theme";
+import { resolveFontStyle, useResolvedSurfaceFill, useSurfaceDecorator, useThemeTokens } from "../theme";
+import { TextField } from "../utils/text-field";
 import { Text } from "./text";
 
 export type InputVariant = "underline" | "outline";
 export type InputSize = "default" | "compact";
+
+interface InputFrame {
+	testID?: string;
+	placeholderColor: string;
+	textStyle: TextStyle;
+	controlStyle: ViewStyle;
+	animatedStyle: ReturnType<typeof useAnimatedStyle>;
+	borderRadius: number;
+	errorFill: string;
+	decorationMeta: {
+		slot: string;
+		variant: string;
+		baseColor: string;
+		borderRadius: number;
+	};
+	inputProps: Omit<TextInputProps, "style" | "onFocus" | "onBlur">;
+	onFocus: TextInputProps["onFocus"];
+	onBlur: TextInputProps["onBlur"];
+}
+
+export const InputFrameContext = createContext<InputFrame | null>(null);
+
+function useInputFrame(): InputFrame {
+	const frame = useContext(InputFrameContext);
+	if (!frame) throw new Error("Input parts must be used within Input.Root");
+	return frame;
+}
 
 export interface InputProps extends Omit<TextInputProps, "style"> {
 	label?: string;
@@ -31,7 +59,7 @@ export interface InputProps extends Omit<TextInputProps, "style"> {
 	style?: TextStyle;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const InputRoot: React.FC<InputProps> = ({
 	label,
 	variant = "underline",
 	size = "default",
@@ -41,6 +69,7 @@ export const Input: React.FC<InputProps> = ({
 	style,
 	onFocus,
 	onBlur,
+	children,
 	...textInputProps
 }) => {
 	const theme = useThemeTokens();
@@ -62,6 +91,28 @@ export const Input: React.FC<InputProps> = ({
 		[theme.spacing],
 	);
 
+	const controlBase =
+		input.background === "transparent" ? "transparent" : theme.colors[input.background];
+	const controlMeta = useMemo(
+		() => ({
+			slot: "inputs.background",
+			variant,
+			baseColor: controlBase,
+			borderRadius: variant === "outline" ? theme.radius[input.radius] : 0,
+		}),
+		[controlBase, input.radius, theme.radius, variant],
+	);
+	const controlFill = useResolvedSurfaceFill(controlBase, controlMeta);
+	const errorMeta = useMemo(
+		() => ({
+			slot: "inputs.error",
+			variant,
+			baseColor: theme.colors.dangerSubtle,
+		}),
+		[theme.colors.dangerSubtle, variant],
+	);
+	const errorFill = useResolvedSurfaceFill(theme.colors.dangerSubtle, errorMeta);
+
 	const inputContainerStyles = useMemo<ViewStyle>(() => {
 		const verticalPadding = size === "compact" ? theme.spacing.xs : theme.spacing[input.paddingY];
 		const minHeight = isMultiline
@@ -71,22 +122,33 @@ export const Input: React.FC<InputProps> = ({
 				: 48;
 
 		return {
+			position: "relative",
 			minHeight,
 			justifyContent: isMultiline ? "flex-start" : "center",
-			backgroundColor:
-				input.background === "transparent" ? "transparent" : theme.colors[input.background],
+			overflow: "hidden",
+			backgroundColor: controlFill,
 			...(variant === "outline" && {
 				borderRadius: theme.radius[input.radius],
 				paddingHorizontal: theme.spacing[input.paddingX],
 				paddingVertical: verticalPadding,
 			}),
 			...(variant === "underline" && {
-				borderBottomWidth: 1,
+				borderBottomWidth: StyleSheet.hairlineWidth,
 				borderColor: theme.colors[input.border],
 				paddingVertical: verticalPadding,
 			}),
 		};
-	}, [input, isMultiline, numberOfLines, size, theme.colors, theme.radius, theme.spacing, variant]);
+	}, [
+		controlFill,
+		input,
+		isMultiline,
+		numberOfLines,
+		size,
+		theme.colors,
+		theme.radius,
+		theme.spacing,
+		variant,
+	]);
 
 	const animatedInputContainerStyle = useAnimatedStyle(() => {
 		const focusBorder = interpolateColor(
@@ -140,52 +202,135 @@ export const Input: React.FC<InputProps> = ({
 		onBlur?.(e);
 	};
 
+	const frame = useMemo<InputFrame>(
+		() => ({
+			testID: textInputProps.testID,
+			placeholderColor: theme.colors[input.placeholder],
+			textStyle: inputStyles,
+			controlStyle: inputContainerStyles,
+			animatedStyle: animatedInputContainerStyle,
+			borderRadius: controlMeta.borderRadius ?? 0,
+			errorFill,
+			decorationMeta: {
+				slot: controlMeta.slot ?? "inputs.background",
+				variant,
+				baseColor: controlMeta.baseColor,
+				borderRadius: controlMeta.borderRadius ?? 0,
+			},
+			inputProps: textInputProps,
+			onFocus: handleFocus,
+			onBlur: handleBlur,
+		}),
+		[
+			animatedInputContainerStyle,
+			controlMeta,
+			errorFill,
+			handleBlur,
+			handleFocus,
+			input.placeholder,
+			inputContainerStyles,
+			inputStyles,
+			textInputProps,
+			theme.colors,
+		],
+	);
+
+	const slots = (
+		<>
+			{label ? <InputLabel>{label}</InputLabel> : null}
+			<InputControl style={style} />
+			{hasError ? <InputError testID={textInputProps.testID}>{error}</InputError> : null}
+			{hasHelper ? <InputHint>{helper}</InputHint> : null}
+		</>
+	);
+
 	return (
-		<View
-			testID={textInputProps.testID ? `${textInputProps.testID}-container` : undefined}
-			style={[containerStyles, containerStyle]}
-		>
-			{label && (
-				<Text variant="label" colorKey="textMuted">
-					{label}
-				</Text>
-			)}
-			<Animated.View
-				testID={textInputProps.testID ? `${textInputProps.testID}-control` : undefined}
-				style={[inputContainerStyles, animatedInputContainerStyle]}
+		<InputFrameContext.Provider value={frame}>
+			<View
+				testID={textInputProps.testID ? `${textInputProps.testID}-container` : undefined}
+				style={[containerStyles, containerStyle]}
 			>
-				<TextInput
-					style={[inputStyles, style]}
-					placeholderTextColor={theme.colors[input.placeholder]}
-					onFocus={handleFocus}
-					onBlur={handleBlur}
-					{...textInputProps}
-				/>
-			</Animated.View>
-			{hasError && (
-				<Animated.View
-					testID={textInputProps.testID ? `${textInputProps.testID}-error` : undefined}
-					entering={FadeInDown.duration(150)}
-					layout={Layout.springify().damping(20).stiffness(260)}
-					style={{
-						backgroundColor: theme.colors.dangerSubtle,
-						borderRadius: theme.radius.pill,
-						paddingHorizontal: theme.spacing.md,
-						paddingVertical: theme.spacing.xs,
-						alignSelf: "flex-start",
-						maxWidth: "100%",
-					}}
-				>
-					<Text variant="caption" colorKey="danger">
-						{error}
-					</Text>
-				</Animated.View>
-			)}
-			{hasHelper && (
-				<Text variant="caption" colorKey="textDisabled">
-					{helper}
-				</Text>
-			)}
-		</View>
+				{children ?? slots}
+			</View>
+		</InputFrameContext.Provider>
 	);
 };
+
+export function InputLabel({ children }: { children?: ReactNode }) {
+	if (!children) return null;
+	return (
+		<Text variant="label" colorKey="textMuted">
+			{children}
+		</Text>
+	);
+}
+
+export function InputControl({ style }: { style?: TextStyle }) {
+	const decorator = useSurfaceDecorator();
+	const frame = useInputFrame();
+	return (
+		<Animated.View
+			testID={frame.testID ? `${frame.testID}-control` : undefined}
+			style={[frame.controlStyle, frame.animatedStyle]}
+		>
+			{decorator?.renderDecoration ? (
+				<View
+					collapsable
+					pointerEvents="none"
+					style={[StyleSheet.absoluteFill, { borderRadius: frame.borderRadius }]}
+				>
+					{decorator.renderDecoration(frame.decorationMeta)}
+				</View>
+			) : null}
+			<TextField
+				style={[frame.textStyle, style]}
+				placeholderTextColor={frame.placeholderColor}
+				onFocus={frame.onFocus}
+				onBlur={frame.onBlur}
+				{...frame.inputProps}
+			/>
+		</Animated.View>
+	);
+}
+
+export function InputError({ children, testID }: { children?: ReactNode; testID?: string }) {
+	const theme = useThemeTokens();
+	const frame = useInputFrame();
+	if (!children) return null;
+	return (
+		<Animated.View
+			testID={testID ? `${testID}-error` : undefined}
+			entering={FadeInDown.duration(150)}
+			layout={Layout.springify().damping(20).stiffness(260)}
+			style={{
+				backgroundColor: frame.errorFill,
+				borderRadius: theme.radius.pill,
+				paddingHorizontal: theme.spacing.md,
+				paddingVertical: theme.spacing.xs,
+				alignSelf: "flex-start",
+				maxWidth: "100%",
+			}}
+		>
+			<Text variant="caption" colorKey="danger">
+				{children}
+			</Text>
+		</Animated.View>
+	);
+}
+
+export function InputHint({ children }: { children?: ReactNode }) {
+	if (!children) return null;
+	return (
+		<Text variant="caption" colorKey="textDisabled">
+			{children}
+		</Text>
+	);
+}
+
+export const Input = Object.assign(InputRoot, {
+	Root: InputRoot,
+	Label: InputLabel,
+	Control: InputControl,
+	Error: InputError,
+	Hint: InputHint,
+});

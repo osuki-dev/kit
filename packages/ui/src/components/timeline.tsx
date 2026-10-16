@@ -33,7 +33,7 @@ const toneColor: Record<TimelineTone, ColorToken> = {
 	info: "info",
 };
 
-export const Timeline: React.FC<TimelineProps> = ({
+const TimelineView: React.FC<TimelineProps> = ({
 	items,
 	size = "default",
 	style,
@@ -52,81 +52,103 @@ export const Timeline: React.FC<TimelineProps> = ({
 
 	return (
 		<View style={[containerStyle, style]} testID={testID} {...props}>
-			{items.map((item, index) => {
-				const isLast = index === items.length - 1;
-				const status = item.status ?? "pending";
-				const completed = status === "completed";
-				const color = theme.colors[toneColor[item.tone ?? "neutral"]];
-				const dotSize = compact ? 24 : 30;
-				return (
-					<View key={item.id} style={{ flexDirection: "row" }}>
-						<View style={{ alignItems: "center", width: dotSize }}>
-							<View
-								style={{
-									width: dotSize,
-									height: dotSize,
-									borderRadius: dotSize / 2,
-									alignItems: "center",
-									justifyContent: "center",
-									borderWidth: status === "active" ? 2 : 1,
-									borderColor: color,
-									backgroundColor: completed ? color : theme.colors.surface,
-								}}
-							>
-								{item.icon ? (
-									<Icon
-										name={item.icon}
-										size={compact ? 13 : 15}
-										color={completed ? theme.colors.onPrimary : color}
-									/>
-								) : (
-									<View
-										style={{
-											width: compact ? 7 : 8,
-											height: compact ? 7 : 8,
-											borderRadius: 4,
-											backgroundColor: completed ? theme.colors.onPrimary : color,
-										}}
-									/>
-								)}
-							</View>
-							{!isLast && (
-								<View
-									style={{
-										width: 1,
-										flex: 1,
-										minHeight: compact ? 28 : 38,
-										backgroundColor: theme.colors.border,
-									}}
-								/>
-							)}
-						</View>
-						<View
-							style={{
-								flex: 1,
-								minWidth: 0,
-								paddingLeft: theme.spacing.sm,
-								paddingBottom: isLast ? 0 : compact ? theme.spacing.sm : theme.spacing.md,
-								gap: compact ? 2 : 4,
-							}}
-						>
-							<Text variant={compact ? "bodySmall" : "body"} colorKey="text">
-								{item.title}
-							</Text>
-							{item.description && (
-								<Text variant="caption" colorKey="textMuted" numberOfLines={compact ? 2 : 3}>
-									{item.description}
-								</Text>
-							)}
-							{(item.timestamp || item.meta) && (
-								<Text variant="caption" colorKey="textDisabled" numberOfLines={1}>
-									{[item.timestamp, item.meta].filter(Boolean).join(" · ")}
-								</Text>
-							)}
-						</View>
-					</View>
-				);
-			})}
+			{items.map((item, index) => (
+				<TimelineRow
+					key={item.id}
+					item={item}
+					compact={compact}
+					isLast={index === items.length - 1}
+				/>
+			))}
 		</View>
 	);
 };
+
+export function TimelineRow({
+	item,
+	compact,
+	isLast,
+}: {
+	item: TimelineItem;
+	compact: boolean;
+	isLast: boolean;
+}) {
+	const theme = useThemeTokens();
+	const status = item.status ?? "pending";
+	const completed = status === "completed";
+	const color = theme.colors[toneColor[item.tone ?? "neutral"]];
+	const dotSize = compact ? 24 : 30;
+	return (
+		<View style={{ flexDirection: "row" }}>
+			<View style={{ alignItems: "center", width: dotSize }}>
+				<View
+					style={{
+						width: dotSize,
+						height: dotSize,
+						borderRadius: dotSize / 2,
+						alignItems: "center",
+						justifyContent: "center",
+						borderWidth: status === "active" ? 2 : 1,
+						borderColor: color,
+						backgroundColor: completed ? color : theme.colors.surface,
+					}}
+				>
+					{item.icon ? (
+						<Icon
+							name={item.icon}
+							size={compact ? 13 : 15}
+							color={completed ? theme.colors.onPrimary : color}
+						/>
+					) : (
+						<View
+							style={{
+								width: compact ? 7 : 8,
+								height: compact ? 7 : 8,
+								borderRadius: 4,
+								backgroundColor: completed ? theme.colors.onPrimary : color,
+							}}
+						/>
+					)}
+				</View>
+				{!isLast && (
+					<View
+						style={{
+							width: 1,
+							flex: 1,
+							minHeight: compact ? 28 : 38,
+							backgroundColor: theme.colors.border,
+						}}
+					/>
+				)}
+			</View>
+			<View
+				style={{
+					flex: 1,
+					minWidth: 0,
+					paddingLeft: theme.spacing.sm,
+					paddingBottom: isLast ? 0 : compact ? theme.spacing.sm : theme.spacing.md,
+					gap: compact ? 2 : 4,
+				}}
+			>
+				<Text variant={compact ? "bodySmall" : "body"} colorKey="text">
+					{item.title}
+				</Text>
+				{item.description && (
+					<Text variant="caption" colorKey="textMuted" numberOfLines={compact ? 2 : 3}>
+						{item.description}
+					</Text>
+				)}
+				{(item.timestamp || item.meta) && (
+					<Text variant="caption" colorKey="textDisabled" numberOfLines={1}>
+						{[item.timestamp, item.meta].filter(Boolean).join(" · ")}
+					</Text>
+				)}
+			</View>
+		</View>
+	);
+}
+
+export const Timeline = Object.assign(TimelineView, {
+	Root: TimelineView,
+	Item: TimelineRow,
+});

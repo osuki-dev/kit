@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { TouchableOpacity, type TouchableOpacityProps, type ViewStyle } from "react-native";
 import Animated, {
 	interpolateColor,
@@ -50,12 +50,22 @@ const sizeMap = {
  * <Checkbox checked={false} size="sm" />
  * ```
  */
-export const Checkbox: React.FC<CheckboxProps> = ({
+interface CheckboxIndicatorContext {
+	boxStyle: React.ComponentProps<typeof Animated.View>["style"];
+	markStyle: React.ComponentProps<typeof Animated.View>["style"];
+	dimension: number;
+	markColor: string;
+}
+
+const CheckboxIndicatorContext = createContext<CheckboxIndicatorContext | null>(null);
+
+export const CheckboxRoot: React.FC<CheckboxProps & { children?: React.ReactNode }> = ({
 	checked,
 	disabled = false,
 	size = "md",
 	style,
 	onToggle,
+	children,
 	...rest
 }) => {
 	const { colors, radius } = useThemeTokens();
@@ -136,23 +146,50 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 		[],
 	);
 
+	const indicator = useMemo<CheckboxIndicatorContext>(
+		() => ({
+			boxStyle: [containerStyle, animatedStyle],
+			markStyle: checkAnimatedStyle,
+			dimension,
+			markColor: colors.onPrimary,
+		}),
+		[animatedStyle, checkAnimatedStyle, colors.onPrimary, containerStyle, dimension],
+	);
+
 	return (
-		<TouchableOpacity
-			onPress={handlePress}
-			disabled={disabled}
-			accessibilityRole="checkbox"
-			accessibilityState={{ checked, disabled }}
-			onPressIn={handlePressIn}
-			onPressOut={handlePressOut}
-			style={[touchableStyle, style]}
-			activeOpacity={1}
-			{...rest}
-		>
-			<Animated.View style={[containerStyle, animatedStyle]}>
-				<Animated.View style={checkAnimatedStyle}>
-					<Icon name="Check" size={dimension - 5} color={colors.onPrimary} />
-				</Animated.View>
-			</Animated.View>
-		</TouchableOpacity>
+		<CheckboxIndicatorContext.Provider value={indicator}>
+			<TouchableOpacity
+				onPress={handlePress}
+				disabled={disabled}
+				accessibilityRole="checkbox"
+				accessibilityState={{ checked, disabled }}
+				onPressIn={handlePressIn}
+				onPressOut={handlePressOut}
+				style={[touchableStyle, style]}
+				activeOpacity={1}
+				{...rest}
+			>
+				{children ?? <CheckboxIndicator />}
+			</TouchableOpacity>
+		</CheckboxIndicatorContext.Provider>
 	);
 };
+
+export function CheckboxIndicator() {
+	const indicator = useContext(CheckboxIndicatorContext);
+	if (!indicator) {
+		throw new Error("Checkbox.Indicator must be used within Checkbox.Root");
+	}
+	return (
+		<Animated.View style={indicator.boxStyle}>
+			<Animated.View style={indicator.markStyle}>
+				<Icon name="Check" size={indicator.dimension - 5} color={indicator.markColor} />
+			</Animated.View>
+		</Animated.View>
+	);
+}
+
+export const Checkbox = Object.assign(CheckboxRoot, {
+	Root: CheckboxRoot,
+	Indicator: CheckboxIndicator,
+});

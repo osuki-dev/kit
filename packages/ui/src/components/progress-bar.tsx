@@ -30,7 +30,63 @@ const sizeHeights: Record<ProgressBarSize, number> = {
 	lg: 12,
 };
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({
+export function ProgressTrack({
+	children,
+	height,
+	radius,
+	testID,
+	accessibilityValue,
+}: {
+	children?: React.ReactNode;
+	height: number;
+	radius: number;
+	testID?: string;
+	accessibilityValue?: { min: number; max: number; now: number };
+}) {
+	const theme = useThemeTokens();
+	return (
+		<View
+			accessibilityRole="progressbar"
+			accessibilityValue={accessibilityValue}
+			testID={testID}
+			style={{
+				width: "100%",
+				height,
+				borderRadius: radius,
+				backgroundColor: theme.colors.surfaceRaised,
+				overflow: "hidden",
+			}}
+		>
+			{children}
+		</View>
+	);
+}
+
+export function ProgressFill({
+	percent,
+	radius,
+	color,
+	testID,
+}: {
+	percent: number;
+	radius: number;
+	color: string;
+	testID?: string;
+}) {
+	return (
+		<View
+			testID={testID}
+			style={{
+				width: `${percent}%`,
+				height: "100%",
+				borderRadius: radius,
+				backgroundColor: color,
+			}}
+		/>
+	);
+}
+
+export function ProgressBarView({
 	value,
 	max = 100,
 	label,
@@ -41,7 +97,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 	style,
 	testID,
 	...props
-}) => {
+}: ProgressBarProps) {
 	const theme = useThemeTokens();
 	const safeMax = max <= 0 ? 100 : max;
 	const ratio = Math.min(Math.max(value / safeMax, 0), 1);
@@ -78,28 +134,25 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 					)}
 				</View>
 			)}
-			<View
-				accessibilityRole="progressbar"
-				accessibilityValue={{ min: 0, max: safeMax, now: Math.min(Math.max(value, 0), safeMax) }}
+			<ProgressTrack
+				height={height}
+				radius={radius}
 				testID={testID ? `${testID}-track` : undefined}
-				style={{
-					width: "100%",
-					height,
-					borderRadius: radius,
-					backgroundColor: theme.colors.surfaceRaised,
-					overflow: "hidden",
-				}}
+				accessibilityValue={{ min: 0, max: safeMax, now: Math.min(Math.max(value, 0), safeMax) }}
 			>
-				<View
+				<ProgressFill
+					percent={percent}
+					radius={radius}
+					color={foreground}
 					testID={testID ? `${testID}-fill` : undefined}
-					style={{
-						width: `${percent}%`,
-						height: "100%",
-						borderRadius: radius,
-						backgroundColor: foreground,
-					}}
 				/>
-			</View>
+			</ProgressTrack>
 		</View>
 	);
 };
+
+export const ProgressBar = Object.assign(ProgressBarView, {
+	Root: ProgressBarView,
+	Track: ProgressTrack,
+	Fill: ProgressFill,
+});

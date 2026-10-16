@@ -31,7 +31,7 @@ export interface SelectProps extends Omit<ViewProps, "style" | "children"> {
 	style?: ViewStyle;
 }
 
-export const Select: React.FC<SelectProps> = ({
+const SelectView: React.FC<SelectProps> = ({
 	options,
 	value,
 	onChange,
@@ -144,20 +144,15 @@ export const Select: React.FC<SelectProps> = ({
 								style={{ gap: theme.spacing.xs }}
 								testID={testID ? `${testID}-options` : undefined}
 							>
-								{options.map((option) => {
-									const selected = option.value === value;
-									return (
-										<SheetListItem
-											key={option.value}
-											label={option.label}
-											description={option.description}
-											selected={selected}
-											disabled={option.disabled}
-											onPress={() => handleSelect(option)}
-											testID={testID ? `${testID}-option-${option.value}` : undefined}
-										/>
-									);
-								})}
+								{options.map((option) => (
+									<SelectItem
+										key={option.value}
+										option={option}
+										selected={option.value === value}
+										onPress={() => handleSelect(option)}
+										testID={testID ? `${testID}-option-${option.value}` : undefined}
+									/>
+								))}
 							</View>
 						</ScrollView>
 					</Sheet.Body>
@@ -166,3 +161,31 @@ export const Select: React.FC<SelectProps> = ({
 		</Sheet.Root>
 	);
 };
+
+export function SelectItem({
+	option,
+	selected,
+	onPress,
+	testID,
+}: {
+	option: SelectOption;
+	selected: boolean;
+	onPress: () => void;
+	testID?: string;
+}) {
+	return (
+		<SheetListItem
+			label={option.label}
+			description={option.description}
+			selected={selected}
+			disabled={option.disabled}
+			onPress={onPress}
+			testID={testID}
+		/>
+	);
+}
+
+export const Select = Object.assign(SelectView, {
+	Root: SelectView,
+	Item: SelectItem,
+});

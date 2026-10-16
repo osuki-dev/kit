@@ -1,5 +1,6 @@
 import React from "react";
 import {
+	Platform,
 	StyleSheet,
 	Text as RNText,
 	View,
@@ -19,6 +20,22 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import { resolveFontStyle, useThemeTokens, type FontWeight, type TypeStyleName } from "../theme";
+
+const HUG_SLACK = "\u2009";
+
+/**
+ * Android clips the last glyph of italic and wide faces at the line edge.
+ * A trailing thin space gives the native text run room without changing the words.
+ */
+export function withHugSlack(children: React.ReactNode, os: string = Platform.OS): React.ReactNode {
+	if (os !== "android") return children;
+	if (typeof children === "string") {
+		if (children.length === 0 || children.endsWith(HUG_SLACK)) return children;
+		return `${children}${HUG_SLACK}`;
+	}
+	if (typeof children === "number") return `${children}${HUG_SLACK}`;
+	return children;
+}
 
 export interface TextProps extends RNTextProps {
 	/** Typography style preset */
@@ -145,14 +162,15 @@ export const Text: React.FC<TextProps> = ({
 			transform,
 		],
 	);
+	const renderedChildren = withHugSlack(children);
 	const flattenedStyle = StyleSheet.flatten(style);
 	const lineHeight =
 		typeof flattenedStyle?.lineHeight === "number"
 			? flattenedStyle.lineHeight
 			: (textStyles.lineHeight ?? typeStyle.fontSize * typeStyle.lineHeight);
 	const estimatedContentWidth = React.useMemo(
-		() => estimateTextWidth(children, textStyles.fontSize ?? typeStyle.fontSize),
-		[children, textStyles.fontSize, typeStyle.fontSize],
+		() => estimateTextWidth(renderedChildren, textStyles.fontSize ?? typeStyle.fontSize),
+		[renderedChildren, textStyles.fontSize, typeStyle.fontSize],
 	);
 	const contentWidth = measuredContentWidth ?? estimatedContentWidth;
 	const overflow = Math.max(0, contentWidth - containerWidth);
@@ -228,7 +246,7 @@ export const Text: React.FC<TextProps> = ({
 						style={[textStyles, style, styles.marqueeText, animatedMarqueeStyle]}
 						{...rest}
 					>
-						{children}
+						{renderedChildren}
 					</Animated.Text>
 				</View>
 			</View>
@@ -243,7 +261,7 @@ export const Text: React.FC<TextProps> = ({
 			style={[textStyles, style]}
 			{...rest}
 		>
-			{children}
+			{renderedChildren}
 		</RNText>
 	);
 };

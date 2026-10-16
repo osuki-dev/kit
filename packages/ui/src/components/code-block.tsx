@@ -20,7 +20,8 @@ import {
 	type ViewProps,
 	type ViewStyle,
 } from "react-native";
-import { useThemeTokens } from "../theme";
+import { readStringFill, useResolvedSurfaceFill, useThemeTokens, withoutStringFill } from "../theme";
+import { withAlpha } from "../utils/color";
 import { Icon } from "./icon";
 
 export type CodeBlockVariant = "default" | "diff" | "terminal" | "compact";
@@ -97,6 +98,20 @@ export function CodeBlockRoot({
 		};
 	}, []);
 
+	const tokenFill = variant === "default" ? theme.colors.surface : theme.colors.surfaceRaised;
+	const fillOverride = readStringFill(style);
+	const baseColor = fillOverride ?? tokenFill;
+	const surfaceMeta = useMemo(
+		() => ({
+			slot: `code.${variant}`,
+			variant,
+			baseColor,
+			borderRadius: theme.radius.md,
+		}),
+		[baseColor, theme.radius.md, variant],
+	);
+	const fill = useResolvedSurfaceFill(baseColor, surfaceMeta);
+
 	const value = useMemo<CodeBlockContextValue>(
 		() => ({
 			state: { copied },
@@ -106,31 +121,13 @@ export function CodeBlockRoot({
 		[copied, copy, variant, code],
 	);
 
-	const variantContainerStyle = useMemo<ViewStyle>(() => {
-		switch (variant) {
-			case "terminal":
-				return {
-					backgroundColor: theme.mode === "light" ? "#121820" : theme.colors.surfaceRaised,
-					borderColor: theme.mode === "light" ? "#202836" : theme.colors.border,
-				};
-			case "diff":
-				return {
-					backgroundColor: theme.colors.surfaceRaised,
-					borderColor: theme.colors.border,
-				};
-			case "compact":
-				return {
-					backgroundColor: theme.colors.surfaceRaised,
-					borderColor: theme.colors.border,
-				};
-			case "default":
-			default:
-				return {
-					backgroundColor: theme.colors.surface,
-					borderColor: theme.colors.border,
-				};
-		}
-	}, [theme.colors.border, theme.colors.surface, theme.colors.surfaceRaised, theme.mode, variant]);
+	const variantContainerStyle = useMemo<ViewStyle>(
+		() => ({
+			backgroundColor: fill,
+			borderColor: theme.colors.border,
+		}),
+		[fill, theme.colors.border],
+	);
 
 	return (
 		<CodeBlockContext.Provider value={value}>
@@ -140,8 +137,9 @@ export function CodeBlockRoot({
 					variantContainerStyle,
 					{
 						borderRadius: theme.radius.md,
+						overflow: "hidden",
 					},
-					style,
+					withoutStringFill(style),
 				]}
 				{...props}
 			>
@@ -168,17 +166,16 @@ export function CodeBlockHeader({ children, showTerminalDots, style }: CodeBlock
 			style={[
 				styles.header,
 				{
-					borderBottomColor:
-						meta.variant === "terminal" && theme.mode === "light" ? "#202836" : theme.colors.border,
+					borderBottomColor: theme.colors.border,
 				},
 				style,
 			]}
 		>
 			{shouldShowDots && (
 				<View style={styles.terminalDots}>
-					<View style={[styles.terminalDot, { backgroundColor: "#FF5F56" }]} />
-					<View style={[styles.terminalDot, { backgroundColor: "#FFBD2E" }]} />
-					<View style={[styles.terminalDot, { backgroundColor: "#27C93F" }]} />
+					<View style={[styles.terminalDot, { backgroundColor: theme.colors.danger }]} />
+					<View style={[styles.terminalDot, { backgroundColor: theme.colors.warning }]} />
+					<View style={[styles.terminalDot, { backgroundColor: theme.colors.success }]} />
 				</View>
 			)}
 			<View style={styles.headerContent}>{children}</View>
@@ -193,10 +190,7 @@ export interface CodeBlockTitleProps {
 
 export function CodeBlockTitle({ children, style }: CodeBlockTitleProps) {
 	const theme = useThemeTokens();
-	const { meta } = useCodeBlock();
-
-	const isTerminal = meta.variant === "terminal";
-	const defaultColor = isTerminal && theme.mode === "light" ? "#FCFBFA" : theme.colors.text;
+	const defaultColor = theme.colors.text;
 
 	return (
 		<RNText
@@ -243,12 +237,7 @@ export function CodeBlockCopyButton({ onCopy, code, style }: CodeBlockCopyButton
 		}
 	}, [actions, code, meta.code, onCopy]);
 
-	const isTerminal = meta.variant === "terminal";
-	const iconColor = state.copied
-		? theme.colors.success
-		: isTerminal && theme.mode === "light"
-			? "#A6AFBE"
-			: theme.colors.textMuted;
+	const iconColor = state.copied ? theme.colors.success : theme.colors.textMuted;
 
 	return (
 		<Pressable
@@ -258,11 +247,7 @@ export function CodeBlockCopyButton({ onCopy, code, style }: CodeBlockCopyButton
 			style={({ pressed }) => [
 				styles.copyButton,
 				{
-					backgroundColor: pressed
-						? isTerminal && theme.mode === "light"
-							? "rgba(255, 255, 255, 0.1)"
-							: theme.colors.surfaceRaised
-						: "transparent",
+					backgroundColor: pressed ? withAlpha(theme.colors.text, 0.08) : "transparent",
 					borderRadius: theme.radius.sm,
 				},
 				style,
@@ -314,41 +299,37 @@ export function CodeBlockLine({
 	const theme = useThemeTokens();
 	const { meta } = useCodeBlock();
 
-	const isTerminal = meta.variant === "terminal";
-
 	const lineHighlight = useMemo(() => {
 		switch (type) {
 			case "add":
 				return {
-					bg: "rgba(18, 183, 106, 0.14)",
+					bg: withAlpha(theme.colors.success, 0.14),
 					marker: "+",
 					markerColor: theme.colors.success,
-					textColor: isTerminal && theme.mode === "light" ? "#74E4A2" : theme.colors.success,
+					textColor: theme.colors.success,
 				};
 			case "delete":
 				return {
-					bg: "rgba(217, 45, 32, 0.14)",
+					bg: withAlpha(theme.colors.danger, 0.14),
 					marker: "-",
 					markerColor: theme.colors.danger,
-					textColor: isTerminal && theme.mode === "light" ? "#FFA39E" : theme.colors.danger,
+					textColor: theme.colors.danger,
 				};
 			case "normal":
 			default:
 				return {
 					bg: "transparent",
 					marker: meta.variant === "diff" ? " " : undefined,
-					markerColor: isTerminal && theme.mode === "light" ? "#667085" : theme.colors.textMuted,
-					textColor: isTerminal && theme.mode === "light" ? "#FCFBFA" : theme.colors.text,
+					markerColor: theme.colors.textMuted,
+					textColor: theme.colors.text,
 				};
 		}
 	}, [
-		isTerminal,
 		meta.variant,
 		theme.colors.danger,
 		theme.colors.success,
 		theme.colors.text,
 		theme.colors.textMuted,
-		theme.mode,
 		type,
 	]);
 
@@ -359,7 +340,7 @@ export function CodeBlockLine({
 					style={[
 						styles.lineNumber,
 						{
-							color: isTerminal && theme.mode === "light" ? "#4A5568" : theme.colors.textDisabled,
+							color: theme.colors.textDisabled,
 							fontFamily: monospaceFont,
 						},
 					]}
@@ -407,7 +388,7 @@ export const CodeBlock = Object.assign(CodeBlockRoot, {
 
 const styles = StyleSheet.create({
 	root: {
-		borderWidth: 1,
+		borderWidth: StyleSheet.hairlineWidth,
 		overflow: "hidden",
 		width: "100%",
 		marginVertical: 4,

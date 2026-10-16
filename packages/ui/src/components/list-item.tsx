@@ -59,7 +59,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
  * />
  * ```
  */
-export const ListItem: React.FC<ListItemProps> = ({
+export const ListItemRoot: React.FC<ListItemProps> = ({
 	icon,
 	title,
 	subtitle,
@@ -113,64 +113,14 @@ export const ListItem: React.FC<ListItemProps> = ({
 		[disabled, separator, theme.colors, theme.semantic.divider, theme.spacing, tokens],
 	);
 
-	const contentStyle: ViewStyle = {
-		flex: 1,
-		minWidth: 0,
-		gap: 2,
-	};
-
-	const renderTrailing = () => {
-		if (!trailing) return null;
-
-		if (typeof trailing === "string") {
-			return (
-				<View style={trailingStyle}>
-					<Text
-						variant="caption"
-						color={theme.colors.textMuted}
-						overflowMode="marquee"
-						marqueePlayback="manual"
-						style={{ textAlign: "right" }}
-					>
-						{trailing}
-					</Text>
-				</View>
-			);
-		}
-
-		return <View style={trailingStyle}>{trailing}</View>;
-	};
-
 	const content = (
 		<>
-			{icon && (
-				<View style={iconSlotStyle}>
-					<Icon name={icon as IconName} size={22} color={theme.colors.textMuted} />
-				</View>
-			)}
-
-			<View style={contentStyle}>
-				<Text
-					variant="body"
-					color={theme.colors.text}
-					overflowMode="marquee"
-					marqueePlayback="manual"
-				>
-					{title}
-				</Text>
-				{subtitle && (
-					<Text
-						variant="caption"
-						color={theme.colors.textMuted}
-						overflowMode="marquee"
-						marqueePlayback="manual"
-					>
-						{subtitle.toUpperCase()}
-					</Text>
-				)}
-			</View>
-
-			{renderTrailing()}
+			{icon ? <ListItemLeading name={icon as IconName} /> : null}
+			<ListItemBody>
+				<ListItemTitle>{title}</ListItemTitle>
+				{subtitle ? <ListItemSubtitle>{subtitle}</ListItemSubtitle> : null}
+			</ListItemBody>
+			{trailing ? <ListItemTrailing>{trailing}</ListItemTrailing> : null}
 		</>
 	);
 
@@ -193,6 +143,79 @@ export const ListItem: React.FC<ListItemProps> = ({
 	}
 
 	return <View style={[containerStyle, style]}>{content}</View>;
+};
+
+export function ListItemLeading({ name }: { name: IconName }) {
+	const theme = useThemeTokens();
+	return (
+		<View style={iconSlotStyle}>
+			<Icon name={name} size={22} color={theme.colors.textMuted} />
+		</View>
+	);
+}
+
+export function ListItemBody({ children }: { children?: React.ReactNode }) {
+	return <View style={bodyStyle}>{children}</View>;
+}
+
+export function ListItemTitle({ children }: { children?: React.ReactNode }) {
+	const theme = useThemeTokens();
+	return (
+		<Text variant="body" color={theme.colors.text} overflowMode="marquee" marqueePlayback="manual">
+			{children}
+		</Text>
+	);
+}
+
+export function ListItemSubtitle({ children }: { children?: string }) {
+	const theme = useThemeTokens();
+	if (!children) return null;
+	return (
+		<Text
+			variant="caption"
+			color={theme.colors.textMuted}
+			overflowMode="marquee"
+			marqueePlayback="manual"
+		>
+			{children.toUpperCase()}
+		</Text>
+	);
+}
+
+export function ListItemTrailing({ children }: { children?: React.ReactNode }) {
+	const theme = useThemeTokens();
+	if (!children) return null;
+	if (typeof children === "string") {
+		return (
+			<View style={trailingStyle}>
+				<Text
+					variant="caption"
+					color={theme.colors.textMuted}
+					overflowMode="marquee"
+					marqueePlayback="manual"
+					style={{ textAlign: "right" }}
+				>
+					{children}
+				</Text>
+			</View>
+		);
+	}
+	return <View style={trailingStyle}>{children}</View>;
+}
+
+export const ListItem = Object.assign(ListItemRoot, {
+	Root: ListItemRoot,
+	Leading: ListItemLeading,
+	Body: ListItemBody,
+	Title: ListItemTitle,
+	Subtitle: ListItemSubtitle,
+	Trailing: ListItemTrailing,
+});
+
+const bodyStyle: ViewStyle = {
+	flex: 1,
+	minWidth: 0,
+	gap: 2,
 };
 
 const iconSlotStyle: ViewStyle = {

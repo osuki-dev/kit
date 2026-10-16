@@ -1,6 +1,6 @@
 import React from "react";
-import { View, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import { StyleSheet, View, type ViewStyle } from "react-native";
+import { useResolvedSurfaceFill, useThemeTokens, type Colors } from "../theme";
 import { Text } from "./text";
 
 export type BadgeVariant = "default" | "primary" | "success" | "warning";
@@ -36,69 +36,84 @@ export interface BadgeProps {
  * <Badge variant="success">99+</Badge>
  * ```
  */
-export const Badge: React.FC<BadgeProps> = ({
+export function BadgeRoot({
 	children,
 	variant = "default",
 	display = "label",
 	style,
 	testID,
-}) => {
-	const { colors } = useThemeTokens();
-
-	const colorMap: Record<BadgeVariant, string> = {
-		default: colors.text,
-		primary: colors.primary,
-		success: colors.success,
-		warning: colors.warning,
-	};
-
-	const backgroundColor = colorMap[variant];
-
+}: Omit<BadgeProps, "children"> & { children?: React.ReactNode }) {
+	const { colors, radius } = useThemeTokens();
+	const baseColor = badgeFill(colors, variant);
+	const fill = useResolvedSurfaceFill(
+		baseColor,
+		React.useMemo(
+			() => ({ slot: "badges.background", variant, baseColor, borderRadius: radius.pill }),
+			[baseColor, radius.pill, variant],
+		),
+	);
 	if (display === "dot") {
-		return (
-			<View
-				testID={testID}
-				style={[
-					{
-						width: 8,
-						height: 8,
-						borderRadius: 4,
-						backgroundColor,
-					},
-					style,
-				]}
-			/>
-		);
+		return <View testID={testID} style={[styles.dot, { backgroundColor: fill }, style]} />;
 	}
-
-	const content = typeof children === "number" && children > 99 ? "99+" : String(children ?? "");
-
 	return (
-		<View
-			testID={testID}
-			style={[
-				{
-					minWidth: 18,
-					height: 18,
-					paddingHorizontal: 6,
-					borderRadius: 999,
-					backgroundColor,
-					justifyContent: "center",
-					alignItems: "center",
-				},
-				style,
-			]}
-		>
-			<Text
-				style={{
-					fontSize: 10,
-					color: colors.background,
-				}}
-				weight="bold"
-				transform="uppercase"
-			>
-				{content}
-			</Text>
+		<View testID={testID} style={[styles.label, { backgroundColor: fill }, style]}>
+			{children}
 		</View>
 	);
-};
+}
+
+export function BadgeLabel({ children }: { children?: BadgeProps["children"] }) {
+	const { colors } = useThemeTokens();
+	return (
+		<Text variant="caption" color={colors.background} weight="bold" transform="uppercase">
+			{badgeLabel(children)}
+		</Text>
+	);
+}
+
+function BadgeFacade({ children, display = "label", ...props }: BadgeProps) {
+	if (display === "dot") return <BadgeRoot display="dot" {...props} />;
+	return (
+		<BadgeRoot display="label" {...props}>
+			<BadgeLabel>{children}</BadgeLabel>
+		</BadgeRoot>
+	);
+}
+
+export const Badge = Object.assign(BadgeFacade, {
+	Root: BadgeRoot,
+	Label: BadgeLabel,
+});
+
+function badgeFill(colors: Colors, variant: BadgeVariant) {
+	if (variant === "primary") return colors.primary;
+	if (variant === "success") return colors.success;
+	if (variant === "warning") return colors.warning;
+	return colors.text;
+}
+
+function badgeLabel(children: BadgeProps["children"]) {
+	if (typeof children === "number") {
+		if (children > 99) return "99+";
+		return String(children);
+	}
+	if (typeof children === "string") return children;
+	return "";
+}
+
+const styles = StyleSheet.create({
+	dot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+	},
+	label: {
+		alignSelf: "flex-start",
+		maxWidth: "100%",
+		paddingVertical: 4,
+		paddingHorizontal: 8,
+		borderRadius: 999,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+});

@@ -9,9 +9,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-	getCachedTransformedColor,
+	readStringFill,
+	useResolvedSurfaceFill,
 	useSurfaceDecorator,
 	useThemeTokens,
+	withoutStringFill,
 	type SurfaceMeta,
 } from "../theme";
 
@@ -47,40 +49,44 @@ export function useSurface(): SurfaceContextValue {
 export interface SurfaceRootProps extends ViewProps {
 	variant?: SurfaceVariant;
 	slot?: string;
+	disabled?: boolean;
+	selected?: boolean;
 	children?: React.ReactNode;
 }
 
 export function SurfaceRoot({
 	variant = "surface",
 	slot,
+	disabled,
+	selected,
 	style,
 	children,
+	accessibilityState,
 	...props
 }: SurfaceRootProps) {
 	const theme = useThemeTokens();
-	const decorator = useSurfaceDecorator();
 	const surfaceToken = theme.components.Surface[variant];
 	const flatStyle = StyleSheet.flatten(style);
-	const baseColor = (flatStyle?.backgroundColor as string) ?? theme.colors[surfaceToken];
+	const fillOverride = readStringFill(style);
+	const baseColor = fillOverride ?? theme.colors[surfaceToken];
 	const borderRadius =
 		typeof flatStyle?.borderRadius === "number" ? flatStyle.borderRadius : undefined;
+	const resolvedDisabled = disabled ?? accessibilityState?.disabled;
+	const resolvedSelected = selected ?? accessibilityState?.selected;
 
 	const meta: SurfaceMeta = useMemo(
 		() => ({
 			slot,
 			variant,
 			baseColor,
+			disabled: resolvedDisabled,
+			selected: resolvedSelected,
 			borderRadius,
 		}),
-		[slot, variant, baseColor, borderRadius],
+		[slot, variant, baseColor, resolvedDisabled, resolvedSelected, borderRadius],
 	);
 
-	const resolvedBackgroundColor = useMemo(() => {
-		if (decorator?.transformBackground) {
-			return getCachedTransformedColor(baseColor, meta, decorator.transformBackground);
-		}
-		return baseColor;
-	}, [baseColor, decorator, meta]);
+	const resolvedBackgroundColor = useResolvedSurfaceFill(baseColor, meta);
 
 	const contextValue = useMemo<SurfaceContextValue>(
 		() => ({
@@ -95,7 +101,19 @@ export function SurfaceRoot({
 
 	return (
 		<SurfaceContext.Provider value={contextValue}>
-			<View style={[{ position: "relative" }, style]} {...props}>
+			<View
+				accessibilityState={
+					disabled === undefined && selected === undefined
+						? accessibilityState
+						: {
+								...accessibilityState,
+								...(disabled === undefined ? {} : { disabled }),
+								...(selected === undefined ? {} : { selected }),
+							}
+				}
+				style={[{ position: "relative" }, withoutStringFill(style)]}
+				{...props}
+			>
 				{children}
 			</View>
 		</SurfaceContext.Provider>
@@ -118,6 +136,7 @@ export function SurfaceBackground({ style, children, ...props }: SurfaceBackgrou
 				absoluteFill,
 				{
 					backgroundColor: resolvedBackgroundColor,
+					overflow: "hidden",
 					...(meta.borderRadius !== undefined ? { borderRadius: meta.borderRadius } : null),
 				},
 				style,
@@ -145,11 +164,28 @@ export function SurfaceContent({ style, children, ...props }: SurfaceContentProp
 export interface SurfaceProps extends ViewProps {
 	variant?: SurfaceVariant;
 	slot?: string;
+	disabled?: boolean;
+	selected?: boolean;
 }
 
-export function Surface({ variant = "surface", slot, style, children, ...props }: SurfaceProps) {
+export function Surface({
+	variant = "surface",
+	slot,
+	disabled,
+	selected,
+	style,
+	children,
+	...props
+}: SurfaceProps) {
 	return (
-		<SurfaceRoot variant={variant} slot={slot} style={style} {...props}>
+		<SurfaceRoot
+			variant={variant}
+			slot={slot}
+			disabled={disabled}
+			selected={selected}
+			style={style}
+			{...props}
+		>
 			<SurfaceBackground />
 			{children}
 		</SurfaceRoot>
@@ -214,7 +250,8 @@ export function ScrollScreen({
 	const insets = useSafeAreaInsets();
 	const decorator = useSurfaceDecorator();
 	const surfaceToken = theme.components.Surface[variant];
-	const baseColor = theme.colors[surfaceToken];
+	const fillOverride = readStringFill(style);
+	const baseColor = fillOverride ?? theme.colors[surfaceToken];
 
 	const meta: SurfaceMeta = useMemo(
 		() => ({
@@ -225,12 +262,7 @@ export function ScrollScreen({
 		[slot, variant, baseColor],
 	);
 
-	const resolvedBackgroundColor = useMemo(() => {
-		if (decorator?.transformBackground) {
-			return getCachedTransformedColor(baseColor, meta, decorator.transformBackground);
-		}
-		return baseColor;
-	}, [baseColor, decorator, meta]);
+	const resolvedBackgroundColor = useResolvedSurfaceFill(baseColor, meta);
 
 	const containerStyle = useMemo<ViewStyle>(
 		() => ({
@@ -243,7 +275,7 @@ export function ScrollScreen({
 
 	return (
 		<ScrollView
-			style={[{ flex: 1, backgroundColor: resolvedBackgroundColor }, style]}
+			style={[{ flex: 1, backgroundColor: resolvedBackgroundColor }, withoutStringFill(style)]}
 			contentContainerStyle={[containerStyle, contentContainerStyle]}
 			showsVerticalScrollIndicator={showsVerticalScrollIndicator}
 			keyboardShouldPersistTaps={keyboardShouldPersistTaps}

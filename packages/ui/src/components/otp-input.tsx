@@ -34,7 +34,7 @@ export interface OtpInputProps
 	cellStyle?: ViewStyle;
 }
 
-export const OtpInput: React.FC<OtpInputProps> = ({
+const OtpInputView: React.FC<OtpInputProps> = ({
 	value = "",
 	length = 6,
 	onChange,
@@ -123,62 +123,136 @@ export const OtpInput: React.FC<OtpInputProps> = ({
 		>
 			<View style={rowStyle}>
 				{digits.map((digit, index) => (
-					<Pressable
+					<OtpCell
 						key={index}
-						accessibilityRole="button"
-						accessibilityLabel={`${label ?? "Verification code"} digit ${index + 1}`}
-						accessibilityState={{ disabled }}
+						index={index}
+						digit={digit}
+						label={label}
+						error={error}
 						disabled={disabled}
+						cellWidth={cellWidth}
+						cellStyle={cellStyle}
+						testID={testID}
 						onPress={() => inputs.current[index]?.focus()}
-						style={[
-							{
-								width: cellWidth,
-								height: 52,
-								alignItems: "center",
-								justifyContent: "center",
-								borderWidth: 1,
-								borderRadius: theme.radius.lg,
-								borderColor: error ? theme.colors.danger : theme.colors.border,
-								backgroundColor: theme.colors.surface,
-								opacity: disabled ? 0.56 : 1,
-							},
-							cellStyle,
-						]}
-						testID={testID ? `${testID}-cell-${index}` : undefined}
-					>
-						<TextInput
-							ref={(node) => {
-								inputs.current[index] = node;
-							}}
-							autoFocus={autoFocus && index === 0}
-							editable={!disabled}
-							keyboardType={keyboardType}
-							maxLength={safeLength}
-							onBlur={onBlur}
-							onChangeText={(text) => updateAt(index, text)}
-							onFocus={onFocus}
-							onKeyPress={(event) => handleKeyPress(index, event)}
-							secureTextEntry={secureTextEntry}
-							selectTextOnFocus
-							style={{
-								width: "100%",
-								height: "100%",
-								color: theme.colors.text,
-								...resolveFontStyle(theme.fonts, theme.typeStyles.label.fontFamily, "bold"),
-								fontSize: 20,
-								includeFontPadding: Platform.OS === "android" ? false : undefined,
-								padding: 0,
-								paddingVertical: 0,
-								textAlign: "center",
-								textAlignVertical: "center",
-							}}
-							testID={testID ? `${testID}-input-${index}` : undefined}
-							textContentType={textContentType}
-							value={digit}
-						/>
-					</Pressable>
+						inputRef={(node) => {
+							inputs.current[index] = node;
+						}}
+						autoFocus={autoFocus}
+						keyboardType={keyboardType}
+						maxLength={safeLength}
+						onBlur={onBlur}
+						onChangeText={(text) => updateAt(index, text)}
+						onFocus={onFocus}
+						onKeyPress={(event) => handleKeyPress(index, event)}
+						secureTextEntry={secureTextEntry}
+						textContentType={textContentType}
+					/>
 				))}
 			</View>
 		</FieldGroup>
 	);
 };
+
+export function OtpCell({
+	index,
+	digit,
+	label,
+	error,
+	disabled,
+	cellWidth,
+	cellStyle,
+	testID,
+	onPress,
+	inputRef,
+	autoFocus,
+	keyboardType,
+	maxLength,
+	onBlur,
+	onChangeText,
+	onFocus,
+	onKeyPress,
+	secureTextEntry,
+	textContentType,
+}: {
+	index: number;
+	digit: string;
+	label?: string;
+	error?: string;
+	disabled: boolean;
+	cellWidth: number;
+	cellStyle?: ViewStyle;
+	testID?: string;
+	onPress: () => void;
+	inputRef: (node: TextInput | null) => void;
+	autoFocus?: boolean;
+	keyboardType: TextInputProps["keyboardType"];
+	maxLength: number;
+	onBlur: TextInputProps["onBlur"];
+	onChangeText: (text: string) => void;
+	onFocus: TextInputProps["onFocus"];
+	onKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
+	secureTextEntry: boolean;
+	textContentType: TextInputProps["textContentType"];
+}) {
+	const theme = useThemeTokens();
+	const borderColor = error ? theme.colors.danger : theme.colors.border;
+
+	return (
+		<Pressable
+			accessibilityRole="button"
+			accessibilityLabel={`${label ?? "Verification code"} digit ${index + 1}`}
+			accessibilityState={{ disabled }}
+			disabled={disabled}
+			onPress={onPress}
+			style={[
+				{
+					width: cellWidth,
+					height: 52,
+					alignItems: "center",
+					justifyContent: "center",
+					borderWidth: 1,
+					borderRadius: theme.radius.lg,
+					borderColor,
+					backgroundColor: theme.colors.surface,
+					opacity: disabled ? 0.56 : 1,
+				},
+				cellStyle,
+			]}
+			testID={testID ? `${testID}-cell-${index}` : undefined}
+		>
+			<TextInput
+				ref={inputRef}
+				autoFocus={Boolean(autoFocus) && index === 0}
+				editable={!disabled}
+				keyboardType={keyboardType}
+				maxLength={maxLength}
+				onBlur={onBlur}
+				onChangeText={onChangeText}
+				onFocus={onFocus}
+				onKeyPress={onKeyPress}
+				secureTextEntry={secureTextEntry}
+				selectTextOnFocus
+				style={{
+					width: "100%",
+					height: "100%",
+					color: theme.colors.text,
+					...resolveFontStyle(theme.fonts, theme.typeStyles.label.fontFamily, "bold"),
+					fontSize: 20,
+					includeFontPadding: Platform.OS === "android" ? false : undefined,
+					padding: 0,
+					paddingVertical: 0,
+					textAlign: "center",
+					textAlignVertical: "center",
+				}}
+				testID={testID ? `${testID}-input-${index}` : undefined}
+				textContentType={textContentType}
+				value={digit}
+			/>
+		</Pressable>
+	);
+}
+
+export const OtpInput = Object.assign(OtpInputView, {
+	Root: OtpInputView,
+	Cell: OtpCell,
+});

@@ -2,7 +2,8 @@ import React, { useMemo } from "react";
 import {
 	Platform,
 	Pressable,
-	TextInput,
+	StyleSheet,
+	View,
 	type TextInputProps,
 	type TextStyle,
 	type ViewStyle,
@@ -13,7 +14,8 @@ import Animated, {
 	useSharedValue,
 	withTiming,
 } from "react-native-reanimated";
-import { resolveFontStyle, useThemeTokens } from "../theme";
+import { resolveFontStyle, useResolvedSurfaceFill, useSurfaceDecorator, useThemeTokens } from "../theme";
+import { TextField } from "../utils/text-field";
 import { Icon } from "./icon";
 
 export interface SearchInputProps extends Omit<TextInputProps, "style"> {
@@ -25,7 +27,7 @@ export interface SearchInputProps extends Omit<TextInputProps, "style"> {
 	clearAccessibilityLabel?: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({
+export const SearchInputRoot: React.FC<SearchInputProps> = ({
 	value,
 	onChangeText,
 	onClear,
@@ -39,25 +41,39 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 	...props
 }) => {
 	const theme = useThemeTokens();
+	const decorator = useSurfaceDecorator();
 	const input = theme.components.Input;
 	const focusProgress = useSharedValue(0);
 	const showClear = value.length > 0;
+	const controlBase =
+		input.background === "transparent" ? "transparent" : theme.colors[input.background];
+	const controlMeta = useMemo(
+		() => ({
+			slot: "inputs.search",
+			variant: "search",
+			baseColor: controlBase,
+			borderRadius: theme.radius.pill,
+		}),
+		[controlBase, theme.radius.pill],
+	);
+	const controlFill = useResolvedSurfaceFill(controlBase, controlMeta);
 
 	const containerStyles = useMemo<ViewStyle>(
 		() => ({
+			position: "relative",
 			minHeight: 44,
 			width: "100%",
-			borderWidth: 1,
+			borderWidth: StyleSheet.hairlineWidth,
 			borderRadius: theme.radius.pill,
 			paddingHorizontal: theme.spacing.md,
 			flexDirection: "row",
 			alignItems: "center",
 			gap: theme.spacing.sm,
-			backgroundColor:
-				input.background === "transparent" ? "transparent" : theme.colors[input.background],
+			overflow: "hidden",
+			backgroundColor: controlFill,
 			borderColor: theme.colors[input.border],
 		}),
-		[input.background, input.border, theme.colors, theme.radius.pill, theme.spacing],
+		[controlFill, input.border, theme.colors, theme.radius.pill, theme.spacing],
 	);
 
 	const animatedContainerStyle = useAnimatedStyle(() => ({
@@ -105,8 +121,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 			testID={testID ? `${testID}-container` : undefined}
 			style={[containerStyles, animatedContainerStyle, containerStyle]}
 		>
+			{decorator?.renderDecoration ? (
+				<View collapsable pointerEvents="none" style={StyleSheet.absoluteFill}>
+					{decorator.renderDecoration(controlMeta)}
+				</View>
+			) : null}
 			<Icon name="Search" size={18} color={theme.colors.textMuted} />
-			<TextInput
+			<TextField
 				testID={testID}
 				value={value}
 				onChangeText={onChangeText}
@@ -119,18 +140,44 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 				onBlur={handleBlur}
 				{...props}
 			/>
-			{showClear && (
-				<Pressable
+			{showClear ? (
+				<SearchInputClear
 					testID={testID ? `${testID}-clear` : undefined}
-					accessibilityRole="button"
 					accessibilityLabel={clearAccessibilityLabel}
 					onPress={handleClear}
-					hitSlop={10}
-					style={{ minWidth: 28, minHeight: 28, alignItems: "center", justifyContent: "center" }}
-				>
-					<Icon name="X" size={16} color={theme.colors.textMuted} />
-				</Pressable>
-			)}
+					color={theme.colors.textMuted}
+				/>
+			) : null}
 		</Animated.View>
 	);
 };
+
+export function SearchInputClear({
+	onPress,
+	accessibilityLabel,
+	testID,
+	color,
+}: {
+	onPress: () => void;
+	accessibilityLabel: string;
+	testID?: string;
+	color: string;
+}) {
+	return (
+		<Pressable
+			testID={testID}
+			accessibilityRole="button"
+			accessibilityLabel={accessibilityLabel}
+			onPress={onPress}
+			hitSlop={10}
+			style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}
+		>
+			<Icon name="X" size={16} color={color} />
+		</Pressable>
+	);
+}
+
+export const SearchInput = Object.assign(SearchInputRoot, {
+	Root: SearchInputRoot,
+	Clear: SearchInputClear,
+});

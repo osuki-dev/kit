@@ -141,7 +141,7 @@ export interface SurfaceDecoratorContextValue {
 6. **`MarqueeText`**：单行文本超出容器时在 UI 线程平滑往返滚动，消除 `…` 截断。
 7. **`TransientPill`**：手势/操作即时反馈的浮动胶囊气泡。
 8. **排版系统健壮性修复**：
-   - `FontedTextInput`：修复 Android 上原生 `TextInput` 的 `placeholder` 无法继承自定义字体的系统缺陷。
+   - 输入框占位符由现有 `Input`、`SearchInput`、`Textarea`、`PromptInput` 用 `Text` 绘制，修复 Android 上原生 `placeholder` 无法继承自定义字体的问题。不另增公开组件。
    - `HugSlack`：修复 Android 上斜体/宽字符在行末被裁切削边的问题（末尾追加 `\u2009` 薄空格）。
 
 ---

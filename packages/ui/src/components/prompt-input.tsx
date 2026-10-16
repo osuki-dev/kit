@@ -10,7 +10,6 @@ import {
 	Platform,
 	Pressable,
 	StyleSheet,
-	TextInput,
 	View,
 	type GestureResponderEvent,
 	type NativeSyntheticEvent,
@@ -22,7 +21,14 @@ import {
 	type ViewProps,
 	type ViewStyle,
 } from "react-native";
-import { useThemeTokens } from "../theme";
+import {
+	readStringFill,
+	useResolvedSurfaceFill,
+	useSurfaceDecorator,
+	useThemeTokens,
+	withoutStringFill,
+} from "../theme";
+import { TextField } from "../utils/text-field";
 import { Icon } from "./icon";
 import { Spinner } from "./spinner";
 
@@ -85,6 +91,7 @@ export function PromptInputRoot({
 	...props
 }: PromptInputRootProps) {
 	const theme = useThemeTokens();
+	const decorator = useSurfaceDecorator();
 	const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
 	const [focused, setFocused] = useState(false);
 
@@ -112,6 +119,20 @@ export function PromptInputRoot({
 		onSubmit?.(trimmed);
 	}, [disabled, loading, onSubmit, value]);
 
+	const fillOverride = readStringFill(style);
+	const baseColor = fillOverride ?? theme.colors.surface;
+	const surfaceMeta = useMemo(
+		() => ({
+			slot: "prompt.background",
+			variant: "composer",
+			baseColor,
+			disabled,
+			borderRadius: theme.radius.lg,
+		}),
+		[baseColor, disabled, theme.radius.lg],
+	);
+	const fill = useResolvedSurfaceFill(baseColor, surfaceMeta);
+
 	const contextValue = useMemo<PromptInputContextValue>(
 		() => ({
 			state: { value, focused },
@@ -127,14 +148,21 @@ export function PromptInputRoot({
 				style={[
 					styles.root,
 					{
-						backgroundColor: theme.colors.surface,
+						position: "relative",
+						backgroundColor: fill,
 						borderColor: focused ? theme.colors.borderStrong : theme.colors.border,
 						borderRadius: theme.radius.lg,
+						overflow: "hidden",
 					},
-					style,
+					withoutStringFill(style),
 				]}
 				{...props}
 			>
+				{decorator?.renderDecoration ? (
+					<View collapsable pointerEvents="none" style={StyleSheet.absoluteFill}>
+						{decorator.renderDecoration(surfaceMeta)}
+					</View>
+				) : null}
 				{children}
 			</View>
 		</PromptInputContext.Provider>
@@ -211,7 +239,7 @@ export function PromptInputTextarea({
 	);
 
 	return (
-		<TextInput
+		<TextField
 			editable={!meta.disabled}
 			multiline
 			value={state.value}
@@ -362,7 +390,7 @@ export const PromptInput = Object.assign(PromptInputRoot, {
 
 const styles = StyleSheet.create({
 	root: {
-		borderWidth: 1,
+		borderWidth: StyleSheet.hairlineWidth,
 		paddingHorizontal: 12,
 		paddingTop: 10,
 		paddingBottom: 8,

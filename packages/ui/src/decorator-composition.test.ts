@@ -37,6 +37,7 @@ mock.module("react-native", () => ({
 		hairlineWidth: 1,
 	},
 	Text: "Text",
+	TextInput: "TextInput",
 	View: "View",
 	useColorScheme: () => "light",
 	useWindowDimensions: () => ({ width: 390, height: 844, scale: 3, fontScale: 1 }),
@@ -46,6 +47,12 @@ mock.module("react-native-safe-area-context", () => ({
 	useSafeAreaInsets: () => ({ top: 47, right: 0, bottom: 34, left: 0 }),
 }));
 
+const entering = { duration: () => entering };
+const layout = {
+	springify: () => layout,
+	damping: () => layout,
+	stiffness: () => layout,
+};
 mock.module("react-native-reanimated", () => ({
 	default: {
 		createAnimatedComponent: (component: unknown) => component,
@@ -53,6 +60,9 @@ mock.module("react-native-reanimated", () => ({
 		View: "Animated.View",
 	},
 	cancelAnimation: () => {},
+	FadeInDown: entering,
+	Layout: layout,
+	interpolateColor: () => "transparent",
 	useAnimatedStyle: (factory: () => unknown) => factory(),
 	useSharedValue: (value: unknown) => ({ value }),
 	withDelay: (_delay: unknown, animation: unknown) => animation,
@@ -82,8 +92,12 @@ const { Card, CardRoot, CardBackground, CardHeader, CardContent, CardFooter } =
 	await import("./components/card");
 const { Surface, SurfaceRoot, SurfaceBackground, SurfaceContent } =
 	await import("./components/surface");
-const { SurfaceDecoratorProvider, useSurfaceDecorator, LRUCache, getCachedTransformedColor } =
+const { SurfaceDecoratorProvider, SurfaceDecoratorContext, useSurfaceDecorator, LRUCache, getCachedTransformedColor } =
 	await import("./theme/decorator-context");
+const { Skeleton } = await import("./components/skeleton");
+const { Input, InputFrameContext } = await import("./components/input");
+const { splitFieldStyle } = await import("./utils/text-field");
+const { withHugSlack } = await import("./components/text");
 
 test("LRUCache stores, retrieves, refreshes and evicts", () => {
 	const cache = new LRUCache<string, number>(2);
@@ -269,4 +283,134 @@ test("Button accepts ReactNode children and renders compound structure", () => {
 	const children = React.Children.toArray(pressableElement.props.children as never) as AnyElement[];
 	assert.equal(children[0]?.type, ButtonBackground);
 	assert.equal(children[1]?.type, "View");
+});
+
+function flattenStyle(style: unknown): Record<string, unknown> {
+	if (!style || typeof style === "boolean") return {};
+	if (Array.isArray(style)) return Object.assign({}, ...style.map(flattenStyle));
+	return style as Record<string, unknown>;
+}
+
+test("two transforms do not share a cached fill", () => {
+	const meta = { slot: "cache.isolation", baseColor: "#222222" };
+	const first = getCachedTransformedColor("#222222", meta, (color) => `a:${color}`);
+	const second = getCachedTransformedColor("#222222", meta, (color) => `b:${color}`);
+	assert.equal(first, "a:#222222");
+	assert.equal(second, "b:#222222");
+});
+
+test("Button paints an override fill once through the decorator", () => {
+	contextStore.set(SurfaceDecoratorContext, {
+		transformBackground: (color: string) => `tint(${color})`,
+	});
+	try {
+		const root = renderComponent(
+			React.createElement(Button, { style: { backgroundColor: "#123456", borderRadius: 12 } }, "Save"),
+		);
+		const provider = renderComponent(root);
+		const buttonValue = provider.props.value as {
+			baseColor: string;
+			resolvedBackgroundColor: string;
+		};
+		assert.equal(buttonValue.baseColor, "#123456");
+		assert.equal(buttonValue.resolvedBackgroundColor, "tint(#123456)");
+		const pressable = provider.props.children as AnyElement;
+		const flat = flattenStyle(pressable.props.style);
+		assert.equal(flat.backgroundColor, undefined);
+		assert.equal(flat.borderRadius, 12);
+	} finally {
+		contextStore.delete(SurfaceDecoratorContext);
+	}
+});
+
+test("Card keeps a caller fill on the background layer only", () => {
+	contextStore.set(SurfaceDecoratorContext, {
+		transformBackground: (color: string) => `tint(${color})`,
+	});
+	try {
+		const root = renderComponent(
+			React.createElement(Card, { style: { backgroundColor: "#123456" } }, "Hi"),
+		);
+		const provider = renderComponent(root);
+		const cardValue = provider.props.value as {
+			meta: { baseColor: string; resolvedBackgroundColor: string };
+		};
+		assert.equal(cardValue.meta.baseColor, "#123456");
+		assert.equal(cardValue.meta.resolvedBackgroundColor, "tint(#123456)");
+		const view = provider.props.children as AnyElement;
+		assert.equal(flattenStyle(view.props.style).backgroundColor, undefined);
+	} finally {
+		contextStore.delete(SurfaceDecoratorContext);
+	}
+});
+
+test("Skeleton fill follows the decorator, and an explicit style still wins", () => {
+	contextStore.set(SurfaceDecoratorContext, {
+		transformBackground: (color: string) => `tint(${color})`,
+	});
+	try {
+		const plain = renderComponent(React.createElement(Skeleton, {}));
+		assert.equal(
+			flattenStyle(plain.props.style).backgroundColor,
+			`tint(${defaultTheme.colors.border})`,
+		);
+		const filled = renderComponent(
+			React.createElement(Skeleton, { style: { backgroundColor: "#abcdef" } }),
+		);
+		assert.equal(flattenStyle(filled.props.style).backgroundColor, "#abcdef");
+	} finally {
+		contextStore.delete(SurfaceDecoratorContext);
+	}
+});
+
+test("Input control fill follows the decorator once", () => {
+	contextStore.set(SurfaceDecoratorContext, {
+		transformBackground: (color: string) => `tint(${color})`,
+	});
+	try {
+		const provider = renderComponent(React.createElement(Input, { testID: "email" }));
+		const view = provider.props.children as AnyElement;
+		contextStore.set(InputFrameContext, provider.props.value);
+		let slots = React.Children.toArray(view.props.children as React.ReactNode) as AnyElement[];
+		const only = slots[0];
+		if (slots.length === 1 && only && typeof only.type === "symbol") {
+			slots = React.Children.toArray(only.props.children as React.ReactNode) as AnyElement[];
+		}
+		const controlPart = slots.find((child) => child && typeof child.type === "function");
+		assert.ok(controlPart, "the field control is rendered");
+		const control = renderComponent(controlPart);
+		const token =
+			defaultTheme.components.Input.background === "transparent"
+				? "transparent"
+				: defaultTheme.colors[defaultTheme.components.Input.background];
+		assert.equal(flattenStyle(control?.props.style).backgroundColor, `tint(${token})`);
+	} finally {
+		contextStore.delete(SurfaceDecoratorContext);
+	}
+});
+
+test("splitFieldStyle keeps placement on the wrapper and type on the field", () => {
+	const parts = splitFieldStyle({
+		flex: 1,
+		marginTop: 4,
+		fontSize: 16,
+		padding: 0,
+		color: "#111111",
+	});
+	assert.equal(parts.wrapper.flex, 1);
+	assert.equal(parts.wrapper.marginTop, 4);
+	assert.equal(parts.input.flexGrow, 1);
+	assert.equal(parts.input.fontSize, 16);
+	assert.equal(parts.input.color, "#111111");
+	assert.equal("flex" in parts.input, false);
+	assert.equal(parts.placeholder.fontSize, 16);
+	assert.equal(parts.placeholder.padding, 0);
+});
+
+test("withHugSlack adds a trailing thin space on Android only", () => {
+	assert.equal(withHugSlack("广", "android"), "广\u2009");
+	assert.equal(withHugSlack("广\u2009", "android"), "广\u2009");
+	assert.equal(withHugSlack("", "android"), "");
+	assert.equal(withHugSlack("广", "ios"), "广");
+	assert.equal(withHugSlack(12, "android"), "12\u2009");
 });

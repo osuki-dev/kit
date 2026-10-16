@@ -90,8 +90,21 @@ export class LRUCache<K, V> {
  */
 export const surfaceColorCache = new LRUCache<string, string>(512);
 
+const transformIds = new WeakMap<(baseColor: string, meta: SurfaceMeta) => string, number>();
+let nextTransformId = 1;
+
+function transformCacheId(transform: (baseColor: string, meta: SurfaceMeta) => string): number {
+	const existing = transformIds.get(transform);
+	if (existing !== undefined) return existing;
+	const id = nextTransformId;
+	nextTransformId += 1;
+	transformIds.set(transform, id);
+	return id;
+}
+
 /**
  * Helper to retrieve or compute a transformed background color using the LRU cache.
+ * The transform function is part of the key, so two decorators cannot share a result.
  */
 export function getCachedTransformedColor(
 	baseColor: string,
@@ -99,10 +112,23 @@ export function getCachedTransformedColor(
 	transform?: (baseColor: string, meta: SurfaceMeta) => string,
 ): string {
 	if (!transform) return baseColor;
-	const cacheKey = `${baseColor}|${meta.slot ?? ""}|${meta.variant ?? ""}|${meta.disabled ? 1 : 0}|${meta.selected ? 1 : 0}|${meta.borderRadius ?? ""}`;
+	const cacheKey = `${transformCacheId(transform)}|${baseColor}|${meta.slot ?? ""}|${meta.variant ?? ""}|${meta.disabled ? 1 : 0}|${meta.selected ? 1 : 0}|${meta.borderRadius ?? ""}`;
 	const cached = surfaceColorCache.get(cacheKey);
 	if (cached !== undefined) return cached;
 	const computed = transform(baseColor, meta);
 	surfaceColorCache.set(cacheKey, computed);
 	return computed;
+}
+
+/**
+ * The fill a surface should paint: the token, passed through the decorator once.
+ * `transparent` is left alone so an empty layer cannot become a second wash.
+ */
+export function useResolvedSurfaceFill(baseColor: string, meta: SurfaceMeta): string {
+	const decorator = useSurfaceDecorator();
+	const transform = decorator?.transformBackground;
+	return useMemo(() => {
+		if (!transform || baseColor === "transparent") return baseColor;
+		return getCachedTransformedColor(baseColor, meta, transform);
+	}, [baseColor, meta, transform]);
 }

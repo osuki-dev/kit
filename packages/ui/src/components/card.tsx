@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useMemo } from "react";
-import { View, type ViewProps, type ViewStyle } from "react-native";
+import { StyleSheet, View, type ViewProps, type ViewStyle } from "react-native";
 import {
-	getCachedTransformedColor,
+	readStringFill,
+	useResolvedSurfaceFill,
 	useSurfaceDecorator,
 	useThemeTokens,
+	withoutStringFill,
 	type SurfaceMeta,
 } from "../theme";
 
@@ -65,12 +67,16 @@ export function CardRoot({
 	...rest
 }: CardRootProps) {
 	const theme = useThemeTokens();
-	const decorator = useSurfaceDecorator();
 	const card = theme.components.Card;
 	const variantTokens = card[variant];
+	const flatStyle = StyleSheet.flatten(style);
+	const fillOverride = readStringFill(style);
 
-	const baseColor = theme.colors[variantTokens.background];
-	const borderRadius = theme.radius[card.radius[radius]];
+	const baseColor = fillOverride ?? theme.colors[variantTokens.background];
+	const borderRadius =
+		typeof flatStyle?.borderRadius === "number"
+			? flatStyle.borderRadius
+			: theme.radius[card.radius[radius]];
 
 	const surfaceMeta: SurfaceMeta = useMemo(
 		() => ({
@@ -82,26 +88,19 @@ export function CardRoot({
 		[slot, variant, baseColor, borderRadius],
 	);
 
-	const resolvedBackgroundColor = useMemo(() => {
-		if (decorator?.transformBackground) {
-			return getCachedTransformedColor(baseColor, surfaceMeta, decorator.transformBackground);
-		}
-		return baseColor;
-	}, [baseColor, decorator, surfaceMeta]);
+	const resolvedBackgroundColor = useResolvedSurfaceFill(baseColor, surfaceMeta);
 
 	const cardStyles = useMemo<ViewStyle>(() => {
 		const paddingToken = card.padding[padding];
 		const borderToken = variantTokens.border ?? "border";
 		const shouldShowBorder = border === "subtle" || Boolean(variantTokens.border);
-		const shouldLift = theme.mode === "light" && radius !== "none";
 		return {
 			position: "relative",
 			borderRadius,
 			padding: paddingToken === 0 ? 0 : theme.spacing[paddingToken],
-			overflow: shouldLift ? "visible" : "hidden",
-			...(shouldLift ? theme.shadow.soft : {}),
+			overflow: "visible",
 			...(shouldShowBorder && {
-				borderWidth: 1,
+				borderWidth: StyleSheet.hairlineWidth,
 				borderColor: theme.colors[borderToken],
 			}),
 		};
@@ -110,10 +109,7 @@ export function CardRoot({
 		borderRadius,
 		card.padding,
 		padding,
-		radius,
 		theme.colors,
-		theme.mode,
-		theme.shadow.soft,
 		theme.spacing,
 		variantTokens.border,
 	]);
@@ -136,7 +132,7 @@ export function CardRoot({
 
 	return (
 		<CardContext.Provider value={contextValue}>
-			<View style={[cardStyles, style]} {...rest}>
+			<View style={[cardStyles, withoutStringFill(style)]} {...rest}>
 				{children}
 			</View>
 		</CardContext.Provider>
@@ -149,7 +145,9 @@ export interface CardBackgroundProps extends ViewProps {
 
 export function CardBackground({ style, children, ...props }: CardBackgroundProps) {
 	const { meta } = useCard();
+	const theme = useThemeTokens();
 	const decorator = useSurfaceDecorator();
+	const lift = theme.mode === "light" && meta.radius !== "none";
 	const surfaceMeta: SurfaceMeta = useMemo(
 		() => ({
 			slot: meta.slot,
@@ -169,13 +167,20 @@ export function CardBackground({ style, children, ...props }: CardBackgroundProp
 				{
 					backgroundColor: meta.resolvedBackgroundColor,
 					borderRadius: meta.borderRadius,
+					...(lift ? theme.shadow.soft : {}),
 				},
 				style,
 			]}
 			{...props}
 		>
-			{decorator?.renderDecoration?.(surfaceMeta)}
-			{children}
+			<View
+				collapsable
+				pointerEvents="none"
+				style={[absoluteFill, { borderRadius: meta.borderRadius, overflow: "hidden" }]}
+			>
+				{decorator?.renderDecoration?.(surfaceMeta)}
+				{children}
+			</View>
 		</View>
 	);
 }

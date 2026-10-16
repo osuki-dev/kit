@@ -27,7 +27,7 @@ export interface ActionSheetProps extends Omit<
 	actionStyle?: ViewStyle;
 }
 
-export const ActionSheet: React.FC<ActionSheetProps> = ({
+const ActionSheetView: React.FC<ActionSheetProps> = ({
 	actions,
 	onAction,
 	onClose,
@@ -80,14 +80,9 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
 							testID={testID ? `${testID}-actions` : undefined}
 						>
 							{actions.map((action) => (
-								<SheetListItem
+								<ActionSheetItem
 									key={action.id}
-									label={action.label}
-									description={action.description}
-									icon={action.icon}
-									disabled={action.disabled}
-									tone={action.tone}
-									variant="raised"
+									action={action}
 									onPress={() => handleAction(action)}
 									style={actionStyle}
 									testID={testID ? `${testID}-action-${action.id}` : undefined}
@@ -122,3 +117,34 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
 		</Sheet.Root>
 	);
 };
+
+export function ActionSheetItem({
+	action,
+	onPress,
+	style,
+	testID,
+}: {
+	action: ActionSheetAction;
+	onPress: () => void;
+	style?: ViewStyle;
+	testID?: string;
+}) {
+	return (
+		<SheetListItem
+			label={action.label}
+			description={action.description}
+			icon={action.icon}
+			disabled={action.disabled}
+			tone={action.tone}
+			variant="raised"
+			onPress={onPress}
+			style={style}
+			testID={testID}
+		/>
+	);
+}
+
+export const ActionSheet = Object.assign(ActionSheetView, {
+	Root: ActionSheetView,
+	Item: ActionSheetItem,
+});

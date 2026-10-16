@@ -86,7 +86,10 @@ export {
 	LRUCache,
 	surfaceColorCache,
 	getCachedTransformedColor,
+	useResolvedSurfaceFill,
 	type SurfaceMeta,
 	type SurfaceDecoratorContextValue,
 	type SurfaceDecoratorProviderProps,
 } from "./decorator-context";
+export { readStringFill, withoutStringFill } from "./surface-fill";
+export { withAlpha } from "../utils/color";
