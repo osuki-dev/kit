@@ -225,7 +225,9 @@ axes, the run's span then sets the same settings again, and Android ignores an
 unchanged settings string, so the run would be measured at the font's default
 instance and drawn at the requested one: heavier text overflowed its box and
 wrapped or lost letters. If you render `fontVariationSettings` yourself in a
-React Native `Text`, do the same.
+React Native `Text`, do the same. The trailing slack, when a role turns it on,
+goes after that run at the paragraph's face, so its width does not follow the
+requested weight.
 
 Variable fonts need React Native 0.88 or later, which this release requires.
 
