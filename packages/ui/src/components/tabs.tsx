@@ -18,6 +18,7 @@ import {
 	type ViewStyle,
 } from "react-native";
 import Animated, {
+	Easing,
 	useAnimatedStyle,
 	useReducedMotion,
 	useSharedValue,
@@ -244,15 +245,21 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 	const indicatorX = useSharedValue(target?.x ?? 0);
 	const indicatorWidth = useSharedValue(target?.width ?? 0);
 	const placed = useSharedValue(target ? 1 : 0);
-	const duration = theme.motion.segmented.duration;
+	// The slide runs on the theme's `motion.segmented` timing and curve.
+	const { duration, easing: curve } = theme.motion.segmented;
+	const [x1, y1, x2, y2] = curve;
+	const timing = useMemo(
+		() => ({ duration, easing: Easing.bezier(x1, y1, x2, y2) }),
+		[duration, x1, x2, y1, y2],
+	);
 	useEffect(() => {
 		if (!target) return;
 		// The first placement and reduce motion land without travelling.
 		const animate = placed.get() === 1 && !reduceMotion;
-		indicatorX.set(animate ? withTiming(target.x, { duration }) : target.x);
-		indicatorWidth.set(animate ? withTiming(target.width, { duration }) : target.width);
+		indicatorX.set(animate ? withTiming(target.x, timing) : target.x);
+		indicatorWidth.set(animate ? withTiming(target.width, timing) : target.width);
 		placed.set(1);
-	}, [duration, indicatorWidth, indicatorX, placed, reduceMotion, target]);
+	}, [indicatorWidth, indicatorX, placed, reduceMotion, target, timing]);
 	const indicatorStyle = useAnimatedStyle(() => ({
 		opacity: placed.get(),
 		width: indicatorWidth.get(),

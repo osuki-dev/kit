@@ -202,11 +202,13 @@ type Widen<T> = T extends (...args: never[]) => unknown
 	? T
 	: T extends number
 		? number
-		: T extends readonly unknown[]
+		: T extends unknown[]
 			? T
-			: T extends object
-				? { [K in keyof T]: Widen<T[K]> }
-				: T;
+			: T extends readonly unknown[]
+				? { readonly [K in keyof T]: Widen<T[K]> }
+				: T extends object
+					? { [K in keyof T]: Widen<T[K]> }
+					: T;
 
 /** `motion` as a theme carries it: the same keys, any values. */
 export type MotionTokens = Widen<typeof motion>;

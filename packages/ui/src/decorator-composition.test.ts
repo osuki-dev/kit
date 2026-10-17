@@ -69,6 +69,7 @@ mock.module("react-native-reanimated", () => ({
 		View: "Animated.View",
 	},
 	cancelAnimation: () => {},
+	Easing: { bezier: () => ({ factory: () => (t: number) => t }) },
 	FadeInDown: entering,
 	Layout: layout,
 	interpolateColor: () => "transparent",

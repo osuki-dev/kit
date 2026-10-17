@@ -388,6 +388,15 @@ import { Easing } from "react-native-reanimated";
 
 `Button` and `PressableCard` press on springs, `springIn` and `springOut`.
 
+The `Tabs` sliding indicator (`indicator="slide"`) travels on
+`motion.segmented`: `duration` in milliseconds and `easing`, a cubic bezier's
+four control values (`[0.25, 0.1, 0.25, 1]` by default). Under reduce motion it
+lands without travelling.
+
+```tsx
+<ThemeProvider theme={{ motion: { segmented: { duration: 240, easing: [0.2, 0, 0, 1] } } }}>
+```
+
 Translucent, image-backed and gradient-backed fills come from the surface
 decorator, below.
 
