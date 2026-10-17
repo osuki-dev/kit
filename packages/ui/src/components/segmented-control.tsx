@@ -14,6 +14,7 @@ import {
 	useSurfaceDecorator,
 	useThemeTokens,
 	withoutStringFill,
+	type RadiusToken,
 	type SurfaceMeta,
 } from "../theme";
 import { Text } from "./text";
@@ -32,6 +33,16 @@ export interface SegmentedControlProps extends Omit<ViewProps, "style"> {
 	value: string;
 	onChange: (value: string) => void;
 	variant?: "pill" | "rounded";
+	/**
+	 * The track radius of this instance only, over the variant's
+	 * (`components.SegmentedControl.radius`, or `pill`).
+	 */
+	radius?: RadiusToken;
+	/**
+	 * The selected option radius of this instance only, over the variant's
+	 * (`components.SegmentedControl.optionRadius`, or `pill`).
+	 */
+	optionRadius?: RadiusToken;
 	style?: StyleProp<ViewStyle>;
 }
 
@@ -48,6 +59,8 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	value,
 	onChange,
 	variant = "rounded",
+	radius: radiusToken,
+	optionRadius: optionRadiusToken,
 	style,
 	testID,
 	...rest
@@ -64,12 +77,9 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	const trackBase = readStringFill(style) ?? colors[tokens.background];
 	const selectedBase = colors[tokens.activeBackground];
 
-	let trackRadius = radius[tokens.radius];
-	let optionRadius = radius[tokens.optionRadius];
-	if (variant === "pill") {
-		trackRadius = radius.pill;
-		optionRadius = radius.pill;
-	}
+	const pill = variant === "pill";
+	const trackRadius = radius[radiusToken ?? (pill ? "pill" : tokens.radius)];
+	const optionRadius = radius[optionRadiusToken ?? (pill ? "pill" : tokens.optionRadius)];
 
 	const trackMeta = useMemo<SurfaceMeta>(
 		() => ({

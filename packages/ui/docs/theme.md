@@ -350,6 +350,21 @@ The ones that shape an app's whole appearance:
 | `Input.hint`                                                                                | the helper line under a field (`textDisabled`)    |
 | `Skeleton.background`                                                                       | placeholder fill under the pulse                  |
 
+The `Tabs` and `SegmentedControl` radius tokens are theme-wide. One instance
+that should differ, say a pill-shaped tab group in a theme whose segmented
+controls are square, takes `radius` and `optionRadius` props instead, as token
+names. They override the theme for that instance only, sliding indicator and
+`segments` layering included:
+
+```tsx
+<Tabs options={options} value={value} onChange={setValue} variant="pill" radius="pill" optionRadius="pill" />
+<SegmentedControl options={options} value={value} onChange={setValue} radius="pill" optionRadius="pill" />
+```
+
+Each prop replaces only its own token. On `Tabs`, an unset `optionRadius`
+follows the theme's `Tabs.optionRadius`, then the track radius; on
+`SegmentedControl` it follows the variant's.
+
 Press feedback is a theme setting too. `motion.press` holds the scale each kind
 of control settles at while held — `control` (Button), `card` (PressableCard),
 `row` (ListItem), `chip` (Tag), `segment` (a `SegmentedControl` option), and
