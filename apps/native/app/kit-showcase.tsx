@@ -56,6 +56,14 @@ import {
 	type IconName,
 } from "@osuki-dev/ui";
 
+// Names from your own icon sets are registered once, so `IconName` still
+// checks them at compile time.
+declare module "@osuki-dev/ui" {
+	interface IconNameRegistry {
+		CustomSparkle: true;
+	}
+}
+
 // Custom Nano Icon Set registration demo
 const demoNanoIcons = createNanoIconSet({
 	CustomSparkle: {

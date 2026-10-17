@@ -1,4 +1,5 @@
 import React from "react";
+import type * as LucideIcons from "lucide-react-native";
 import {
 	Image,
 	StyleSheet,
@@ -66,48 +67,29 @@ export const DEFAULT_CHROME_FALLBACKS: Record<string, string> = {
 };
 
 /**
- * Common Lucide icon names for IDE autocomplete while permitting any string
- * (e.g. custom theme pack names like "chrome.back" or NanoIcon names).
+ * Every export name of `lucide-react-native`, as in 1.x. A type-only import, so
+ * Lucide stays an optional runtime peer.
  */
-export type CommonIconName =
-	| "Home"
-	| "Settings"
-	| "User"
-	| "Search"
-	| "LayoutGrid"
-	| "Menu"
-	| "Info"
-	| "Bell"
-	| "ChevronLeft"
-	| "ChevronRight"
-	| "ChevronDown"
-	| "ChevronUp"
-	| "ChevronsLeft"
-	| "ChevronsRight"
-	| "ArrowUp"
-	| "ArrowDown"
-	| "ArrowLeft"
-	| "ArrowRight"
-	| "Check"
-	| "CircleCheck"
-	| "CircleAlert"
-	| "TriangleAlert"
-	| "X"
-	| "Plus"
-	| "Minus"
-	| "Inbox"
-	| "Calendar"
-	| "Clock"
-	| "Eye"
-	| "EyeOff"
-	| "Trash2"
-	| "Edit"
-	| "Share2"
-	| "Filter"
-	| "SlidersHorizontal"
-	| ThemeIconName;
+export type LucideIconName = keyof typeof LucideIcons;
 
-export type IconName = CommonIconName | (string & {});
+/**
+ * Register the names your own icons answer to, so `IconName` keeps checking
+ * them at compile time:
+ *
+ * ```ts
+ * declare module "@osuki-dev/ui" {
+ *   interface IconNameRegistry {
+ *     "brand.logo": true;
+ *     heart: true;
+ *   }
+ * }
+ * ```
+ */
+// oxlint-disable-next-line typescript/no-empty-interface -- augmented by consumers
+export interface IconNameRegistry {}
+
+/** A Lucide name, a theme chrome name, or a name registered in `IconNameRegistry`. */
+export type IconName = LucideIconName | ThemeIconName | Extract<keyof IconNameRegistry, string>;
 
 export const ICON_DIRECTION_ANGLES: Record<IconDirection, number> = {
 	up: 0,
@@ -668,8 +650,13 @@ export const IconGlyph: React.FC<IconGlyphProps> = ({
 		return <>{renderedNode}</>;
 	}
 
-	// Standalone usage: wrap in container with rotation
-	const rotationTransform = direction ? { rotate: `${deg}deg` } : undefined;
+	// A rendered glyph is already a size x size box. A host view is added only
+	// when something needs one: a rotation, a style, or view props such as testID.
+	const rotationTransform = deg !== 0 ? { rotate: `${deg}deg` } : undefined;
+	if (!rotationTransform && style == null && Object.keys(viewProps).length === 0) {
+		return <>{renderedNode}</>;
+	}
+
 	const flattenedStyle = StyleSheet.flatten(style) as ViewStyle | undefined;
 	const transform = combineTransforms(flattenedStyle?.transform, rotationTransform);
 
@@ -716,8 +703,6 @@ export interface IconProps extends Omit<ViewProps, "children"> {
 	fallback?: React.ComponentType<IconRenderProps>;
 	/** Children if used as a compound container */
 	children?: React.ReactNode;
-	/** Additional SVG-compatible or element properties */
-	[key: string]: any;
 }
 
 export interface IconComponent extends React.FC<IconProps> {
@@ -773,32 +758,23 @@ export const Icon: IconComponent = (({
 		);
 	}
 
+	if (!name) return null;
+
+	// A named icon renders the glyph directly: no container view unless the
+	// glyph needs one for rotation, style, or view props.
 	return (
-		<IconRoot
+		<IconGlyph
+			name={name}
 			size={size}
 			color={color}
 			strokeWidth={strokeWidth}
 			direction={direction}
 			sourceDirection={sourceDirection}
 			renderMode={renderMode}
+			fallback={fallback}
 			style={style}
 			{...rest}
-		>
-			{name ? (
-				<IconGlyph
-					name={name}
-					size={size}
-					color={color}
-					strokeWidth={strokeWidth}
-					direction={direction}
-					sourceDirection={sourceDirection}
-					renderMode={renderMode}
-					fallback={fallback}
-				/>
-			) : (
-				children
-			)}
-		</IconRoot>
+		/>
 	);
 }) as IconComponent;
 
