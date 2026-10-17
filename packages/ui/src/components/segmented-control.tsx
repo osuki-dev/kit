@@ -1,7 +1,6 @@
 import React, { memo, useCallback, useMemo } from "react";
 import {
 	Platform,
-	Pressable,
 	StyleSheet,
 	View,
 	type ViewProps,
@@ -19,6 +18,7 @@ import {
 } from "../theme";
 import { Text } from "./text";
 import { useHaptics } from "./haptics";
+import { PressableScale } from "./pressable-scale";
 import { SurfaceDecoration } from "./surface-decoration";
 
 export interface SegmentedControlOption {
@@ -210,7 +210,7 @@ const Segment = memo(function Segment({
 	onSelect,
 	testID,
 }: SegmentProps) {
-	const { colors, components } = useThemeTokens();
+	const { colors, components, motion } = useThemeTokens();
 	const handlePress = useCallback(() => {
 		onSelect(value);
 	}, [onSelect, value]);
@@ -219,37 +219,37 @@ const Segment = memo(function Segment({
 	let textColor = colors[tokens.inactiveForeground];
 	if (selected) textColor = colors[tokens.activeForeground];
 
+	const segmentStyle = useMemo<ViewStyle>(() => {
+		const next: ViewStyle = {
+			borderRadius: radius,
+			backgroundColor: fill,
+			opacity: disabled ? 0.4 : 1,
+		};
+		if (raised) Object.assign(next, shadow);
+		return next;
+	}, [disabled, fill, radius, raised, shadow]);
+
+	// The press dips by `motion.press.segment` and holds still under reduce
+	// motion. The selection haptic is played once, by the control, on select.
 	return (
-		<Pressable
+		<PressableScale
 			accessibilityRole="tab"
 			accessibilityLabel={label}
 			accessibilityState={{ selected, disabled }}
 			disabled={disabled}
+			feedback="none"
+			pressedScale={motion.press.segment}
 			hitSlop={SEGMENT_HIT_SLOP}
 			onPress={handlePress}
-			style={({ pressed }) => {
-				const next: ViewStyle = {
-					borderRadius: radius,
-					backgroundColor: fill,
-					opacity: segmentOpacity(disabled, pressed),
-				};
-				if (raised) Object.assign(next, shadow);
-				return [styles.segment, next];
-			}}
+			style={[styles.segment, segmentStyle]}
 			testID={testID}
 		>
 			<Text variant="label" color={textColor}>
 				{label}
 			</Text>
-		</Pressable>
+		</PressableScale>
 	);
 });
-
-function segmentOpacity(disabled: boolean, pressed: boolean) {
-	if (disabled) return 0.4;
-	if (pressed) return 0.72;
-	return 1;
-}
 
 const styles = StyleSheet.create({
 	track: {
