@@ -248,11 +248,22 @@ export const Text: React.FC<TextProps> = ({
 					callerStyle?.fontVariationSettings ?? fontStyle.fontVariationSettings,
 			};
 	const { paragraph, run } = splitVariation(resolvedStyle);
-	const content = (
-		<NestedTextContext.Provider value>
-			{run ? <RNText style={run}>{renderedChildren}</RNText> : renderedChildren}
-		</NestedTextContext.Provider>
-	);
+	let body: React.ReactNode = renderedChildren;
+	if (run) {
+		// The slack goes after the run, at the paragraph's own face: inside it,
+		// its advance would follow the run's axes and move centred text.
+		const runText = <RNText style={run}>{children}</RNText>;
+		body =
+			renderedChildren === children ? (
+				runText
+			) : (
+				<>
+					{runText}
+					{HUG_SLACK}
+				</>
+			);
+	}
+	const content = <NestedTextContext.Provider value>{body}</NestedTextContext.Provider>;
 	const lineHeight =
 		typeof flattenedStyle?.lineHeight === "number"
 			? flattenedStyle.lineHeight
