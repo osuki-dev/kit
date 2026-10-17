@@ -231,6 +231,31 @@ requested weight.
 
 Variable fonts need React Native 0.88 or later, which this release requires.
 
+### Trailing slack
+
+Android clips the edge of the last glyph of some italic and wide faces at the
+line end. `trailingSlack: true` on a font role appends a thin space to every
+kit `Text` in that role, which gives the glyph room without changing the words:
+
+```tsx
+const theme = { fonts: { body: { family: "ReaderSerif", trailingSlack: true } } };
+```
+
+`Text`'s `hugSlack` overrides the role for one instance. Nested and selectable
+text never get the slack, and these kit labels default to `hugSlack={false}`,
+because they are centred or hug their own width and the slack would move them
+off centre or widen them:
+
+| Component                       | Why it opts out                          |
+| ------------------------------- | ---------------------------------------- |
+| `Button` (`Button.Label`)       | Centred in the button.                   |
+| `Tabs.Label`                    | Centred in its trigger.                  |
+| `Tag`, `Tag.Label`              | The chip is as wide as its label.        |
+| `Badge`, `Avatar`, `Tabs.Badge` | A count or initials in a box of its own. |
+
+`Button.Label`, `Tabs.Label`, `Tag` and `Tag.Label` take `hugSlack` to turn it
+back on.
+
 ## Light and dark
 
 `ThemeProvider` resolves the mode. It never hands components `"system"`; by the

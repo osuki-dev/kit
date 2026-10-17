@@ -345,6 +345,11 @@ export interface TabsLabelProps {
 	transform?: TextProps["transform"];
 	weight?: FontWeightValue;
 	numberOfLines?: number;
+	/**
+	 * Android trailing slack. Off by default: the label is centred in its
+	 * trigger, so the slack would move it off centre. See `Text`'s `hugSlack`.
+	 */
+	hugSlack?: boolean;
 }
 
 export function TabsLabel({
@@ -352,12 +357,14 @@ export function TabsLabel({
 	transform = "inherit",
 	weight,
 	numberOfLines = 1,
+	hugSlack = false,
 }: TabsLabelProps) {
 	const theme = useThemeTokens();
 	const selected = useContext(TabsTriggerContext);
 	return (
 		<Text
 			variant="label"
+			hugSlack={hugSlack}
 			color={
 				selected
 					? theme.colors[theme.components.Tabs.activeForeground]

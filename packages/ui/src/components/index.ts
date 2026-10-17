@@ -87,7 +87,7 @@ export {
 	type SegmentedProgressBarProps,
 	type ProgressStatus,
 } from "./segmented-progress-bar";
-export { Tag, type TagProps, type TagVariant } from "./tag";
+export { Tag, type TagLabelProps, type TagProps, type TagVariant } from "./tag";
 export { Badge, type BadgeProps, type BadgeVariant } from "./badge";
 export { Avatar, type AvatarProps, type AvatarSize } from "./avatar";
 export { AvatarGroup, type AvatarGroupItem, type AvatarGroupProps } from "./avatar-group";

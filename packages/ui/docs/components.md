@@ -42,6 +42,8 @@ The things a screen is made of before it is made of interactions.
 the number exactly (see [theme.md](./theme.md#variable-fonts)). `hugSlack` is an
 Android-only opt-in that appends a thin space so an italic or wide face does not
 lose the edge of its last glyph; it is ignored on nested and selectable text.
+A font role's `trailingSlack` sets its default; `Button`, `Tabs.Label` and
+`Tag` labels default to off (see [theme.md](./theme.md#trailing-slack)).
 
 `Icon` names are checked at compile time: a Lucide export name, a theme chrome
 name such as `"chrome.back"`, or a name you register for your own icons:

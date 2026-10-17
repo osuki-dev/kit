@@ -18,6 +18,11 @@ export interface TagProps extends Omit<TouchableOpacityProps, "style"> {
 	style?: ViewStyle;
 	/** Callback when tag is pressed (makes tag interactive) */
 	onPress?: () => void;
+	/**
+	 * Android trailing slack on the label. Off by default: a chip hugs its
+	 * label, so the slack would only widen it. See `Text`'s `hugSlack`.
+	 */
+	hugSlack?: boolean;
 }
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
@@ -45,14 +50,9 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
  * <Tag variant="pill" onPress={selectFilter}>FILTER</Tag>
  * ```
  */
-export const TagRoot: React.FC<Omit<TagProps, "children"> & { children?: React.ReactNode }> = ({
-	children,
-	variant = "default",
-	disabled = false,
-	style,
-	onPress,
-	...rest
-}) => {
+export const TagRoot: React.FC<
+	Omit<TagProps, "children" | "hugSlack"> & { children?: React.ReactNode }
+> = ({ children, variant = "default", disabled = false, style, onPress, ...rest }) => {
 	const { colors, mode, motion, shadow } = useThemeTokens();
 	const haptics = useHaptics();
 	const scale = useSharedValue(1);
@@ -120,21 +120,32 @@ export const TagRoot: React.FC<Omit<TagProps, "children"> & { children?: React.R
 	return <View style={[tagStyles, style]}>{children}</View>;
 };
 
-export function TagLabel({ children }: { children?: React.ReactNode }) {
+export interface TagLabelProps {
+	children?: React.ReactNode;
+	/** Android trailing slack. Off by default, as on `Tag`. */
+	hugSlack?: boolean;
+}
+
+export function TagLabel({ children, hugSlack = false }: TagLabelProps) {
 	const { colors } = useThemeTokens();
 	return (
-		<Text variant="caption" color={colors.text} transform="uppercase">
+		<Text variant="caption" color={colors.text} transform="uppercase" hugSlack={hugSlack}>
 			{children}
 		</Text>
 	);
 }
 
-function TagFacade({ children, variant = "default", ...props }: TagProps) {
+function TagFacade({ children, variant = "default", hugSlack = false, ...props }: TagProps) {
 	const { colors } = useThemeTokens();
 	const muted = variant !== "active";
 	return (
 		<TagRoot variant={variant} {...props}>
-			<Text variant="caption" color={muted ? colors.textMuted : colors.text} transform="uppercase">
+			<Text
+				variant="caption"
+				color={muted ? colors.textMuted : colors.text}
+				transform="uppercase"
+				hugSlack={hugSlack}
+			>
 				{children}
 			</Text>
 		</TagRoot>
