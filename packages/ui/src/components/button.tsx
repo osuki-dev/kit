@@ -277,6 +277,9 @@ export function ButtonLabel({ style, children, ...props }: ButtonLabelProps) {
 
 	return (
 		<Text
+			// Centred in the button, where the slack would move it off centre.
+			// A caller can still pass `hugSlack`.
+			hugSlack={false}
 			variant="button"
 			color={textColor}
 			transform="inherit"

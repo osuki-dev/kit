@@ -47,9 +47,10 @@ export type FontDefinition = Partial<Record<FontWeight, string>> & {
 	/**
 	 * The face draws past its glyph advances (an italic, an oblique, a wide
 	 * brush face, or any face the app cannot vouch for, such as a user-supplied
-	 * file). On Android, every kit `Text` in this role, including the labels
-	 * inside kit components, then appends a thin space so the last glyph is
-	 * not clipped at the line edge. `hugSlack={false}` still opts one out.
+	 * file). On Android, every kit `Text` in this role then appends a thin
+	 * space so the last glyph is not clipped at the line edge. Centred and
+	 * shrink-wrapped kit labels (`Button`, `Tabs.Label`, `Tag`, badges) opt out
+	 * by default; `hugSlack` overrides either way.
 	 */
 	trailingSlack?: boolean;
 };
