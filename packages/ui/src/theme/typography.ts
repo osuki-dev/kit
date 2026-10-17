@@ -46,10 +46,12 @@ export type FontDefinition = Partial<Record<FontWeight, string>> & {
 	width?: number;
 	/**
 	 * The face draws past its glyph advances (an italic, an oblique, a wide
-	 * brush face). On Android, `Text` in this role then defaults `hugSlack` on,
-	 * so the last glyph is not clipped at the line edge.
+	 * brush face, or any face the app cannot vouch for, such as a user-supplied
+	 * file). On Android, every kit `Text` in this role, including the labels
+	 * inside kit components, then appends a thin space so the last glyph is
+	 * not clipped at the line edge. `hugSlack={false}` still opts one out.
 	 */
-	overhang?: boolean;
+	trailingSlack?: boolean;
 };
 
 export type FontRegistry = Record<FontFamily, FontDefinition>;

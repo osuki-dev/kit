@@ -41,6 +41,7 @@ mock.module("react-native", () => ({
 }));
 
 mock.module("react-native-reanimated", () => ({
+	useReducedMotion: () => false,
 	default: {
 		createAnimatedComponent: (component: unknown) => component,
 		View: "AnimatedView",

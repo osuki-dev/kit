@@ -24,6 +24,7 @@ import {
 	useResolvedSurfaceFill,
 	useThemeTokens,
 	withoutStringFill,
+	type SurfaceMeta,
 } from "../theme";
 import { Text } from "./text";
 import { withAlpha } from "../utils/color";
@@ -106,7 +107,7 @@ export function CodeBlockRoot({
 	const tokenFill = variant === "default" ? theme.colors.surface : theme.colors.surfaceRaised;
 	const fillOverride = readStringFill(style);
 	const baseColor = fillOverride ?? tokenFill;
-	const surfaceMeta = useMemo(
+	const surfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: `code.${variant}`,
 			variant,

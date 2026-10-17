@@ -86,16 +86,21 @@ export type {
 } from "./types";
 export * from "./responsive-theme";
 export {
+	SURFACE_SLOTS,
 	SurfaceDecoratorContext,
 	SurfaceDecoratorProvider,
+	resolveSurfaceFill,
 	useSurfaceDecorator,
-	LRUCache,
-	surfaceColorCache,
-	getCachedTransformedColor,
+	useSurfaceMeta,
 	useResolvedSurfaceFill,
+	type KitSurfaceSlot,
 	type SurfaceMeta,
+	type SurfaceRole,
+	type SurfaceSlot,
+	type SurfaceSlotRegistry,
 	type SurfaceDecoratorContextValue,
 	type SurfaceDecoratorProviderProps,
 } from "./decorator-context";
 export { readStringFill, withoutStringFill } from "./surface-fill";
-export { withAlpha } from "../utils/color";
+export { multiplyAlpha, withAlpha } from "../utils/color";
+export { TextPlateProvider, useTextPlate, type TextPlateProviderProps } from "./text-plate";

@@ -29,6 +29,12 @@ export const motion = {
 		row: 0.98, // ListItem
 		chip: 0.96, // Tag
 		surface: 0.985, // PressableScale
+		// PressableScale timing: the dip arrives under the finger and leaves slower.
+		inMs: 80,
+		outMs: 120,
+		// Button and PressableCard springs.
+		springIn: { stiffness: 520, damping: 34, mass: 0.72 },
+		springOut: { stiffness: 420, damping: 30, mass: 0.78 },
 	},
 } as const;
 

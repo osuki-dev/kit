@@ -83,6 +83,7 @@ export function EmptyStateTitle({
 			variant={size === "compact" ? "body" : "subheading"}
 			colorKey="text"
 			style={{ textAlign: "center" }}
+			plated
 		>
 			{children}
 		</Text>
@@ -92,7 +93,7 @@ export function EmptyStateTitle({
 export function EmptyStateMessage({ children }: { children?: ReactNode }) {
 	if (!children) return null;
 	return (
-		<Text variant="bodySmall" colorKey="textMuted" style={{ textAlign: "center" }}>
+		<Text variant="bodySmall" colorKey="textMuted" style={{ textAlign: "center" }} plated>
 			{children}
 		</Text>
 	);

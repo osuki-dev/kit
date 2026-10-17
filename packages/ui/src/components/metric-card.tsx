@@ -53,7 +53,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 			<View style={contentStyle}>
 				<View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.sm }}>
 					{icon && <Icon name={icon} size={18} color={accent} />}
-					<Text variant="label" colorKey="textMuted" transform="uppercase" numberOfLines={1}>
+					<Text variant="label" colorKey="textMuted" numberOfLines={1}>
 						{label}
 					</Text>
 				</View>

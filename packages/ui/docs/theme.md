@@ -330,11 +330,129 @@ system reduce-motion setting is on.
 <ThemeProvider theme={{ motion: { press: { control: 0.97, surface: 0.96 } } }}>
 ```
 
-Fills that are translucent, image-backed, or gradient-backed are not tokens:
-they come from `SurfaceDecoratorProvider`, whose `transformBackground` maps
-every string fill (for example to apply an opacity) and whose
-`renderDecoration` paints artwork behind a slot. Every control paints its fill
-once through it, so a translucent fill is never stacked on itself.
+Translucent, image-backed and gradient-backed fills come from the surface
+decorator, below.
+
+## Surface decoration
+
+Fills that are translucent, image-backed, or gradient-backed are not tokens.
+They come from one provider that every kit surface paints through:
+
+```tsx
+import { SurfaceDecoratorProvider, multiplyAlpha, type SurfaceMeta } from "@osuki-dev/ui";
+
+function AppDecorator({ opacity, children }: { opacity: number; children: React.ReactNode }) {
+	// Recreated when `opacity` changes: components memoize on its identity.
+	const transformBackground = useCallback(
+		(color: string, meta: SurfaceMeta) =>
+			meta.role === "mark" ? color : multiplyAlpha(color, opacity),
+		[opacity],
+	);
+	const renderDecoration = useCallback(
+		(meta: SurfaceMeta) =>
+			meta.slot === "cards.decoration" ? <CardArtwork mode={meta.mode} /> : null,
+		[],
+	);
+	return (
+		<SurfaceDecoratorProvider
+			transformBackground={transformBackground}
+			renderDecoration={renderDecoration}
+		>
+			{children}
+		</SurfaceDecoratorProvider>
+	);
+}
+```
+
+The contract:
+
+- `transformBackground(color, meta)` maps one string fill. Keep it a pure
+  function of its arguments and create a new function when anything it reads
+  changes; components memoize the result on the function's identity. It is
+  never called with `transparent`.
+- `renderDecoration(meta)` returns artwork for a slot, or `null`. The kit
+  places it in an absolute, non-interactive layer clipped to the surface's
+  corners.
+- Every fill is painted once. A selection drawn over a track (`Tabs` in the
+  `pill` variant, `SegmentedControl`) is an `overlay`, and its meta carries the
+  resolved fill underneath as `over`, so a translucent policy can avoid
+  multiplying itself or return an opaque fill for it.
+- Use `multiplyAlpha` for opacity, not `withAlpha`: `withAlpha` replaces the
+  alpha, so it would make an already translucent token such as `primarySubtle`
+  more opaque.
+
+`meta` carries `slot`, `role` (`surface`, `overlay`, `mark`), `over`, `mode`
+(the resolved theme mode), `variant`, `baseColor`, `disabled`, `selected` and
+`borderRadius`.
+
+### Slots
+
+A slot names a fill. Decorator policies key on these names, so renaming one is
+a breaking change, like renaming a token.
+
+| Slot                                  | Painted by                                                | Role      |
+| ------------------------------------- | --------------------------------------------------------- | --------- |
+| `screens.page`                        | `Screen`, `ScrollScreen`, page `Surface`                  | `surface` |
+| `surfaces.surface`, `surfaces.raised` | `Surface` variants                                        | `surface` |
+| `cards.decoration`                    | `Card`                                                    | `surface` |
+| `buttons.{variant}.background`        | `Button` (`primary`, `secondary`, `ghost`, `destructive`) | `surface` |
+| `inputs.background`, `inputs.search`  | `Input`, `Textarea`, `SearchInput`                        | `surface` |
+| `inputs.error`                        | the `Input` error pill                                    | `surface` |
+| `prompt.background`                   | `PromptInput`                                             | `surface` |
+| `tabs.track`                          | `Tabs.List` (`pill`)                                      | `surface` |
+| `tabs.selected`                       | the selected `pill` trigger or indicator                  | `overlay` |
+| `tabs.badge`                          | `Tabs.Badge`                                              | `mark`    |
+| `segmented.track`                     | `SegmentedControl`                                        | `surface` |
+| `segmented.selected`                  | the selected segment                                      | `overlay` |
+| `toggles.track`                       | `Toggle`                                                  | `mark`    |
+| `tags.background`                     | `Tag`                                                     | `surface` |
+| `badges.background`                   | `Badge`                                                   | `mark`    |
+| `skeleton.fill`                       | `Skeleton`                                                | `surface` |
+| `empty.icon`                          | the `EmptyState` icon well                                | `surface` |
+| `alerts.{variant}`                    | `Alert` (`info`, `success`, `warning`, `danger`)          | `surface` |
+| `code.{variant}`                      | `CodeBlock` (`default`, `diff`, `terminal`, `compact`)    | `surface` |
+| `sheets.background`, `sheets.action`  | `Sheet` body, `ActionSheet` cancel                        | `surface` |
+| `dialogs.background`                  | `Modal` and `Dialog` content                              | `surface` |
+| `popovers.background`                 | `Popover`                                                 | `surface` |
+| `tooltips.background`                 | `Tooltip`                                                 | `surface` |
+| `toasts.background`                   | toasts                                                    | `surface` |
+| `menus.trigger`, `selects.trigger`    | `Menu` and `Select` triggers                              | `surface` |
+| `rows.background`                     | `ListItem`, when its token sets a fill                    | `surface` |
+
+Scrims, pressed tints, handles and other decorative tints are not slots and do
+not go through the decorator.
+
+Register your own slots so `SurfaceSlot` keeps checking them:
+
+```ts
+declare module "@osuki-dev/ui" {
+	interface SurfaceSlotRegistry {
+		"composer.dock": true;
+	}
+}
+```
+
+Pass them as `slot` to `Surface`, `Card` or `Button`, or decorate a view the kit
+does not own with `<SurfaceDecoration slot="composer.dock" baseColor={fill} borderRadius={16} />`
+placed first inside it.
+
+`ScrollScreen` keeps its decoration in a fixed layer behind the scrolling
+content, so a backdrop does not scroll away.
+
+### Text plates
+
+Text that stands directly on a decorated background, outside any card or
+control, can need a backing to stay legible. Publish one with
+`TextPlateProvider`; the kit applies it to field labels and hints, section
+titles and descriptions, and empty-state copy, and your own `Text` takes it with
+`plated`:
+
+```tsx
+<TextPlateProvider plate={overImage ? plateStyle : null}>{children}</TextPlateProvider>
+```
+
+The kit never decides when a plate is needed; it only applies the style the
+app publishes. Keep the plate object stable.
 
 ## Your brand colour
 

@@ -12,7 +12,7 @@ import {
 	Slider,
 	SurfaceDecoratorProvider,
 	useTheme,
-	withAlpha,
+	multiplyAlpha,
 	type IconDirection,
 } from "@osuki-dev/ui";
 
@@ -62,7 +62,7 @@ export default function ThemingAndIconsScreen() {
 			transformBackground: (baseColor: string) => {
 				const color = activeTheme.bg ?? baseColor;
 				if (surfaceOpacity >= 0.999) return color;
-				return withAlpha(color, surfaceOpacity);
+				return multiplyAlpha(color, surfaceOpacity);
 			},
 		};
 	}, [activeTheme.bg, surfaceOpacity]);

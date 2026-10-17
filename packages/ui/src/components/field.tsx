@@ -43,7 +43,7 @@ export function FieldRoot({
 export function FieldLabel({ children }: { children?: ReactNode }) {
 	const { required } = useField();
 	return (
-		<Text variant="label" colorKey="textMuted">
+		<Text variant="label" colorKey="textMuted" plated>
 			{children}
 			{required ? <Text colorKey="danger"> *</Text> : null}
 		</Text>
@@ -52,7 +52,7 @@ export function FieldLabel({ children }: { children?: ReactNode }) {
 
 export function FieldDescription({ children }: { children?: ReactNode }) {
 	return (
-		<Text variant="caption" colorKey="textSubtle">
+		<Text variant="caption" colorKey="textSubtle" plated>
 			{children}
 		</Text>
 	);

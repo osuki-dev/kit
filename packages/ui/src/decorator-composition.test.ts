@@ -1,6 +1,14 @@
 import { strict as assert } from "node:assert";
 import { mock, test } from "bun:test";
 
+// Slots an app registers for its own surfaces.
+declare module "./theme/decorator-context" {
+	interface SurfaceSlotRegistry {
+		"custom.slot": true;
+		"custom.button.slot": true;
+	}
+}
+
 mock.module("react-native", () => ({
 	Dimensions: {
 		get: () => ({ width: 390, height: 844 }),
@@ -54,6 +62,7 @@ const layout = {
 	stiffness: () => layout,
 };
 mock.module("react-native-reanimated", () => ({
+	useReducedMotion: () => false,
 	default: {
 		createAnimatedComponent: (component: unknown) => component,
 		Text: "Animated.Text",
@@ -92,48 +101,12 @@ const { Card, CardRoot, CardBackground, CardHeader, CardContent, CardFooter } =
 	await import("./components/card");
 const { Surface, SurfaceRoot, SurfaceBackground, SurfaceContent } =
 	await import("./components/surface");
-const {
-	SurfaceDecoratorProvider,
-	SurfaceDecoratorContext,
-	useSurfaceDecorator,
-	LRUCache,
-	getCachedTransformedColor,
-} = await import("./theme/decorator-context");
+const { SurfaceDecoratorProvider, SurfaceDecoratorContext, useSurfaceDecorator } =
+	await import("./theme/decorator-context");
 const { Skeleton } = await import("./components/skeleton");
 const { Input, InputFrameContext } = await import("./components/input");
 const { splitFieldStyle } = await import("./utils/text-field");
 const { withHugSlack } = await import("./components/text");
-
-test("LRUCache stores, retrieves, refreshes and evicts", () => {
-	const cache = new LRUCache<string, number>(2);
-	cache.set("a", 1);
-	cache.set("b", 2);
-	assert.equal(cache.get("a"), 1);
-	cache.set("c", 3); // should evict 'b' since 'a' was recently accessed
-	assert.equal(cache.get("b"), undefined);
-	assert.equal(cache.get("a"), 1);
-	assert.equal(cache.get("c"), 3);
-	assert.equal(cache.size, 2);
-	cache.clear();
-	assert.equal(cache.size, 0);
-});
-
-test("getCachedTransformedColor caches transformations", () => {
-	let callCount = 0;
-	const transform = (base: string, meta: { slot?: string }) => {
-		callCount++;
-		return `${base}-transformed-${meta.slot}`;
-	};
-	const meta = { slot: "test.slot", baseColor: "#111111" };
-	const res1 = getCachedTransformedColor("#111111", meta, transform);
-	assert.equal(res1, "#111111-transformed-test.slot");
-	assert.equal(callCount, 1);
-
-	// Second call with same parameters should hit cache
-	const res2 = getCachedTransformedColor("#111111", meta, transform);
-	assert.equal(res2, "#111111-transformed-test.slot");
-	assert.equal(callCount, 1);
-});
 
 test("Surface exposes compound subcomponents and functions as facade", () => {
 	assert.equal(typeof Surface, "function");
@@ -296,14 +269,6 @@ function flattenStyle(style: unknown): Record<string, unknown> {
 	return style as Record<string, unknown>;
 }
 
-test("two transforms do not share a cached fill", () => {
-	const meta = { slot: "cache.isolation", baseColor: "#222222" };
-	const first = getCachedTransformedColor("#222222", meta, (color) => `a:${color}`);
-	const second = getCachedTransformedColor("#222222", meta, (color) => `b:${color}`);
-	assert.equal(first, "a:#222222");
-	assert.equal(second, "b:#222222");
-});
-
 test("Button paints an override fill once through the decorator", () => {
 	contextStore.set(SurfaceDecoratorContext, {
 		transformBackground: (color: string) => `tint(${color})`,
@@ -353,7 +318,7 @@ test("Card keeps a caller fill on the background layer only", () => {
 	}
 });
 
-test("Skeleton fill follows the decorator, and an explicit style still wins", () => {
+test("Skeleton fill follows the decorator, including an explicit style fill", () => {
 	contextStore.set(SurfaceDecoratorContext, {
 		transformBackground: (color: string) => `tint(${color})`,
 	});
@@ -366,7 +331,7 @@ test("Skeleton fill follows the decorator, and an explicit style still wins", ()
 		const filled = renderComponent(
 			React.createElement(Skeleton, { style: { backgroundColor: "#abcdef" } }),
 		);
-		assert.equal(flattenStyle(filled.props.style).backgroundColor, "#abcdef");
+		assert.equal(flattenStyle(filled.props.style).backgroundColor, "tint(#abcdef)");
 	} finally {
 		contextStore.delete(SurfaceDecoratorContext);
 	}

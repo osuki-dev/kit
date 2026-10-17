@@ -157,6 +157,9 @@ export interface SegmentedControlTokens {
 	radius: RadiusToken;
 	/** Selected option radius of the `rounded` variant. */
 	optionRadius: RadiusToken;
+	height: number;
+	/** Inset between the track and its options. */
+	padding: SpaceToken;
 	background: ColorToken;
 	activeBackground: ColorToken;
 	activeForeground: ColorToken;

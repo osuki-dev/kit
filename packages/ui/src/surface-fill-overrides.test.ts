@@ -57,6 +57,7 @@ const layout = {
 	stiffness: () => layout,
 };
 mock.module("react-native-reanimated", () => ({
+	useReducedMotion: () => false,
 	default: {
 		createAnimatedComponent: (component: unknown) => component,
 		Text: "Animated.Text",

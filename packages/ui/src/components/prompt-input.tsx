@@ -26,10 +26,12 @@ import {
 	useSurfaceDecorator,
 	useThemeTokens,
 	withoutStringFill,
+	type SurfaceMeta,
 } from "../theme";
 import { TextField } from "../utils/text-field";
 import { Icon } from "./icon";
 import { Spinner } from "./spinner";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export interface PromptInputState {
 	value: string;
@@ -120,7 +122,7 @@ export function PromptInputRoot({
 
 	const fillOverride = readStringFill(style);
 	const baseColor = fillOverride ?? theme.colors.surface;
-	const surfaceMeta = useMemo(
+	const surfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "prompt.background",
 			variant: "composer",
@@ -159,7 +161,7 @@ export function PromptInputRoot({
 			>
 				{decorator?.renderDecoration ? (
 					<View collapsable pointerEvents="none" style={StyleSheet.absoluteFill}>
-						{decorator.renderDecoration(surfaceMeta)}
+						<SurfaceDecoration {...surfaceMeta} />
 					</View>
 				) : null}
 				{children}

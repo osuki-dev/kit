@@ -133,6 +133,7 @@ export function AvatarFallback({
 			style={{ fontSize: fontSizeMap[size], color: colors.text }}
 			weight="bold"
 			transform="uppercase"
+			hugSlack={false}
 		>
 			{initials.slice(0, 2).toUpperCase()}
 		</Text>

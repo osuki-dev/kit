@@ -423,13 +423,13 @@ assert.ok(
 );
 const toastCardSource = toastSource.slice(toastSource.indexOf("const ToastCard"));
 assert.ok(
-	toastCardSource.indexOf("backgroundColor: theme.colors[tokens.background]") <
-		toastCardSource.indexOf("toast.style"),
+	toastCardSource.indexOf("backgroundColor: toastFill") >= 0 &&
+		toastCardSource.indexOf("backgroundColor: toastFill") < toastCardSource.indexOf("toast.style"),
 	"the consumer's styles are merged after the variant fill, so a fill override wins",
 );
 assert.ok(
-	skeletonSource.includes("backgroundColor: fillOverride"),
-	"Skeleton routes a style fill override down to its lines",
+	skeletonSource.includes("readStringFill(style)"),
+	"Skeleton takes a style fill override as its base, through the decorator, on its lines",
 );
 assert.ok(
 	keyboardToolbarSource.includes("backgroundColor?: string"),
@@ -554,3 +554,12 @@ assert.ok(
 );
 
 console.log("[ui-public-contract] PASS");
+
+const { multiplyAlpha } = await import("./utils/color");
+assert.equal(
+	multiplyAlpha("#11223380", 0.5),
+	"rgba(17, 34, 51, 0.251)",
+	"multiplyAlpha keeps a translucent token proportionally translucent",
+);
+assert.equal(multiplyAlpha("rgba(0, 0, 0, 0.4)", 0.5), "rgba(0, 0, 0, 0.2)");
+assert.equal(multiplyAlpha("transparent", 0.5), "transparent");

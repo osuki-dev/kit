@@ -15,7 +15,7 @@ import {
 	type PressableProps,
 	type ViewProps,
 } from "react-native";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 
 export interface PopoverAnchor {
 	x: number;
@@ -128,6 +128,10 @@ export interface PopoverContentProps extends ViewProps {
 
 export function PopoverContent({ children, width = 280, style, ...props }: PopoverContentProps) {
 	const theme = useThemeTokens();
+	const popoverFill = useResolvedSurfaceFill(theme.colors.surface, {
+		slot: "popovers.background",
+		baseColor: theme.colors.surface,
+	});
 	const { state, actions } = usePopover();
 	const window = useWindowDimensions();
 	if (!state.open || !state.anchor) return null;
@@ -161,7 +165,7 @@ export function PopoverContent({ children, width = 280, style, ...props }: Popov
 							top,
 							left,
 							width,
-							backgroundColor: theme.colors.surface,
+							backgroundColor: popoverFill,
 							borderColor: theme.colors.border,
 							borderRadius: theme.radius.lg,
 						},

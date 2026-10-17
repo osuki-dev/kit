@@ -1,0 +1,6 @@
+---
+"@osuki-dev/ui": minor
+"@osuki-dev/kit-community": minor
+---
+
+Give the surface decorator a stable contract. Slots are a typed `SurfaceSlot` union, listed with their roles in `docs/theme.md`, and apps register their own through `SurfaceSlotRegistry`. `SurfaceMeta` gains `role` (`surface`, `overlay`, `mark`), `over` (the fill an overlay sits on) and `mode`. `Tabs` and `SegmentedControl` follow one layering rule: the track is painted once and the selection is an overlay. `Tabs.Root` takes `indicator="slide"` for a selection that travels between triggers, `Tabs.Label` passes `transform`, `weight` and `numberOfLines` through, and labels on `Button`, `Tabs` and `SegmentedControl` take their casing from the type style. Sheets, dialogs, popovers, tooltips, toasts, menu and select triggers and list rows now paint through the decorator, `Skeleton` sends a `style.backgroundColor` override through it too, and `ScrollScreen` keeps its decoration fixed behind the scrolling content. New: `SurfaceDecoration` for views the kit does not own, `TextPlateProvider` and the `plated` prop on `Text` for text over a decorated background, `multiplyAlpha` for opacity policies, and `motion.press` springs and timings that `Button`, `PressableCard` and `PressableScale` read, with reduce motion honored. The fill cache and its helpers are no longer exported.

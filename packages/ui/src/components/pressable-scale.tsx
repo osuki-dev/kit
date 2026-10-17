@@ -12,11 +12,6 @@ import { useHaptics, type HapticFeedbackKind } from "./haptics";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-// The dip has to arrive under the finger and leave more slowly than it came,
-// or the control reads as laggy on press and twitchy on release.
-const PRESS_IN_DURATION = 80;
-const PRESS_OUT_DURATION = 120;
-
 /** Which haptic a press plays, or `"none"` for a control that should stay silent. */
 export type PressableScaleFeedback = HapticFeedbackKind | "none";
 
@@ -48,7 +43,7 @@ export interface PressableScaleProps extends Omit<PressableProps, "style" | "chi
  *
  * Osuki Design Rules:
  * - Scale only, never opacity: a dimmed control reads as disabled
- * - Press-in faster than press-out (80ms / 120ms), ease-out both ways
+ * - Press-in faster than press-out (theme `motion.press.inMs` / `outMs`), ease-out both ways
  * - Disabled controls neither animate nor fire haptics
  *
  * @example
@@ -92,23 +87,23 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
 			}
 			if (feedback !== "none") haptics.feedback(feedback);
 			scale.value = withTiming(restingScale, {
-				duration: PRESS_IN_DURATION,
+				duration: motion.press.inMs,
 				easing: Easing.out(Easing.cubic),
 			});
 			onPressIn?.(event);
 		},
-		[disabled, feedback, haptics, onPressIn, restingScale, scale],
+		[disabled, feedback, haptics, motion.press.inMs, onPressIn, restingScale, scale],
 	);
 
 	const handlePressOut = useCallback<NonNullable<PressableProps["onPressOut"]>>(
 		(event) => {
 			scale.value = withTiming(1, {
-				duration: PRESS_OUT_DURATION,
+				duration: motion.press.outMs,
 				easing: Easing.out(Easing.cubic),
 			});
 			onPressOut?.(event);
 		},
-		[onPressOut, scale],
+		[motion.press.outMs, onPressOut, scale],
 	);
 
 	return (

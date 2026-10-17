@@ -17,7 +17,7 @@ import {
 	type ViewStyle,
 } from "react-native";
 import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Icon } from "./icon";
 import { Text } from "./text";
 
@@ -135,6 +135,10 @@ export function ModalContent({
 	...props
 }: ModalContentProps) {
 	const theme = useThemeTokens();
+	const dialogFill = useResolvedSurfaceFill(theme.colors.surface, {
+		slot: "dialogs.background",
+		baseColor: theme.colors.surface,
+	});
 	const { state, actions } = useModal();
 	const contentStyles = useMemo<ViewStyle>(
 		() => ({
@@ -143,12 +147,12 @@ export function ModalContent({
 			borderRadius: theme.radius.lg,
 			padding: theme.spacing.lg,
 			gap: theme.spacing.md,
-			backgroundColor: theme.colors.surface,
+			backgroundColor: dialogFill,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 			...(theme.mode === "light" ? theme.shadow.soft : {}),
 		}),
-		[theme.colors, theme.mode, theme.radius.lg, theme.shadow.soft, theme.spacing],
+		[dialogFill, theme.colors, theme.mode, theme.radius.lg, theme.shadow.soft, theme.spacing],
 	);
 	return (
 		<RNModal
