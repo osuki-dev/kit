@@ -97,6 +97,7 @@ value, they tell you when it should change.
 | `Input`            | Single-line text, with the label and error states already wired.                                                                                | `label`, `value`, `onChangeText`, `variant`, `size`, `error`, `helper`, plus `TextInputProps`       |
 | `Textarea`         | Multi-line text that grows between a row floor and ceiling.                                                                                     | `label`, `value`, `onChangeText`, `minRows`, `maxRows`, `error`, `helper`                           |
 | `SearchInput`      | A filter field with the leading glyph and the clear button already there.                                                                       | `value`, `onChangeText`, `onClear`, `placeholder`                                                   |
+| `TextField`        | Your own field in the theme's face: the bare input under the kit's fields, placeholder drawn by `Text`, no fill, border or label.               | `TextInputProps`; `children` for value spans, `placeholder`, `placeholderTextColor`                 |
 | `Select`           | Picking one option out of a list, presented as a bottom sheet rather than a platform picker.                                                    | `options`, `value`, `onChange`, `label`, `placeholder`, `helper`, `error`, `required`, `sheetTitle` |
 | `Menu`             | Picking one option out of a list when the trigger is a button rather than a field. Same sheet, different affordance.                            | `items`, `onSelect`, `selectedId`, `label`, `triggerLabel`, `placeholder`, `sheetTitle`             |
 | `DateInput`        | A date, a time, or both, without importing a picker library per platform.                                                                       | `mode`, `value` (ISO string), `onChange`, `label`, `helper`, `error`, `applyLabel`, `todayLabel`    |
@@ -109,6 +110,33 @@ value, they tell you when it should change.
 
 `Select` and `Menu` both take `disabled` on individual options, so a temporarily
 unavailable choice can stay visible instead of disappearing.
+
+`TextField` is what the kit's own fields are built on. It sets the value and
+the placeholder in the theme's body face (variable axes included) at the
+style's size and weight, keeps placement styles on a wrapper, and passes
+`children` to the native input, so highlighted spans are nested `Text` runs
+(leave `value` unset when you pass them; the runs are the value):
+
+```tsx
+<TextField
+	onChangeText={setQuery}
+	placeholder="Filter commands"
+	placeholderTextColor={colors.textSubtle}
+	style={{ flex: 1, fontSize: 15 }}
+>
+	{query.split(/(@\w+)/).map((part, index) =>
+		part.startsWith("@") ? (
+			<Text key={index} colorKey="primary">
+				{part}
+			</Text>
+		) : (
+			part
+		),
+	)}
+</TextField>
+```
+
+The fill, border, label and error are yours; for those, use `Input`.
 
 ---
 

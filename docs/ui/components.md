@@ -19,6 +19,9 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
   and profile content.
 - `SearchInput`: search-specific input with leading icon, clear action, and
   stable empty state.
+- `TextField`: the bare field under the kit's inputs: a `TextInput` in the
+  theme's body face with its placeholder drawn by `Text`, and no chrome. Use it
+  to build your own field with custom value spans and placeholder.
 - `Select`: bottom-sheet backed option picker for mobile forms and settings.
 - `DateInput`: date, time, and datetime field with a bottom-sheet editing flow.
 - `Menu`: triggered option/action menu for sort, filter, view, and overflow

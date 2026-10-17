@@ -1,5 +1,6 @@
 // Core components
 export { Text, type TextProps } from "./text";
+export { TextField, type TextFieldProps } from "../utils/text-field";
 export {
 	Button,
 	ButtonRoot,
