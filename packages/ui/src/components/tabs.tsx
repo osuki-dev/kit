@@ -29,7 +29,9 @@ import {
 	useThemeTokens,
 	withoutStringFill,
 	type FontWeightValue,
+	type RadiusToken,
 	type SurfaceMeta,
+	type TabsTokens,
 } from "../theme";
 import { useHaptics } from "./haptics";
 import { Text, type TextProps } from "./text";
@@ -65,6 +67,10 @@ export interface TabsMeta {
 	size: TabsSize;
 	indicator: TabsIndicator;
 	layering: TabsLayering;
+	/** This instance's `pill` track radius, over `components.Tabs.radius`. */
+	radius?: RadiusToken;
+	/** This instance's selection radius, over `components.Tabs.optionRadius`. */
+	optionRadius?: RadiusToken;
 }
 
 export interface TabsContextValue {
@@ -98,6 +104,18 @@ export interface TabsRootProps {
 	indicator?: TabsIndicator;
 	/** Who paints the `pill` fills. Defaults to `overlay`. */
 	layering?: TabsLayering;
+	/**
+	 * The `pill` track radius of this instance only, over
+	 * `components.Tabs.radius`.
+	 */
+	radius?: RadiusToken;
+	/**
+	 * The selection radius of this instance only (the selected trigger, the
+	 * sliding indicator and, with `segments` layering, every trigger), over
+	 * `components.Tabs.optionRadius`. Unset, it follows the theme's
+	 * `optionRadius`, then `radius`.
+	 */
+	optionRadius?: RadiusToken;
 }
 
 export function TabsRoot({
@@ -109,6 +127,8 @@ export function TabsRoot({
 	size = "default",
 	indicator = "static",
 	layering = "overlay",
+	radius,
+	optionRadius,
 }: TabsRootProps) {
 	const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
 	const controlled = controlledValue !== undefined;
@@ -124,11 +144,23 @@ export function TabsRoot({
 		() => ({
 			state: { value },
 			actions: { setValue },
-			meta: { controlled, variant, size, indicator, layering },
+			meta: { controlled, variant, size, indicator, layering, radius, optionRadius },
 		}),
-		[controlled, indicator, layering, setValue, size, value, variant],
+		[controlled, indicator, layering, optionRadius, radius, setValue, size, value, variant],
 	);
 	return <TabsContext.Provider value={contextValue}>{children}</TabsContext.Provider>;
+}
+
+/**
+ * The `pill` track and selection radius tokens: the instance's, then the
+ * theme's. The selection falls back to the track.
+ */
+function tabsRadiusTokens(
+	meta: TabsMeta,
+	tabs: TabsTokens,
+): { track: RadiusToken; option: RadiusToken } {
+	const track = meta.radius ?? tabs.radius;
+	return { track, option: meta.optionRadius ?? tabs.optionRadius ?? track };
 }
 
 export function useTabs(): TabsContextValue {
@@ -176,8 +208,9 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 	const tabs = theme.components.Tabs;
 	const pill = meta.variant === "pill";
 	const paintsTrack = pill && meta.layering === "overlay";
-	const radius = pill ? theme.radius[tabs.radius] : 0;
-	const optionRadius = pill ? theme.radius[tabs.optionRadius ?? tabs.radius] : 0;
+	const radiusTokens = tabsRadiusTokens(meta, tabs);
+	const radius = pill ? theme.radius[radiusTokens.track] : 0;
+	const optionRadius = pill ? theme.radius[radiusTokens.option] : 0;
 	const trackBase = paintsTrack
 		? (readStringFill(style) ?? theme.colors[tabs.background])
 		: (readStringFill(style) ?? "transparent");
@@ -293,7 +326,7 @@ export function TabsTrigger({
 	const pill = meta.variant === "pill";
 	const sliding = meta.indicator === "slide";
 	const segments = pill && meta.layering === "segments";
-	const radius = pill ? theme.radius[tabs.optionRadius ?? tabs.radius] : 0;
+	const radius = pill ? theme.radius[tabsRadiusTokens(meta, tabs).option] : 0;
 	const selectionFill = useSelectionFill(list?.trackFill ?? "transparent", radius, meta.layering);
 	const segmentBase = segments ? theme.colors[tabs.background] : "transparent";
 	const segmentMeta = useMemo<SurfaceMeta>(
@@ -473,6 +506,10 @@ export interface TabsProps extends Omit<ViewProps, "style" | "children"> {
 	size?: TabsSize;
 	indicator?: TabsIndicator;
 	layering?: TabsLayering;
+	/** See `TabsRootProps.radius`. */
+	radius?: RadiusToken;
+	/** See `TabsRootProps.optionRadius`. */
+	optionRadius?: RadiusToken;
 	style?: StyleProp<ViewStyle>;
 }
 
@@ -484,6 +521,8 @@ function TabsFacade({
 	size = "default",
 	indicator = "static",
 	layering = "overlay",
+	radius,
+	optionRadius,
 	style,
 	testID,
 	...props
@@ -496,6 +535,8 @@ function TabsFacade({
 			size={size}
 			indicator={indicator}
 			layering={layering}
+			radius={radius}
+			optionRadius={optionRadius}
 		>
 			<TabsList style={style} testID={testID} {...props}>
 				{options.map((option) => (
