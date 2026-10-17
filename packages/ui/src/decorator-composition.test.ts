@@ -263,6 +263,30 @@ test("Button accepts ReactNode children and renders compound structure", () => {
 	assert.equal(children[1]?.type, "View");
 });
 
+test("Button.Root keeps its background a layer and lays the other parts out in one row", () => {
+	const root = renderComponent(
+		React.createElement(
+			ButtonRoot,
+			{ variant: "primary" },
+			React.createElement(ButtonIcon, { name: "Sparkles" }),
+			React.createElement(ButtonBackground),
+			React.createElement(ButtonLabel, null, "Go"),
+		),
+	);
+	const pressable = root.props.children as AnyElement;
+	assert.equal(flattenStyle(pressable.props.style).flexDirection, "column");
+	const children = React.Children.toArray(pressable.props.children as never) as AnyElement[];
+	assert.equal(children.length, 2);
+	assert.equal(children[0]?.type, ButtonBackground);
+	const row = children[1]!;
+	assert.equal(flattenStyle(row.props.style).flexDirection, "row");
+	const parts = React.Children.toArray(row.props.children as never) as AnyElement[];
+	assert.deepEqual(
+		parts.map((part) => part.type),
+		[ButtonIcon, ButtonLabel],
+	);
+});
+
 function flattenStyle(style: unknown): Record<string, unknown> {
 	if (!style || typeof style === "boolean") return {};
 	if (Array.isArray(style)) return Object.assign({}, ...style.map(flattenStyle));

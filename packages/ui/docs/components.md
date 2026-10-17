@@ -126,8 +126,20 @@ Things that are tappable, and rows whose whole point is to be tapped.
 | `PressableCard`  | A whole card that is one tap target, with the press feedback already correct.                                                                                            | `onPress`, `children`, `variant`, `border`, `radius`, `padding`, `disabled`                               |
 | `PressableScale` | Adding a press dip and a haptic to something that is otherwise not a kit component.                                                                                      | `pressedScale`, `feedback`, `children`                                                                    |
 
-`Button` takes a string child, not an element. If you need an icon, use
-`leftIcon` / `rightIcon`, which take an `IconName`.
+A string child becomes the label; for an icon, use `leftIcon` / `rightIcon`,
+which take an `IconName`. For anything else, compose the parts:
+
+```tsx
+<Button.Root variant="primary" onPress={save}>
+	<Button.Background />
+	<Button.Icon name="Sparkles" />
+	<Button.Label>Save</Button.Label>
+</Button.Root>
+```
+
+The root is a column, as in 1.x, so a button inside a wrapping column keeps its
+own width. `Button.Background` is a layer behind the content; every other part
+is laid out in one centred row.
 
 ---
 
