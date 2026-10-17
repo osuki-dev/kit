@@ -49,7 +49,8 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	testID,
 	...rest
 }) => {
-	const { colors, mode, radius, shadow } = useThemeTokens();
+	const { colors, components, mode, radius, shadow } = useThemeTokens();
+	const tokens = components.SegmentedControl;
 	const decorator = useSurfaceDecorator();
 	const { feedback } = useHaptics();
 	const selectedIndex = Math.max(
@@ -57,11 +58,11 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 		options.findIndex((option) => option.value === value),
 	);
 	const hasDisabledOptions = options.some((option) => option.disabled);
-	const trackBase = readStringFill(style) ?? colors.surfaceRaised;
-	const selectedBase = colors.surface;
+	const trackBase = readStringFill(style) ?? colors[tokens.background];
+	const selectedBase = colors[tokens.activeBackground];
 
-	let trackRadius = radius.lg;
-	let optionRadius = radius.md;
+	let trackRadius = radius[tokens.radius];
+	let optionRadius = radius[tokens.optionRadius];
 	if (variant === "pill") {
 		trackRadius = radius.pill;
 		optionRadius = radius.pill;
@@ -200,13 +201,14 @@ const Segment = memo(function Segment({
 	onSelect,
 	testID,
 }: SegmentProps) {
-	const { colors } = useThemeTokens();
+	const { colors, components } = useThemeTokens();
 	const handlePress = useCallback(() => {
 		onSelect(value);
 	}, [onSelect, value]);
 
-	let textColor = colors.textMuted;
-	if (selected) textColor = colors.text;
+	const tokens = components.SegmentedControl;
+	let textColor = colors[tokens.inactiveForeground];
+	if (selected) textColor = colors[tokens.activeForeground];
 
 	return (
 		<Pressable

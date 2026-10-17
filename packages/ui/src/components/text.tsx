@@ -79,11 +79,12 @@ export interface TextProps extends RNTextProps {
 	 */
 	weight?: FontWeightValue;
 	/**
-	 * Android only, off by default. Appends a thin space after the text so an
-	 * italic or wide face does not lose the edge of its last glyph to the line
-	 * clip. Ignored on nested and selectable text, which it would otherwise
-	 * put mid-sentence or into the clipboard. Leave it off for text in a box
-	 * of its own size, such as a count in a round badge.
+	 * Android only. Appends a thin space after the text so an italic or wide
+	 * face does not lose the edge of its last glyph to the line clip. Defaults
+	 * to the role's `overhang` in the theme's font registry, so it is off for
+	 * upright faces. Ignored on nested and selectable text, which it would
+	 * otherwise put mid-sentence or into the clipboard. Pass `false` for text
+	 * in a box of its own size, such as a count in a round badge.
 	 */
 	hugSlack?: boolean;
 	/** Explicit text transform; inherit preserves the typography preset */
@@ -133,7 +134,7 @@ export const Text: React.FC<TextProps> = ({
 	marqueePlayback = "auto",
 	marqueeDelayMs = 700,
 	marqueeSpeed = 56,
-	hugSlack = false,
+	hugSlack,
 	style,
 	children,
 	maxFontSizeMultiplier,
@@ -207,8 +208,9 @@ export const Text: React.FC<TextProps> = ({
 		],
 	);
 	const nested = React.useContext(NestedTextContext);
+	const wantsSlack = hugSlack ?? fonts[typeStyle.fontFamily]?.overhang ?? false;
 	const renderedChildren =
-		hugSlack && !nested && !rest.selectable ? withHugSlack(children) : children;
+		wantsSlack && !nested && !rest.selectable ? withHugSlack(children) : children;
 	const flattenedStyle = callerStyle;
 	const merged: TextStyle = { ...textStyles, ...callerStyle };
 	const resolvedStyle: TextStyle = callerOwnsFace

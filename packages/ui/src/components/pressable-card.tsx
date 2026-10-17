@@ -43,6 +43,7 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 	...rest
 }) => {
 	const theme = useThemeTokens();
+	const pressDepth = 1 - theme.motion.press.card;
 	const haptics = useHaptics();
 	const card = theme.components.Card;
 	const variantTokens = card[variant];
@@ -52,7 +53,7 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 		opacity: 1 - pressProgress.value * 0.06,
 		transform: [
 			{ translateY: pressProgress.value * 1.5 },
-			{ scale: 1 - pressProgress.value * 0.01 },
+			{ scale: 1 - pressProgress.value * pressDepth },
 		],
 	}));
 

@@ -20,6 +20,16 @@ export const motion = {
 	segmented: { duration: 200, easing: [0.25, 0.1, 0.25, 1] as const },
 	modal: { duration: 300, easing: [0.25, 0.1, 0.25, 1] as const },
 	dropdown: { duration: 150, easing: [0.25, 0.1, 0.25, 1] as const },
+
+	// Scale a pressed control settles at while held. 1 turns the dip off.
+	// Large targets dip less than small ones.
+	press: {
+		control: 0.988, // Button
+		card: 0.99, // PressableCard
+		row: 0.98, // ListItem
+		chip: 0.96, // Tag
+		surface: 0.985, // PressableScale
+	},
 } as const;
 
 /**
