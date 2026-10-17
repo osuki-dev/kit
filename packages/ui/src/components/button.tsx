@@ -270,7 +270,7 @@ export interface ButtonLabelProps extends Omit<TextProps, "children"> {
 
 export function ButtonLabel({ style, children, ...props }: ButtonLabelProps) {
 	const { textColor } = useButton();
-	const flattenedStyle = StyleSheet.flatten([styles.label, style]);
+	const flattenedStyle = StyleSheet.flatten([styles.label, style]) ?? undefined;
 
 	return (
 		<Text

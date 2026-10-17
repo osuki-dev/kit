@@ -9,6 +9,7 @@ import {
 	type GestureResponderEvent,
 	type PanResponderGestureState,
 	type StyleProp,
+	type ViewInstance,
 	type ViewStyle,
 } from "react-native";
 import { Host, Slider as SwiftUISlider } from "@expo/ui/swift-ui";
@@ -105,7 +106,7 @@ export const Slider: React.FC<SliderProps> = ({
 	}, [clampedValue, disabled]);
 
 	// RN PanResponder fallback implementation
-	const containerRef = useRef<View>(null);
+	const containerRef = useRef<ViewInstance>(null);
 	const [trackWidth, setTrackWidth] = useState(0);
 	const pageXOffsetRef = useRef(0);
 

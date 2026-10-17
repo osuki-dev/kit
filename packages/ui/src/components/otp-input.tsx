@@ -4,8 +4,8 @@ import {
 	Pressable,
 	TextInput,
 	View,
-	type NativeSyntheticEvent,
-	type TextInputKeyPressEventData,
+	type TextInputInstance,
+	type TextInputKeyPressEvent,
 	type TextInputProps,
 	type ViewProps,
 	type ViewStyle,
@@ -57,7 +57,7 @@ const OtpInputView: React.FC<OtpInputProps> = ({
 	...props
 }) => {
 	const theme = useThemeTokens();
-	const inputs = useRef<Array<TextInput | null>>([]);
+	const inputs = useRef<Array<TextInputInstance | null>>([]);
 	const safeLength = Math.max(1, length);
 	const digits = Array.from({ length: safeLength }, (_, index) => value[index] ?? "");
 	const cellWidth = safeLength > 6 ? 42 : 48;
@@ -101,10 +101,7 @@ const OtpInputView: React.FC<OtpInputProps> = ({
 		}
 	};
 
-	const handleKeyPress = (
-		index: number,
-		event: NativeSyntheticEvent<TextInputKeyPressEventData>,
-	) => {
+	const handleKeyPress = (index: number, event: TextInputKeyPressEvent) => {
 		if (event.nativeEvent.key !== "Backspace" || digits[index]) return;
 		if (index > 0) inputs.current[index - 1]?.focus();
 	};
@@ -183,14 +180,14 @@ export function OtpCell({
 	cellStyle?: ViewStyle;
 	testID?: string;
 	onPress: () => void;
-	inputRef: (node: TextInput | null) => void;
+	inputRef: (node: TextInputInstance | null) => void;
 	autoFocus?: boolean;
 	keyboardType: TextInputProps["keyboardType"];
 	maxLength: number;
 	onBlur: TextInputProps["onBlur"];
 	onChangeText: (text: string) => void;
 	onFocus: TextInputProps["onFocus"];
-	onKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
+	onKeyPress: (event: TextInputKeyPressEvent) => void;
 	secureTextEntry: boolean;
 	textContentType: TextInputProps["textContentType"];
 }) {

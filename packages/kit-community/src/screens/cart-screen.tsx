@@ -5,7 +5,6 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	TextInput,
-	type ImageSourcePropType,
 	type ScrollViewProps,
 	type ViewStyle,
 	type ImageStyle,
@@ -19,6 +18,7 @@ import {
 	Button,
 	Icon,
 	Image,
+	type ImageProps,
 	Tag,
 	useTheme,
 	useResponsiveTheme,
@@ -68,7 +68,7 @@ export interface CartScreenConfig {
 		text: string;
 	};
 	/** Optional empty cart artwork shown behind the empty state */
-	emptyArtwork?: ImageSourcePropType;
+	emptyArtwork?: ImageProps["source"];
 	/** Primary CTA */
 	primaryAction: {
 		label: string;

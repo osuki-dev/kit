@@ -52,7 +52,8 @@ table.
 
 | `@osuki-dev/ui` | Expo SDK | React Native | React |
 | --------------- | -------- | ------------ | ----- |
-| 1.0.x           | 57       | 0.86         | 19.2  |
+| 2.0.x           | 58       | 0.88         | 19.3  |
+| 1.x             | 57       | 0.86         | 19.2  |
 
 Each release targets one Expo SDK. When a new SDK ships, a compatible release
 follows; older SDKs are not backported.

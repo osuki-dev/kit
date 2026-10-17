@@ -6,10 +6,9 @@ import {
 	View,
 	type GestureResponderEvent,
 	type LayoutChangeEvent,
-	type NativeSyntheticEvent,
 	type TextProps as RNTextProps,
 	type TextStyle,
-	type TextLayoutEventData,
+	type TextLayoutEvent,
 	type ViewStyle,
 } from "react-native";
 import Animated, {
@@ -163,7 +162,7 @@ export const Text: React.FC<TextProps> = ({
 		],
 	);
 	const renderedChildren = withHugSlack(children);
-	const flattenedStyle = StyleSheet.flatten(style);
+	const flattenedStyle = StyleSheet.flatten(style) ?? undefined;
 	const lineHeight =
 		typeof flattenedStyle?.lineHeight === "number"
 			? flattenedStyle.lineHeight
@@ -210,7 +209,7 @@ export const Text: React.FC<TextProps> = ({
 		setContainerWidth(event.nativeEvent.layout.width);
 	};
 
-	const handleTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+	const handleTextLayout = (event: TextLayoutEvent) => {
 		const line = event.nativeEvent.lines?.[0];
 		if (!line?.width) return;
 		const width = Math.ceil(line.width);

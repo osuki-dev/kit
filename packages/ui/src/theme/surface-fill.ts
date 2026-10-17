@@ -11,7 +11,7 @@ export function readStringFill(style: StyleProp<ViewStyle> | undefined): string 
  * Layout, radius, and any non-string fill stay put.
  */
 export function withoutStringFill(style: StyleProp<ViewStyle> | undefined): ViewStyle | undefined {
-	const flat = StyleSheet.flatten(style);
+	const flat = StyleSheet.flatten(style) ?? undefined;
 	if (!flat || typeof flat.backgroundColor !== "string") return flat;
 	const { backgroundColor: _fill, ...rest } = flat;
 	return rest;

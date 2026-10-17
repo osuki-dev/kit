@@ -10,6 +10,9 @@
 
 import { StyleSheet, type ViewStyle, type TextStyle } from "react-native";
 
+// React Native 0.88 types style props as readonly; these helpers build one.
+type MutableViewStyle = { -readonly [K in keyof ViewStyle]: ViewStyle[K] };
+
 // Static base styles - created once
 export const createBaseStyles = <T extends Record<string, ViewStyle | TextStyle>>(styles: T): T => {
 	return StyleSheet.create(styles);
@@ -50,7 +53,7 @@ export type SpacingCombination =
  * ```
  */
 export const spacing = (config: SpacingCombination): ViewStyle => {
-	const style: ViewStyle = {};
+	const style: MutableViewStyle = {};
 
 	if ("margin" in config) style.margin = config.margin;
 	if ("marginHorizontal" in config) {
@@ -195,7 +198,7 @@ export const borders = {
 	}),
 
 	all: (color: string, width: number = 1, radius?: number): ViewStyle => {
-		const style: ViewStyle = {
+		const style: MutableViewStyle = {
 			borderWidth: width,
 			borderColor: color,
 		};

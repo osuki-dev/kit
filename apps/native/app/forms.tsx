@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
-import type { ScrollView as ScrollViewType } from "react-native";
+import type { ScrollViewInstance } from "react-native";
 
 import {
 	Screen,
@@ -19,7 +19,7 @@ import { Container } from "@/components/container";
 export default function FormsPage() {
 	const { colors, spacing } = useTheme();
 	const { isMobile, pagePadding } = useResponsiveTheme();
-	const scrollRef = useRef<ScrollViewType>(null);
+	const scrollRef = useRef<ScrollViewInstance>(null);
 
 	const [formState, setFormState] = useState({
 		// Basic text inputs
