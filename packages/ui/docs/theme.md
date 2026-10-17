@@ -347,6 +347,7 @@ The ones that shape an app's whole appearance:
 | `SegmentedControl.radius`, `SegmentedControl.optionRadius`                                  | the `rounded` segmented track and selected option |
 | `SegmentedControl.background`, `activeBackground`, `activeForeground`, `inactiveForeground` | segmented fills and labels                        |
 | `Input.placeholder`                                                                         | placeholder colour of every field                 |
+| `Input.hint`                                                                                | the helper line under a field (`textDisabled`)    |
 | `Skeleton.background`                                                                       | placeholder fill under the pulse                  |
 
 Press feedback is a theme setting too. `motion.press` holds the scale each kind

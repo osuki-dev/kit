@@ -114,6 +114,8 @@ export interface InputTokens {
 	background: ColorToken | "transparent";
 	foreground: ColorToken;
 	placeholder: ColorToken;
+	/** Colour of `Input.Hint`, the helper line under a field. */
+	hint: ColorToken;
 	border: ColorToken;
 	borderFocused: ColorToken;
 	borderError: ColorToken;

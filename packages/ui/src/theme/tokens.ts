@@ -115,6 +115,7 @@ export const componentTokens: ComponentTokens = {
 		background: "surfaceRaised",
 		foreground: "text",
 		placeholder: "textDisabled",
+		hint: "textDisabled",
 		border: "borderStrong",
 		borderFocused: "text",
 		borderError: "danger",
