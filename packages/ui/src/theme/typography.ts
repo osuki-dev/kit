@@ -44,6 +44,12 @@ export type FontDefinition = Partial<Record<FontWeight, string>> & {
 	axes?: VariableFontAxes;
 	/** The `wdth` this role is set at, when the face has a `wdth` axis. */
 	width?: number;
+	/**
+	 * The face draws past its glyph advances (an italic, an oblique, a wide
+	 * brush face). On Android, `Text` in this role then defaults `hugSlack` on,
+	 * so the last glyph is not clipped at the line edge.
+	 */
+	overhang?: boolean;
 };
 
 export type FontRegistry = Record<FontFamily, FontDefinition>;

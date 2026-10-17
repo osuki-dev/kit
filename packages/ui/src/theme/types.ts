@@ -112,6 +112,8 @@ export interface InputTokens {
 	borderFocused: ColorToken;
 	borderError: ColorToken;
 	radius: RadiusToken;
+	/** Corner radius of `SearchInput`. */
+	searchRadius: RadiusToken;
 	paddingX: SpaceToken;
 	paddingY: SpaceToken;
 }
@@ -146,6 +148,24 @@ export interface TabsTokens {
 	activeBackground: ColorToken;
 	activeForeground: ColorToken;
 	inactiveForeground: ColorToken;
+	/** Underline of the selected trigger in the `underline` variant. */
+	indicator: ColorToken;
+}
+
+export interface SegmentedControlTokens {
+	/** Track radius of the `rounded` variant; `pill` always uses `pill`. */
+	radius: RadiusToken;
+	/** Selected option radius of the `rounded` variant. */
+	optionRadius: RadiusToken;
+	background: ColorToken;
+	activeBackground: ColorToken;
+	activeForeground: ColorToken;
+	inactiveForeground: ColorToken;
+}
+
+export interface SkeletonTokens {
+	/** Placeholder fill, before the surface decorator transforms it. */
+	background: ColorToken;
 }
 
 export interface SurfaceTokens {
@@ -160,6 +180,18 @@ export interface TextTokens {
 	mutedColor: ColorToken;
 }
 
+/** Number literals widened, so a theme override can set any value. */
+type Widen<T> = T extends number
+	? number
+	: T extends readonly unknown[]
+		? T
+		: T extends object
+			? { [K in keyof T]: Widen<T[K]> }
+			: T;
+
+/** `motion` as a theme carries it: the same keys, any values. */
+export type MotionTokens = Widen<typeof motion>;
+
 export interface ComponentTokens {
 	Button: ButtonTokens;
 	Card: CardTokens;
@@ -169,6 +201,8 @@ export interface ComponentTokens {
 	Sheet: SheetTokens;
 	ListItem: ListItemTokens;
 	Tabs: TabsTokens;
+	SegmentedControl: SegmentedControlTokens;
+	Skeleton: SkeletonTokens;
 }
 
 export interface OsukiTheme {
@@ -179,7 +213,7 @@ export interface OsukiTheme {
 	commerce: CommerceTokens;
 	spacing: SpacingScale;
 	radius: RadiusScale;
-	motion: typeof motion;
+	motion: MotionTokens;
 	shadow: typeof shadow;
 	iconography: typeof iconography;
 	typeStyles: TypographyStyles;

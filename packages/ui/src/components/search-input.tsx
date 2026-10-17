@@ -57,9 +57,9 @@ export const SearchInputRoot: React.FC<SearchInputProps> = ({
 			slot: "inputs.search",
 			variant: "search",
 			baseColor: controlBase,
-			borderRadius: theme.radius.pill,
+			borderRadius: theme.radius[input.searchRadius],
 		}),
-		[controlBase, theme.radius.pill],
+		[controlBase, theme.radius[input.searchRadius]],
 	);
 	const controlFill = useResolvedSurfaceFill(controlBase, controlMeta);
 
@@ -69,7 +69,7 @@ export const SearchInputRoot: React.FC<SearchInputProps> = ({
 			minHeight: 44,
 			width: "100%",
 			borderWidth: StyleSheet.hairlineWidth,
-			borderRadius: theme.radius.pill,
+			borderRadius: theme.radius[input.searchRadius],
 			paddingHorizontal: theme.spacing.md,
 			flexDirection: "row",
 			alignItems: "center",
@@ -78,7 +78,7 @@ export const SearchInputRoot: React.FC<SearchInputProps> = ({
 			backgroundColor: controlFill,
 			borderColor: theme.colors[input.border],
 		}),
-		[controlFill, input.border, theme.colors, theme.radius.pill, theme.spacing],
+		[controlFill, input.border, theme.colors, theme.radius[input.searchRadius], theme.spacing],
 	);
 
 	const animatedContainerStyle = useAnimatedStyle(() => ({

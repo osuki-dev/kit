@@ -33,7 +33,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
  * - Active: display border + text
  *
  * Features:
- * - Press scale animation (0.96) when onPress is provided
+ * - Press scale animation (theme `motion.press.chip`) when onPress is provided
  * - Subtle tactile feedback for interactive tags
  * - Disabled state disables animations
  *
@@ -53,7 +53,7 @@ export const TagRoot: React.FC<Omit<TagProps, "children"> & { children?: React.R
 	onPress,
 	...rest
 }) => {
-	const { colors, mode, shadow } = useThemeTokens();
+	const { colors, mode, motion, shadow } = useThemeTokens();
 	const haptics = useHaptics();
 	const scale = useSharedValue(1);
 
@@ -64,7 +64,7 @@ export const TagRoot: React.FC<Omit<TagProps, "children"> & { children?: React.R
 	const handlePressIn = () => {
 		if (!disabled && onPress) {
 			haptics.feedback("selection");
-			scale.value = withSpring(0.96, {
+			scale.value = withSpring(motion.press.chip, {
 				stiffness: 400,
 				damping: 25,
 			});

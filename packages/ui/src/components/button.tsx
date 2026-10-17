@@ -99,6 +99,7 @@ export function ButtonRoot({
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
 	const pressProgress = useSharedValue(0);
+	const pressDepth = 1 - theme.motion.press.control;
 
 	const button = theme.components.Button;
 	const variantTokens = button[variant];
@@ -134,7 +135,10 @@ export function ButtonRoot({
 	const iconColor = loading ? theme.colors.textDisabled : textColor;
 
 	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateY: pressProgress.value }, { scale: 1 - pressProgress.value * 0.012 }],
+		transform: [
+			{ translateY: pressProgress.value },
+			{ scale: 1 - pressProgress.value * pressDepth },
+		],
 	}));
 
 	const buttonRootStyle = useMemo<ViewStyle>(() => {

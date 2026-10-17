@@ -3,9 +3,11 @@ import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from "
 import Animated, {
 	Easing,
 	useAnimatedStyle,
+	useReducedMotion,
 	useSharedValue,
 	withTiming,
 } from "react-native-reanimated";
+import { useThemeTokens } from "../theme";
 import { useHaptics, type HapticFeedbackKind } from "./haptics";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -22,7 +24,7 @@ export interface PressableScaleProps extends Omit<PressableProps, "style" | "chi
 	/**
 	 * Scale the content settles at while held. Large targets want a shallower
 	 * dip than small ones: a full-width row at 0.9 looks broken, an icon button
-	 * at 0.99 looks dead.
+	 * at 0.99 looks dead. Defaults to the theme's `motion.press.surface`.
 	 */
 	pressedScale?: number;
 	/** Haptic played on press-in. `"none"` opts a control out entirely. */
@@ -67,11 +69,15 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
 	feedback = "selection",
 	onPressIn,
 	onPressOut,
-	pressedScale = 0.985,
+	pressedScale,
 	style,
 	...rest
 }) => {
 	const haptics = useHaptics();
+	const { motion } = useThemeTokens();
+	const reduceMotion = useReducedMotion();
+	// With reduce motion on, the press lands without moving the content.
+	const restingScale = reduceMotion ? 1 : (pressedScale ?? motion.press.surface);
 	const scale = useSharedValue(1);
 
 	const animatedStyle = useAnimatedStyle(() => ({
@@ -85,13 +91,13 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
 				return;
 			}
 			if (feedback !== "none") haptics.feedback(feedback);
-			scale.value = withTiming(pressedScale, {
+			scale.value = withTiming(restingScale, {
 				duration: PRESS_IN_DURATION,
 				easing: Easing.out(Easing.cubic),
 			});
 			onPressIn?.(event);
 		},
-		[disabled, feedback, haptics, onPressIn, pressedScale, scale],
+		[disabled, feedback, haptics, onPressIn, restingScale, scale],
 	);
 
 	const handlePressOut = useCallback<NonNullable<PressableProps["onPressOut"]>>(

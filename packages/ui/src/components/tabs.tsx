@@ -99,7 +99,8 @@ export function TabsList({ style, ...props }: ViewProps) {
 	const theme = useThemeTokens();
 	const { meta } = useTabs();
 	const explicitTrack = readStringFill(style);
-	const trackBase = explicitTrack ?? theme.colors.surfaceRaised;
+	const tabs = theme.components.Tabs;
+	const trackBase = explicitTrack ?? theme.colors[tabs.background];
 	const listStyle = useMemo<ViewStyle>(
 		() => ({
 			flexDirection: "row",
@@ -108,8 +109,8 @@ export function TabsList({ style, ...props }: ViewProps) {
 			borderBottomWidth: meta.variant === "underline" ? StyleSheet.hairlineWidth : 0,
 			borderBottomColor: theme.colors.border,
 			backgroundColor: "transparent",
-			borderRadius: meta.variant === "pill" ? theme.radius.pill : 0,
-			padding: meta.variant === "pill" ? theme.spacing.xs : 0,
+			borderRadius: meta.variant === "pill" ? theme.radius[tabs.radius] : 0,
+			padding: meta.variant === "pill" ? theme.spacing[tabs.padding] : 0,
 		}),
 		[meta.variant, theme.colors.border, theme.radius.pill, theme.spacing.xs],
 	);
@@ -140,12 +141,13 @@ export function TabsTrigger({
 	const { state, actions, meta } = useTabs();
 	const trackBase = useContext(TabsTrackContext);
 	const selected = state.value === value;
-	const radius = meta.variant === "pill" ? theme.radius.pill : 0;
+	const tabs = theme.components.Tabs;
+	const radius = meta.variant === "pill" ? theme.radius[tabs.radius] : 0;
 	const baseColor =
 		meta.variant === "pill"
 			? selected
-				? theme.colors.surface
-				: (trackBase ?? theme.colors.surfaceRaised)
+				? theme.colors[tabs.activeBackground]
+				: (trackBase ?? theme.colors[tabs.background])
 			: "transparent";
 	const surfaceMeta = useMemo(
 		() => ({
@@ -174,7 +176,7 @@ export function TabsTrigger({
 			overflow: "hidden",
 			backgroundColor: fill,
 			borderBottomWidth: meta.variant === "underline" && selected ? 2 : 0,
-			borderBottomColor: theme.colors.primary,
+			borderBottomColor: theme.colors[tabs.indicator],
 			opacity: disabled ? 0.44 : 1,
 		}),
 		[
@@ -184,7 +186,8 @@ export function TabsTrigger({
 			meta.variant,
 			radius,
 			selected,
-			theme.colors.primary,
+			tabs.indicator,
+			theme.colors,
 			theme.spacing.xs,
 			theme.spacing.sm,
 		],
@@ -227,7 +230,11 @@ export function TabsLabel({ children }: TabsLabelProps) {
 	return (
 		<Text
 			variant="label"
-			color={selected ? theme.colors.text : theme.colors.textMuted}
+			color={
+				selected
+					? theme.colors[theme.components.Tabs.activeForeground]
+					: theme.colors[theme.components.Tabs.inactiveForeground]
+			}
 			transform="uppercase"
 			numberOfLines={1}
 			adjustsFontSizeToFit

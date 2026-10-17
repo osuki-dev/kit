@@ -303,9 +303,38 @@ the app at once without a wrapper:
 ```
 
 Component token blocks available under `components`: `Button`, `Card`, `Input`,
-`Surface`, `Text`, `Sheet`, `ListItem`, `Tabs`. Their fields hold _token names_,
-not values — `Button.radius` is `"pill"`, `Input.border` is `"borderStrong"` —
-so an override stays inside the system.
+`Surface`, `Text`, `Sheet`, `ListItem`, `Tabs`, `SegmentedControl`, `Skeleton`.
+Their fields hold _token names_, not values — `Button.radius` is `"pill"`,
+`Input.border` is `"borderStrong"` — so an override stays inside the system.
+
+The ones that shape an app's whole appearance:
+
+| Token                                                                                       | Controls                                          |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `Button.radius`, `Input.radius`, `Input.searchRadius`                                       | control corners                                   |
+| `Card.radius`                                                                               | which radius token each `Card` `radius` maps to   |
+| `Tabs.radius`, `Tabs.background`, `Tabs.activeBackground`                                   | the `pill` tabs track and selected trigger        |
+| `Tabs.activeForeground`, `Tabs.inactiveForeground`, `Tabs.indicator`                        | tab labels and the underline                      |
+| `SegmentedControl.radius`, `SegmentedControl.optionRadius`                                  | the `rounded` segmented track and selected option |
+| `SegmentedControl.background`, `activeBackground`, `activeForeground`, `inactiveForeground` | segmented fills and labels                        |
+| `Input.placeholder`                                                                         | placeholder colour of every field                 |
+| `Skeleton.background`                                                                       | placeholder fill under the pulse                  |
+
+Press feedback is a theme setting too. `motion.press` holds the scale each kind
+of control settles at while held — `control` (Button), `card` (PressableCard),
+`row` (ListItem), `chip` (Tag), and `surface` (the `PressableScale` default).
+Set one to `1` to turn its dip off. `PressableScale` also stays still when the
+system reduce-motion setting is on.
+
+```tsx
+<ThemeProvider theme={{ motion: { press: { control: 0.97, surface: 0.96 } } }}>
+```
+
+Fills that are translucent, image-backed, or gradient-backed are not tokens:
+they come from `SurfaceDecoratorProvider`, whose `transformBackground` maps
+every string fill (for example to apply an opacity) and whose
+`renderDecoration` paints artwork behind a slot. Every control paints its fill
+once through it, so a translucent fill is never stacked on itself.
 
 ## Your brand colour
 

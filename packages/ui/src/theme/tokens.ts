@@ -119,6 +119,7 @@ export const componentTokens: ComponentTokens = {
 		borderFocused: "text",
 		borderError: "danger",
 		radius: "lg",
+		searchRadius: "pill",
 		paddingX: "md",
 		paddingY: "sm",
 	},
@@ -158,7 +159,19 @@ export const componentTokens: ComponentTokens = {
 		radius: "pill",
 		background: "surfaceRaised",
 		activeBackground: "surface",
-		activeForeground: "primary",
+		activeForeground: "text",
 		inactiveForeground: "textMuted",
+		indicator: "primary",
+	},
+	SegmentedControl: {
+		radius: "lg",
+		optionRadius: "md",
+		background: "surfaceRaised",
+		activeBackground: "surface",
+		activeForeground: "text",
+		inactiveForeground: "textMuted",
+	},
+	Skeleton: {
+		background: "border",
 	},
 };

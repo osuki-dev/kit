@@ -52,11 +52,11 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 		() => ({
 			slot: "skeleton.fill",
 			variant,
-			baseColor: theme.colors.border,
+			baseColor: theme.colors[theme.components.Skeleton.background],
 		}),
-		[theme.colors.border, variant],
+		[theme.colors[theme.components.Skeleton.background], variant],
 	);
-	const fill = useResolvedSurfaceFill(theme.colors.border, fillMeta);
+	const fill = useResolvedSurfaceFill(theme.colors[theme.components.Skeleton.background], fillMeta);
 
 	useEffect(() => {
 		if (motion === "static") {

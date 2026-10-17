@@ -39,7 +39,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
  * - 44px touch target for trailing actions
  *
  * Features:
- * - Press scale animation (0.98) for tactile feedback
+ * - Press scale animation (theme `motion.press.row`) for tactile feedback
  * - Smooth spring animations
  * - Disabled state disables animations
  *
@@ -81,12 +81,12 @@ export const ListItemRoot: React.FC<ListItemProps> = ({
 	const handlePressIn = useCallback(() => {
 		if (!disabled && onPress) {
 			haptics.feedback("selection");
-			scale.value = withSpring(0.98, {
+			scale.value = withSpring(theme.motion.press.row, {
 				stiffness: 400,
 				damping: 25,
 			});
 		}
-	}, [disabled, haptics, onPress, scale]);
+	}, [disabled, haptics, onPress, scale, theme.motion.press.row]);
 
 	const handlePressOut = useCallback(() => {
 		scale.value = withSpring(1, {
