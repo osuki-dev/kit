@@ -10,7 +10,6 @@ import React, {
 import {
 	Pressable,
 	StyleSheet,
-	Text as RNText,
 	View,
 	type GestureResponderEvent,
 	type StyleProp,
@@ -25,6 +24,7 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import { useThemeTokens } from "../theme";
+import { Text } from "./text";
 import { Icon } from "./icon";
 
 export interface ReasoningState {
@@ -182,9 +182,12 @@ export function ReasoningTrigger({
 				)}
 				{children ?? (
 					<View style={styles.defaultTriggerContent}>
-						<RNText style={[styles.triggerText, { color: theme.colors.textMuted }]}>
+						<Text
+							variant="bodySmall"
+							style={[styles.triggerText, { color: theme.colors.textMuted }]}
+						>
 							{meta.isStreaming ? "Thinking..." : "Thought process"}
-						</RNText>
+						</Text>
 						<ReasoningDuration />
 					</View>
 				)}
@@ -213,9 +216,12 @@ export function ReasoningDuration({ children, style }: ReasoningDurationProps) {
 
 	if (children !== undefined) {
 		return (
-			<RNText style={[styles.durationText, { color: theme.colors.textSubtle }, style]}>
+			<Text
+				variant="bodySmall"
+				style={[styles.durationText, { color: theme.colors.textSubtle }, style]}
+			>
 				{children}
-			</RNText>
+			</Text>
 		);
 	}
 
@@ -230,9 +236,12 @@ export function ReasoningDuration({ children, style }: ReasoningDurationProps) {
 	const durationLabel = `for ${meta.durationSeconds}s`;
 
 	return (
-		<RNText style={[styles.durationText, { color: theme.colors.textSubtle }, style]}>
+		<Text
+			variant="bodySmall"
+			style={[styles.durationText, { color: theme.colors.textSubtle }, style]}
+		>
 			{durationLabel}
-		</RNText>
+		</Text>
 	);
 }
 
@@ -261,7 +270,8 @@ export function ReasoningContent({ children, style, ...props }: ReasoningContent
 			{...props}
 		>
 			{typeof children === "string" ? (
-				<RNText
+				<Text
+					variant="bodySmall"
 					style={[
 						styles.contentText,
 						{
@@ -270,7 +280,7 @@ export function ReasoningContent({ children, style, ...props }: ReasoningContent
 					]}
 				>
 					{children}
-				</RNText>
+				</Text>
 			) : (
 				children
 			)}
@@ -318,10 +328,12 @@ const styles = StyleSheet.create({
 	},
 	triggerText: {
 		fontSize: 13,
+		lineHeight: 18,
 		fontWeight: "500",
 	},
 	durationText: {
 		fontSize: 12,
+		lineHeight: 16,
 		fontStyle: "italic",
 	},
 	chevronWrapper: {

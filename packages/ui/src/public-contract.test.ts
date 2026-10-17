@@ -208,6 +208,31 @@ assert.deepEqual(
 	{ fontFamily: "Inter", fontWeight: "600" },
 	"single-family definitions support native and variable font weights",
 );
+const variableFonts = {
+	body: {
+		family: "InterVariable",
+		axes: { wght: { min: 100, max: 900 }, opsz: { min: 14, max: 32 } },
+	},
+};
+assert.deepEqual(
+	resolveFontStyle(variableFonts, "body", "bold", { fontSize: 12 }),
+	{
+		fontFamily: "InterVariable",
+		fontWeight: "400",
+		fontVariationSettings: { wght: 700, opsz: 14 },
+	},
+	"a variable face keeps native weight 400 and carries the weight and clamped optical size as axes",
+);
+assert.deepEqual(
+	resolveFontStyle(variableFonts, "body", 950),
+	{ fontFamily: "InterVariable", fontWeight: "400", fontVariationSettings: { wght: 900 } },
+	"numeric weights clamp to the face's wght range, and opsz is omitted without a size",
+);
+assert.deepEqual(
+	resolveFontStyle(customFontTheme.fonts, customFontTheme.typeStyles.body.fontFamily, 650),
+	{ fontFamily: "Inter_700Bold", fontWeight: "700" },
+	"numeric weights round to the nearest loaded weight on a static family",
+);
 
 const fashionTheme = createThemePreset({ tone: "fashion" });
 assert.equal(

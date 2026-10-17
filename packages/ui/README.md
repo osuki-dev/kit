@@ -343,7 +343,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Each role also accepts a single native or variable family with `{ family: "Inter" }`. Missing roles and weights fall back safely to the system font or the nearest configured weight.
+Each role also accepts a single native family with `{ family: "Inter" }`. Missing roles and weights fall back safely to the system font or the nearest configured weight.
+
+A variable face declares its axes, and every weight then renders through its `wght` axis, including 700 and above on Android:
+
+```tsx
+const theme = {
+	fonts: {
+		body: { family: "InterVariable", axes: { wght: { min: 100, max: 900 } } },
+	},
+};
+```
+
+`resolveFontStyle` returns `fontVariationSettings` for such a role, `Text` accepts numeric weights (`weight={850}`), and `opsz` / `wdth` axes are supported. See [docs/theme.md](./docs/theme.md#variable-fonts).
 
 ## Theme Tokens
 

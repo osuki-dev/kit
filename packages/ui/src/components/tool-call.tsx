@@ -10,7 +10,6 @@ import {
 	Platform,
 	Pressable,
 	StyleSheet,
-	Text as RNText,
 	View,
 	type GestureResponderEvent,
 	type StyleProp,
@@ -19,6 +18,7 @@ import {
 	type ViewStyle,
 } from "react-native";
 import { useThemeTokens } from "../theme";
+import { Text } from "./text";
 import { Icon, type IconName } from "./icon";
 import { Spinner } from "./spinner";
 
@@ -284,7 +284,8 @@ export function ToolCallName({ children, style }: ToolCallNameProps) {
 				},
 			]}
 		>
-			<RNText
+			<Text
+				variant="bodySmall"
 				style={[
 					styles.nameText,
 					{
@@ -295,7 +296,7 @@ export function ToolCallName({ children, style }: ToolCallNameProps) {
 				]}
 			>
 				{content}
-			</RNText>
+			</Text>
 		</View>
 	);
 }
@@ -366,7 +367,9 @@ export function ToolCallStatus({ children, variant, style }: ToolCallStatusProps
 			{meta.status === "running" && <Spinner size="sm" />}
 			{meta.status === "success" && <Icon name="Check" size={12} color={badgeColors.text} />}
 			{meta.status === "error" && <Icon name="CircleAlert" size={12} color={badgeColors.text} />}
-			<RNText style={[styles.statusText, { color: badgeColors.text }]}>{meta.status}</RNText>
+			<Text variant="bodySmall" style={[styles.statusText, { color: badgeColors.text }]}>
+				{meta.status}
+			</Text>
 		</View>
 	);
 }
@@ -398,7 +401,9 @@ export function ToolCallPayload({
 				onPress={actions.togglePayload}
 				style={styles.sectionHeader}
 			>
-				<RNText style={[styles.sectionTitle, { color: theme.colors.textMuted }]}>{label}</RNText>
+				<Text variant="bodySmall" style={[styles.sectionTitle, { color: theme.colors.textMuted }]}>
+					{label}
+				</Text>
 				{collapsible && (
 					<Icon
 						name={state.payloadExpanded ? "ChevronDown" : "ChevronRight"}
@@ -418,11 +423,12 @@ export function ToolCallPayload({
 					]}
 				>
 					{typeof children === "string" ? (
-						<RNText
+						<Text
+							variant="bodySmall"
 							style={[styles.codeText, { color: theme.colors.text, fontFamily: monospaceFont }]}
 						>
 							{children}
-						</RNText>
+						</Text>
 					) : (
 						children
 					)}
@@ -470,14 +476,15 @@ export function ToolCallResult({
 				onPress={actions.toggleResult}
 				style={styles.sectionHeader}
 			>
-				<RNText
+				<Text
+					variant="bodySmall"
 					style={[
 						styles.sectionTitle,
 						{ color: isError ? theme.colors.danger : theme.colors.textMuted },
 					]}
 				>
 					{label}
-				</RNText>
+				</Text>
 				{collapsible && (
 					<Icon
 						name={state.resultExpanded ? "ChevronDown" : "ChevronRight"}
@@ -497,7 +504,8 @@ export function ToolCallResult({
 					]}
 				>
 					{typeof children === "string" ? (
-						<RNText
+						<Text
+							variant="bodySmall"
 							style={[
 								styles.codeText,
 								{
@@ -507,7 +515,7 @@ export function ToolCallResult({
 							]}
 						>
 							{children}
-						</RNText>
+						</Text>
 					) : (
 						children
 					)}
@@ -567,6 +575,7 @@ const styles = StyleSheet.create({
 	},
 	nameText: {
 		fontSize: 12,
+		lineHeight: 16,
 		fontWeight: "600",
 		letterSpacing: 0.2,
 	},
@@ -579,6 +588,7 @@ const styles = StyleSheet.create({
 	},
 	statusText: {
 		fontSize: 11,
+		lineHeight: 14,
 		fontWeight: "600",
 		textTransform: "capitalize",
 	},
@@ -594,6 +604,7 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 11,
+		lineHeight: 14,
 		fontWeight: "600",
 		textTransform: "uppercase",
 		letterSpacing: 0.5,

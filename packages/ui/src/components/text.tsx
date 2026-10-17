@@ -6,6 +6,7 @@ import {
 	View,
 	type GestureResponderEvent,
 	type LayoutChangeEvent,
+	type StyleProp,
 	type TextProps as RNTextProps,
 	type TextStyle,
 	type TextLayoutEvent,
@@ -18,7 +19,13 @@ import Animated, {
 	withDelay,
 	withTiming,
 } from "react-native-reanimated";
-import { resolveFontStyle, useThemeTokens, type FontWeight, type TypeStyleName } from "../theme";
+import {
+	resolveFontStyle,
+	useThemeTokens,
+	type FontWeightValue,
+	type TypeStyleName,
+} from "../theme";
+import { styleFontWeight } from "../utils/font-weight";
 
 const HUG_SLACK = "\u2009";
 
@@ -36,6 +43,27 @@ export function withHugSlack(children: React.ReactNode, os: string = Platform.OS
 	return children;
 }
 
+/** True inside a kit `Text`, where a child `Text` is a run, not a paragraph. */
+const NestedTextContext = React.createContext(false);
+
+/**
+ * Android measures a paragraph with a paint that already carries the
+ * paragraph's `fontVariationSettings`; each run's span then resets the
+ * typeface and sets the same settings again, and `Paint` ignores an unchanged
+ * settings string. The run is measured at the font's default instance and
+ * drawn at the requested one, so heavier text overflows its box and wraps or
+ * loses letters. The axes therefore go on one inner run and never on the
+ * paragraph.
+ */
+function splitVariation(
+	style: TextStyle,
+	os: string = Platform.OS,
+): { paragraph: TextStyle; run?: TextStyle } {
+	if (os !== "android" || style.fontVariationSettings === undefined) return { paragraph: style };
+	const { fontVariationSettings, ...paragraph } = style;
+	return { paragraph, run: { fontVariationSettings } };
+}
+
 export interface TextProps extends RNTextProps {
 	/** Typography style preset */
 	variant?: TypeStyleName;
@@ -43,8 +71,21 @@ export interface TextProps extends RNTextProps {
 	color?: string;
 	/** Color key from theme (overrides color prop) */
 	colorKey?: keyof ReturnType<typeof useThemeTokens>["colors"];
-	/** Font weight override */
-	weight?: FontWeight;
+	/**
+	 * Font weight override: a named weight, or a number from 1 to 1000. A
+	 * variable face draws a numeric weight exactly; a static family rounds it.
+	 * A `fontWeight` in `style` is honored the same way unless `style` also
+	 * sets its own `fontFamily`.
+	 */
+	weight?: FontWeightValue;
+	/**
+	 * Android only, off by default. Appends a thin space after the text so an
+	 * italic or wide face does not lose the edge of its last glyph to the line
+	 * clip. Ignored on nested and selectable text, which it would otherwise
+	 * put mid-sentence or into the clipboard. Leave it off for text in a box
+	 * of its own size, such as a count in a round badge.
+	 */
+	hugSlack?: boolean;
 	/** Explicit text transform; inherit preserves the typography preset */
 	transform?: "inherit" | "none" | "uppercase";
 	/** Single-line overflow behavior */
@@ -56,7 +97,7 @@ export interface TextProps extends RNTextProps {
 	/** Horizontal scroll speed in pixels per second */
 	marqueeSpeed?: number;
 	/** Additional styles */
-	style?: TextStyle | TextStyle[];
+	style?: StyleProp<TextStyle>;
 }
 
 /**
@@ -92,6 +133,7 @@ export const Text: React.FC<TextProps> = ({
 	marqueePlayback = "auto",
 	marqueeDelayMs = 700,
 	marqueeSpeed = 56,
+	hugSlack = false,
 	style,
 	children,
 	maxFontSizeMultiplier,
@@ -127,14 +169,17 @@ export const Text: React.FC<TextProps> = ({
 		return colors.textMuted;
 	}, [color, colorKey, colors, variant]);
 
+	const callerStyle = StyleSheet.flatten(style) ?? undefined;
+	// A caller style that names its own family owns its weight too. Otherwise a
+	// `fontWeight` in it is a weight request like `weight`, resolved against the
+	// theme's face instead of reaching the native side as a bare number.
+	const callerOwnsFace = callerStyle?.fontFamily !== undefined;
+	const callerWeight = callerOwnsFace ? undefined : styleFontWeight(callerStyle?.fontWeight);
+	const requestedWeight = weight ?? callerWeight ?? typeStyle.fontWeight;
+	const fontSize = callerStyle?.fontSize ?? typeStyle.fontSize;
 	const fontStyle = React.useMemo(
-		() =>
-			resolveFontStyle(
-				fonts,
-				typeStyle.fontFamily,
-				weight ?? getWeightFromNumber(typeStyle.fontWeight),
-			),
-		[fonts, typeStyle.fontFamily, typeStyle.fontWeight, weight],
+		() => resolveFontStyle(fonts, typeStyle.fontFamily, requestedWeight, { fontSize }),
+		[fonts, typeStyle.fontFamily, requestedWeight, fontSize],
 	);
 
 	const textStyles = React.useMemo<TextStyle>(
@@ -161,8 +206,31 @@ export const Text: React.FC<TextProps> = ({
 			transform,
 		],
 	);
-	const renderedChildren = withHugSlack(children);
-	const flattenedStyle = StyleSheet.flatten(style) ?? undefined;
+	const nested = React.useContext(NestedTextContext);
+	const renderedChildren =
+		hugSlack && !nested && !rest.selectable ? withHugSlack(children) : children;
+	const flattenedStyle = callerStyle;
+	const merged: TextStyle = { ...textStyles, ...callerStyle };
+	const resolvedStyle: TextStyle = callerOwnsFace
+		? merged
+		: {
+				...merged,
+				fontFamily: fontStyle.fontFamily,
+				// The system face draws any native weight, so a numeric request
+				// such as 800 is passed through rather than rounded to 700.
+				fontWeight:
+					fontStyle.fontFamily === undefined && typeof requestedWeight === "number"
+						? (String(requestedWeight) as TextStyle["fontWeight"])
+						: fontStyle.fontWeight,
+				fontVariationSettings:
+					callerStyle?.fontVariationSettings ?? fontStyle.fontVariationSettings,
+			};
+	const { paragraph, run } = splitVariation(resolvedStyle);
+	const content = (
+		<NestedTextContext.Provider value>
+			{run ? <RNText style={run}>{renderedChildren}</RNText> : renderedChildren}
+		</NestedTextContext.Provider>
+	);
 	const lineHeight =
 		typeof flattenedStyle?.lineHeight === "number"
 			? flattenedStyle.lineHeight
@@ -242,10 +310,10 @@ export const Text: React.FC<TextProps> = ({
 						numberOfLines={1}
 						ellipsizeMode="clip"
 						onPress={handleMarqueePress}
-						style={[textStyles, style, styles.marqueeText, animatedMarqueeStyle]}
+						style={[paragraph, styles.marqueeText, animatedMarqueeStyle]}
 						{...rest}
 					>
-						{renderedChildren}
+						{content}
 					</Animated.Text>
 				</View>
 			</View>
@@ -257,10 +325,10 @@ export const Text: React.FC<TextProps> = ({
 			maxFontSizeMultiplier={maxFontSizeMultiplier ?? getDefaultMaxFontScale(variant)}
 			numberOfLines={numberOfLines}
 			onPress={onPress}
-			style={[textStyles, style]}
+			style={paragraph}
 			{...rest}
 		>
-			{renderedChildren}
+			{content}
 		</RNText>
 	);
 };
@@ -296,14 +364,6 @@ function getDefaultMaxFontScale(variant: TypeStyleName) {
 	if (variant === "heading" || variant === "subheading") return 1.14;
 	if (variant === "button" || variant === "label" || variant === "caption") return 1.18;
 	return 1.24;
-}
-
-function getWeightFromNumber(weight: number): FontWeight {
-	if (weight <= 300) return "light";
-	if (weight <= 400) return "regular";
-	if (weight <= 500) return "medium";
-	if (weight <= 600) return "semibold";
-	return "bold";
 }
 
 function estimateTextWidth(children: React.ReactNode, fontSize: number) {

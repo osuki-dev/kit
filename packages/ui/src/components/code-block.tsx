@@ -13,7 +13,6 @@ import {
 	Pressable,
 	ScrollView,
 	StyleSheet,
-	Text as RNText,
 	View,
 	type StyleProp,
 	type TextStyle,
@@ -26,6 +25,7 @@ import {
 	useThemeTokens,
 	withoutStringFill,
 } from "../theme";
+import { Text } from "./text";
 import { withAlpha } from "../utils/color";
 import { Icon } from "./icon";
 
@@ -198,7 +198,8 @@ export function CodeBlockTitle({ children, style }: CodeBlockTitleProps) {
 	const defaultColor = theme.colors.text;
 
 	return (
-		<RNText
+		<Text
+			variant="bodySmall"
 			style={[
 				styles.title,
 				{
@@ -209,7 +210,7 @@ export function CodeBlockTitle({ children, style }: CodeBlockTitleProps) {
 			]}
 		>
 			{children}
-		</RNText>
+		</Text>
 	);
 }
 
@@ -341,7 +342,8 @@ export function CodeBlockLine({
 	return (
 		<View style={[styles.line, { backgroundColor: lineHighlight.bg }, style]}>
 			{lineNumber !== undefined && (
-				<RNText
+				<Text
+					variant="bodySmall"
 					style={[
 						styles.lineNumber,
 						{
@@ -351,10 +353,11 @@ export function CodeBlockLine({
 					]}
 				>
 					{lineNumber}
-				</RNText>
+				</Text>
 			)}
 			{lineHighlight.marker !== undefined && (
-				<RNText
+				<Text
+					variant="bodySmall"
 					style={[
 						styles.marker,
 						{
@@ -364,9 +367,10 @@ export function CodeBlockLine({
 					]}
 				>
 					{lineHighlight.marker}
-				</RNText>
+				</Text>
 			)}
-			<RNText
+			<Text
+				variant="bodySmall"
 				style={[
 					styles.lineText,
 					{
@@ -376,7 +380,7 @@ export function CodeBlockLine({
 				]}
 			>
 				{children}
-			</RNText>
+			</Text>
 		</View>
 	);
 }
@@ -426,6 +430,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 12,
+		lineHeight: 16,
 		fontWeight: "500",
 		letterSpacing: 0.2,
 	},
@@ -460,6 +465,7 @@ const styles = StyleSheet.create({
 	lineNumber: {
 		width: 32,
 		fontSize: 12,
+		lineHeight: 16,
 		textAlign: "right",
 		marginRight: 12,
 		userSelect: "none" as unknown as undefined,
@@ -467,6 +473,7 @@ const styles = StyleSheet.create({
 	marker: {
 		width: 14,
 		fontSize: 12,
+		lineHeight: 16,
 		fontWeight: "600",
 	},
 	lineText: {

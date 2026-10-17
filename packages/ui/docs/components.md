@@ -22,21 +22,40 @@ always available even when not listed.
 
 The things a screen is made of before it is made of interactions.
 
-| Component     | What it solves                                                                                                                               | Main props                                                                             |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `Text`        | Every string on screen. Carries the CJK-safe line height and the type scale, so a Japanese screen and an English screen stay the same shape. | `variant`, `colorKey`, `color`, `weight`, `transform`, `overflowMode`, `numberOfLines` |
-| `Icon`        | A Lucide glyph at the theme's stroke width and default colour, instead of each call site guessing.                                           | `name` (PascalCase, e.g. `"Search"`), `size`, `color`, `strokeWidth`                   |
-| `Image`       | Remote or bundled image with caching and a fade-in, so lists do not flash white on scroll. Wraps `expo-image`.                               | `source`, `contentFit`, `cachePolicy`, `transition`                                    |
-| `Avatar`      | A person or entity, with initials as the fallback when there is no picture.                                                                  | `source`, `initials`, `size`, `isOnline`                                               |
-| `AvatarGroup` | Several avatars overlapped, with a `+N` overflow chip past `max`.                                                                            | `items`, `max`, `size`, `overlap`                                                      |
-| `Tag`         | A short classifying word attached to something else — a status, a category, a provenance mark.                                               | `children` (string), `variant`, `onPress`, `disabled`                                  |
-| `Badge`       | A count, or a bare dot, sitting on top of something. Not for classification; for "there is something new here".                              | `children` (number or string), `variant`, `display`                                    |
-| `Divider`     | A hairline between items when a gap is not enough and a card is too much.                                                                    | `variant`, `thickness`                                                                 |
+| Component     | What it solves                                                                                                                               | Main props                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `Text`        | Every string on screen. Carries the CJK-safe line height and the type scale, so a Japanese screen and an English screen stay the same shape. | `variant`, `colorKey`, `color`, `weight`, `transform`, `overflowMode`, `numberOfLines`, `hugSlack` |
+| `Icon`        | A glyph at the theme's stroke width and default colour, resolved through `IconProvider`, theme chrome names, then Lucide.                    | `name` (a typed `IconName`), `size`, `color`, `strokeWidth`, `direction`, `renderMode`             |
+| `Image`       | Remote or bundled image with caching and a fade-in, so lists do not flash white on scroll. Wraps `expo-image`.                               | `source`, `contentFit`, `cachePolicy`, `transition`                                                |
+| `Avatar`      | A person or entity, with initials as the fallback when there is no picture.                                                                  | `source`, `initials`, `size`, `isOnline`                                                           |
+| `AvatarGroup` | Several avatars overlapped, with a `+N` overflow chip past `max`.                                                                            | `items`, `max`, `size`, `overlap`                                                                  |
+| `Tag`         | A short classifying word attached to something else — a status, a category, a provenance mark.                                               | `children` (string), `variant`, `onPress`, `disabled`                                              |
+| `Badge`       | A count, or a bare dot, sitting on top of something. Not for classification; for "there is something new here".                              | `children` (number or string), `variant`, `display`                                                |
+| `Divider`     | A hairline between items when a gap is not enough and a card is too much.                                                                    | `variant`, `thickness`                                                                             |
 
 `Text` variants, in the order they appear in the type scale: `hero` (72),
 `display` (48), `dataLarge` (36), `heading` (24), `subheading` (18), `body`
 (16), `data` (16), `bodySmall` (14), `caption` (12), `label` (11, uppercased),
 `button` (13, uppercased). See [theme.md](./theme.md) for the full table.
+
+`weight` takes a named weight or a number from 1 to 1000; a variable face draws
+the number exactly (see [theme.md](./theme.md#variable-fonts)). `hugSlack` is an
+Android-only opt-in that appends a thin space so an italic or wide face does not
+lose the edge of its last glyph; it is ignored on nested and selectable text.
+
+`Icon` names are checked at compile time: a Lucide export name, a theme chrome
+name such as `"chrome.back"`, or a name you register for your own icons:
+
+```ts
+declare module "@osuki-dev/ui" {
+	interface IconNameRegistry {
+		"brand.logo": true;
+	}
+}
+```
+
+A named `Icon` renders the glyph itself. It adds a host `View` only when it
+needs one: a `direction` rotation, a `style`, or view props such as `testID`.
 
 ---
 

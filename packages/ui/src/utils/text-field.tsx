@@ -10,7 +10,8 @@ import {
 	type ViewStyle,
 } from "react-native";
 import { Text } from "../components/text";
-import { useThemeTokens } from "../theme";
+import { resolveFontStyle, useThemeTokens } from "../theme";
+import { styleFontWeight } from "./font-weight";
 
 /**
  * Internal field used by Input, SearchInput, and PromptInput.
@@ -53,6 +54,7 @@ const TYPE_KEYS = [
 	"fontSize",
 	"fontStyle",
 	"fontWeight",
+	"fontVariationSettings",
 	"letterSpacing",
 	"lineHeight",
 	"textAlign",
@@ -123,7 +125,7 @@ export const TextField: React.ForwardRefExoticComponent<
 	},
 	ref,
 ) {
-	const { colors } = useThemeTokens();
+	const { colors, fonts, typeStyles } = useThemeTokens();
 	const [typed, setTyped] = useState(defaultValue ?? "");
 	const handleChangeText = useCallback(
 		(next: string) => {
@@ -134,7 +136,21 @@ export const TextField: React.ForwardRefExoticComponent<
 	);
 	const currentValue = value ?? typed;
 	const empty = currentValue.length === 0;
-	const parts = splitFieldStyle(style);
+	// A field whose style names no family is set in the theme's body face, at
+	// the style's weight, through the same resolution as `Text`. The system face
+	// is left to the style, which already says everything it needs.
+	const flat = StyleSheet.flatten(style) ?? undefined;
+	let fieldStyle: TextInputProps["style"] = style;
+	if (flat?.fontFamily === undefined) {
+		const face = resolveFontStyle(
+			fonts,
+			typeStyles.body.fontFamily,
+			styleFontWeight(flat?.fontWeight) ?? "regular",
+			{ fontSize: flat?.fontSize ?? typeStyles.body.fontSize },
+		);
+		if (face.fontFamily !== undefined) fieldStyle = [style, face];
+	}
+	const parts = splitFieldStyle(fieldStyle);
 
 	let fieldSize = 16;
 	if (typeof parts.placeholder.fontSize === "number") fieldSize = parts.placeholder.fontSize;

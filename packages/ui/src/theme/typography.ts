@@ -3,18 +3,65 @@ export type FontFamily = string;
 export type FontWeight = "light" | "regular" | "medium" | "semibold" | "bold";
 
 /**
+ * A weight request: a named weight, or a CSS weight from 1 to 1000. A variable
+ * face draws a numeric weight exactly; a static family rounds it to the
+ * nearest named weight (`fontWeightName`) and then to the nearest one loaded.
+ */
+export type FontWeightValue = FontWeight | number;
+
+/** One design axis of a variable font, in the font's own user-space units. */
+export interface FontAxisRange {
+	min: number;
+	max: number;
+	/** The font's default instance on this axis, from its `fvar` table. */
+	default?: number;
+}
+
+/**
+ * The axes a variable face declares, as its `fvar` table lists them. `wght`
+ * is what makes a face variable for the theme; `opsz` follows the text size
+ * and `wdth` follows `FontDefinition.width`. Other axes (`slnt`, `ital`, a
+ * foundry's upper-case tags) may be listed and stay at the font's default.
+ */
+export interface VariableFontAxes {
+	wght: FontAxisRange;
+	opsz?: FontAxisRange;
+	wdth?: FontAxisRange;
+	[tag: string]: FontAxisRange | undefined;
+}
+
+/**
  * A family may use one native/variable family name, or a separately loaded name per weight.
  * Expo font packages commonly use the per-weight form (for example `Inter_400Regular`).
+ *
+ * A variable face is one loaded file: name it as `family` and declare its
+ * `axes`. Every weight then resolves to that family with the weight on its
+ * `wght` axis, so a variable face renders its own 700 and above on Android.
  */
 export type FontDefinition = Partial<Record<FontWeight, string>> & {
 	family?: string;
+	/** Declares `family` as a variable face with these axes. */
+	axes?: VariableFontAxes;
+	/** The `wdth` this role is set at, when the face has a `wdth` axis. */
+	width?: number;
 };
 
 export type FontRegistry = Record<FontFamily, FontDefinition>;
 export type NativeFontWeight = "300" | "400" | "500" | "600" | "700";
+
+/** Axis tags to values: the object form of React Native's `fontVariationSettings`. */
+export type FontVariationSettings = Readonly<Record<string, number>>;
+
 export interface ResolvedFontStyle {
 	fontFamily?: string;
 	fontWeight: NativeFontWeight;
+	/** Set only for a variable face: `wght`, plus `opsz` and `wdth` when they apply. */
+	fontVariationSettings?: FontVariationSettings;
+}
+
+export interface ResolveFontStyleOptions {
+	/** The size the text is set at. A face with an `opsz` axis follows it. */
+	fontSize?: number;
 }
 
 /** System-font defaults keep the UI package font-agnostic and asset-free. */
@@ -32,6 +79,14 @@ const nativeFontWeights: Record<FontWeight, NativeFontWeight> = {
 	bold: "700",
 };
 
+const numericFontWeights: Record<FontWeight, number> = {
+	light: 300,
+	regular: 400,
+	medium: 500,
+	semibold: 600,
+	bold: 700,
+};
+
 const weightFallbacks: Record<FontWeight, FontWeight[]> = {
 	light: ["light", "regular"],
 	regular: ["regular", "medium", "light"],
@@ -40,20 +95,65 @@ const weightFallbacks: Record<FontWeight, FontWeight[]> = {
 	bold: ["bold", "semibold", "medium", "regular"],
 };
 
+/** The named weight a numeric weight rounds to on a static family. */
+export function fontWeightName(weight: FontWeightValue): FontWeight {
+	if (typeof weight === "string") return weight;
+	if (weight <= 300) return "light";
+	if (weight <= 400) return "regular";
+	if (weight <= 500) return "medium";
+	if (weight <= 600) return "semibold";
+	return "bold";
+}
+
+function clampToAxis(value: number, axis: FontAxisRange): number {
+	return Math.min(axis.max, Math.max(axis.min, value));
+}
+
+/**
+ * The style for one weight of one font role.
+ *
+ * A static family walks a fallback ladder to the nearest weight it loaded. A
+ * variable family (`axes.wght` and `family` both set) answers with its one
+ * face at native weight 400 and puts the requested weight on `wght`, clamped
+ * to the font's range. 400 because Android registers a loaded face under the
+ * normal style only: a native 700 misses that entry and falls back to the
+ * system bold, which is why a static ladder can never reach 700 in an
+ * app-loaded face.
+ */
 export function resolveFontStyle(
 	registry: FontRegistry,
 	family: FontFamily,
-	weight: FontWeight = "regular",
+	weight: FontWeightValue = "regular",
+	options: ResolveFontStyleOptions = {},
 ): ResolvedFontStyle {
 	const definition = registry[family];
-	const loadedWeight = weightFallbacks[weight].find(
+	const axes = definition?.axes;
+
+	if (axes?.wght && definition?.family) {
+		const requested = typeof weight === "number" ? weight : numericFontWeights[weight];
+		const settings: Record<string, number> = { wght: clampToAxis(requested, axes.wght) };
+		if (axes.opsz && options.fontSize !== undefined) {
+			settings.opsz = clampToAxis(options.fontSize, axes.opsz);
+		}
+		if (axes.wdth && definition.width !== undefined) {
+			settings.wdth = clampToAxis(definition.width, axes.wdth);
+		}
+		return {
+			fontFamily: definition.family,
+			fontWeight: "400",
+			fontVariationSettings: settings,
+		};
+	}
+
+	const named = fontWeightName(weight);
+	const loadedWeight = weightFallbacks[named].find(
 		(fallbackWeight) => definition?.[fallbackWeight],
 	);
 	const loadedFamily = loadedWeight ? definition?.[loadedWeight] : undefined;
 
 	return {
 		fontFamily: loadedFamily ?? definition?.family,
-		fontWeight: nativeFontWeights[loadedWeight ?? weight],
+		fontWeight: nativeFontWeights[loadedWeight ?? named],
 	};
 }
 
