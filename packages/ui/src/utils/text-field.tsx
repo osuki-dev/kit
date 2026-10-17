@@ -14,7 +14,8 @@ import { resolveFontStyle, useThemeTokens } from "../theme";
 import { styleFontWeight } from "./font-weight";
 
 /**
- * Internal field used by Input, SearchInput, and PromptInput.
+ * The bare field under Input, SearchInput, Textarea, PromptInput, InputGroup
+ * and Command, exported so an app can build its own field in the theme's face.
  *
  * The platform draws a TextInput placeholder with the view typeface, which
  * ignores a custom font on some Android devices. The native hint stays
@@ -107,9 +108,22 @@ export function splitFieldStyle(style: TextInputProps["style"]): {
 	};
 }
 
+/**
+ * A React Native `TextInput`'s props. `children` are the value's runs (nested
+ * `Text`, for highlighted spans); `placeholderTextColor` colours the drawn
+ * placeholder, `colors.textSubtle` by default.
+ */
+export type TextFieldProps = TextInputProps;
+
+/**
+ * A `TextInput` set in the theme's body face at the style's size and weight,
+ * with its placeholder drawn by `Text` in the same face. Placement styles
+ * (flex, margins, width, position) go on a wrapper; everything else on the
+ * input. It brings no chrome: no fill, border, label or error.
+ */
 export const TextField: React.ForwardRefExoticComponent<
-	TextInputProps & React.RefAttributes<TextInputInstance>
-> = forwardRef<TextInputInstance, TextInputProps>(function TextField(
+	TextFieldProps & React.RefAttributes<TextInputInstance>
+> = forwardRef<TextInputInstance, TextFieldProps>(function TextField(
 	{
 		style,
 		placeholder,

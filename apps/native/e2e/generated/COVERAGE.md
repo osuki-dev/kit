@@ -53,6 +53,7 @@ Metro URL: http://127.0.0.1:8081
 - E2E COMPONENT Tabs
 - E2E COMPONENT Tag
 - E2E COMPONENT Input
+- E2E COMPONENT TextField
 - E2E COMPONENT Select
 - E2E COMPONENT DateInput
 - E2E COMPONENT Dialog
@@ -118,6 +119,7 @@ Metro URL: http://127.0.0.1:8081
 | Tabs                    | `e2e-tabs, e2e-tabs-overview, e2e-tabs-orders`                                                   |
 | Tag                     | `e2e-tag`                                                                                        |
 | Input                   | `e2e-input`                                                                                      |
+| TextField               | `e2e-text-field`                                                                                 |
 | Select                  | `e2e-select`                                                                                     |
 | DateInput               | `e2e-date-input`                                                                                 |
 | Dialog                  | `e2e-dialog-trigger, e2e-dialog-action-confirm`                                                  |

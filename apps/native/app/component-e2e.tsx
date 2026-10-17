@@ -41,6 +41,7 @@ import {
 	Tag,
 	Tabs,
 	Text,
+	TextField,
 	Timeline,
 	Toggle,
 	Tooltip,
@@ -377,6 +378,14 @@ export default function ComponentE2EScreen() {
 							<Text variant="caption" colorKey="textMuted">
 								INPUT VALUE {input || "EMPTY"}
 							</Text>
+
+							<ComponentLabel>E2E COMPONENT TextField</ComponentLabel>
+							<TextField
+								placeholder="Bare field"
+								testID="e2e-text-field"
+								accessibilityLabel="E2E TEXT FIELD"
+								style={styles.textField}
+							/>
 
 							<ComponentLabel>E2E COMPONENT Select</ComponentLabel>
 							<Select
@@ -1138,6 +1147,10 @@ export default function ComponentE2EScreen() {
 const styles = StyleSheet.create({
 	content: {
 		paddingTop: 24,
+	},
+	textField: {
+		fontSize: 16,
+		paddingVertical: 8,
 	},
 	subtitle: {
 		marginTop: 8,

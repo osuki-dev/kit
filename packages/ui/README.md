@@ -71,6 +71,7 @@ version installed:
 | `Input`           | Form text inputs                     | `variant`, `label`, `secureTextEntry`   |
 | `Textarea`        | Multi-line text input                | `label`, `minRows`, `maxRows`           |
 | `SearchInput`     | Search field with clear action       | `value`, `onChangeText`, `onClear`      |
+| `TextField`       | Bare fonted field, no chrome         | `TextInputProps`, `children` spans      |
 | `Select`          | Bottom-sheet option picker           | `options`, `value`, `onChange`          |
 | `DateInput`       | Date, time, and datetime picker      | `mode`, `value`, `onChange`             |
 | `Menu`            | Triggered option/action menu         | `items`, `selectedId`, `onSelect`       |

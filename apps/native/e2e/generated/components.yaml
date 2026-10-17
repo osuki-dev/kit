@@ -215,6 +215,12 @@ name: component-coverage
 - assertVisible: "E2E COMPONENT Input"
 - scrollUntilVisible:
     element:
+      text: "E2E COMPONENT TextField"
+    direction: DOWN
+    timeout: 8000
+- assertVisible: "E2E COMPONENT TextField"
+- scrollUntilVisible:
+    element:
       text: "E2E COMPONENT Select"
     direction: DOWN
     timeout: 8000
