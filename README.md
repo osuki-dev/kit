@@ -72,6 +72,7 @@ installed and an agent can read them offline. In this repository they live in
 | theming, dark mode, brand colour | [theme.md](packages/ui/docs/theme.md)                     |
 | assembling a whole screen        | [patterns.md](packages/ui/docs/patterns.md)               |
 | reviewing a diff                 | [conventions.md](packages/ui/docs/conventions.md)         |
+| upgrading from 1.x               | [migrating-to-2.0.md](docs/migrating-to-2.0.md)           |
 
 ### For coding agents
 
