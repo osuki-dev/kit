@@ -39,7 +39,7 @@ const PROFILES: Record<Profile, ThemeOverride> = {
 		radius: { xs: 2, sm: 4, md: 4, lg: 6 },
 		components: {
 			Button: { radius: "sm" },
-			Input: { radius: "sm", searchRadius: "sm" },
+			Input: { radius: "sm", searchRadius: "sm", hint: "textMuted" },
 			Tabs: { radius: "sm", optionRadius: "xs" },
 			SegmentedControl: { radius: "sm", optionRadius: "xs" },
 		},

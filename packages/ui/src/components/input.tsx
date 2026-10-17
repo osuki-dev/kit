@@ -12,6 +12,7 @@ import Animated, {
 	Layout,
 	interpolateColor,
 	useAnimatedStyle,
+	useReducedMotion,
 	useSharedValue,
 	withTiming,
 } from "react-native-reanimated";
@@ -301,15 +302,20 @@ export function InputControl({ style }: { style?: TextStyle }) {
 	);
 }
 
+const ERROR_ENTERING = FadeInDown.duration(150);
+const ERROR_LAYOUT = Layout.springify().damping(20).stiffness(260);
+
 export function InputError({ children, testID }: { children?: ReactNode; testID?: string }) {
 	const theme = useThemeTokens();
 	const frame = useInputFrame();
+	// Reduce motion shows the pill in place, without the drop-in or the spring.
+	const reduceMotion = useReducedMotion();
 	if (!children) return null;
 	return (
 		<Animated.View
 			testID={testID ? `${testID}-error` : undefined}
-			entering={FadeInDown.duration(150)}
-			layout={Layout.springify().damping(20).stiffness(260)}
+			entering={reduceMotion ? undefined : ERROR_ENTERING}
+			layout={reduceMotion ? undefined : ERROR_LAYOUT}
 			style={{
 				backgroundColor: frame.errorFill,
 				borderRadius: theme.radius.pill,
@@ -327,9 +333,10 @@ export function InputError({ children, testID }: { children?: ReactNode; testID?
 }
 
 export function InputHint({ children }: { children?: ReactNode }) {
+	const { components } = useThemeTokens();
 	if (!children) return null;
 	return (
-		<Text variant="caption" colorKey="textDisabled" plated>
+		<Text variant="caption" colorKey={components.Input.hint} plated>
 			{children}
 		</Text>
 	);
