@@ -149,7 +149,7 @@ export function ProgressBarView({
 			</ProgressTrack>
 		</View>
 	);
-};
+}
 
 export const ProgressBar = Object.assign(ProgressBarView, {
 	Root: ProgressBarView,

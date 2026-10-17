@@ -10,12 +10,7 @@ export interface LoadingViewProps extends ViewProps {
 	children?: ReactNode;
 }
 
-export function LoadingViewRoot({
-	size = "default",
-	style,
-	children,
-	...props
-}: LoadingViewProps) {
+export function LoadingViewRoot({ size = "default", style, children, ...props }: LoadingViewProps) {
 	const theme = useThemeTokens();
 	const compact = size === "compact";
 	const containerStyle = useMemo<ViewStyle>(
@@ -47,7 +42,12 @@ export function LoadingViewLabel({ children }: { children?: ReactNode }) {
 	);
 }
 
-function LoadingViewFacade({ label = "Loading", size = "default", children, ...props }: LoadingViewProps) {
+function LoadingViewFacade({
+	label = "Loading",
+	size = "default",
+	children,
+	...props
+}: LoadingViewProps) {
 	return (
 		<LoadingViewRoot size={size} {...props}>
 			{children ?? (

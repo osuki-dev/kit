@@ -123,7 +123,13 @@ export interface AccordionItemProps extends ViewProps {
 
 const AccordionItemDisabled = createContext(false);
 
-export function AccordionItem({ value, disabled = false, children, style, ...props }: AccordionItemProps) {
+export function AccordionItem({
+	value,
+	disabled = false,
+	children,
+	style,
+	...props
+}: AccordionItemProps) {
 	const theme = useThemeTokens();
 	return (
 		<AccordionItemContext.Provider value={value}>

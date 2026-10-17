@@ -92,8 +92,13 @@ const { Card, CardRoot, CardBackground, CardHeader, CardContent, CardFooter } =
 	await import("./components/card");
 const { Surface, SurfaceRoot, SurfaceBackground, SurfaceContent } =
 	await import("./components/surface");
-const { SurfaceDecoratorProvider, SurfaceDecoratorContext, useSurfaceDecorator, LRUCache, getCachedTransformedColor } =
-	await import("./theme/decorator-context");
+const {
+	SurfaceDecoratorProvider,
+	SurfaceDecoratorContext,
+	useSurfaceDecorator,
+	LRUCache,
+	getCachedTransformedColor,
+} = await import("./theme/decorator-context");
 const { Skeleton } = await import("./components/skeleton");
 const { Input, InputFrameContext } = await import("./components/input");
 const { splitFieldStyle } = await import("./utils/text-field");
@@ -305,7 +310,11 @@ test("Button paints an override fill once through the decorator", () => {
 	});
 	try {
 		const root = renderComponent(
-			React.createElement(Button, { style: { backgroundColor: "#123456", borderRadius: 12 } }, "Save"),
+			React.createElement(
+				Button,
+				{ style: { backgroundColor: "#123456", borderRadius: 12 } },
+				"Save",
+			),
 		);
 		const provider = renderComponent(root);
 		const buttonValue = provider.props.value as {

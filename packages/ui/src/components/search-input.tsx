@@ -14,7 +14,12 @@ import Animated, {
 	useSharedValue,
 	withTiming,
 } from "react-native-reanimated";
-import { resolveFontStyle, useResolvedSurfaceFill, useSurfaceDecorator, useThemeTokens } from "../theme";
+import {
+	resolveFontStyle,
+	useResolvedSurfaceFill,
+	useSurfaceDecorator,
+	useThemeTokens,
+} from "../theme";
 import { TextField } from "../utils/text-field";
 import { Icon } from "./icon";
 

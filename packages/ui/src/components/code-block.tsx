@@ -20,7 +20,12 @@ import {
 	type ViewProps,
 	type ViewStyle,
 } from "react-native";
-import { readStringFill, useResolvedSurfaceFill, useThemeTokens, withoutStringFill } from "../theme";
+import {
+	readStringFill,
+	useResolvedSurfaceFill,
+	useThemeTokens,
+	withoutStringFill,
+} from "../theme";
 import { withAlpha } from "../utils/color";
 import { Icon } from "./icon";
 

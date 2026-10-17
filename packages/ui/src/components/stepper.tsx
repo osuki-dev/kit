@@ -109,13 +109,7 @@ interface StepperButtonProps {
 	testID?: string;
 }
 
-export function StepperButton({
-	icon,
-	label,
-	disabled,
-	onPress,
-	testID,
-}: StepperButtonProps) {
+export function StepperButton({ icon, label, disabled, onPress, testID }: StepperButtonProps) {
 	const theme = useThemeTokens();
 
 	return (
