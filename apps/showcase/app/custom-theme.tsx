@@ -39,7 +39,8 @@ const PROFILES: Record<Profile, ThemeOverride> = {
 	square: {
 		radius: { xs: 2, sm: 4, md: 4, lg: 6 },
 		components: {
-			Button: { radius: "sm" },
+			// A protective fill under the ghost label; its shadow token keeps it flat.
+			Button: { radius: "sm", ghost: { background: "surfaceRaised" } },
 			Input: { radius: "sm", searchRadius: "sm", hint: "textMuted" },
 			Tabs: { radius: "sm", optionRadius: "xs" },
 			SegmentedControl: { radius: "sm", optionRadius: "xs" },
@@ -186,6 +187,7 @@ export default function CustomThemeScreen() {
 								<View style={styles.row}>
 									<Button variant="primary">Primary</Button>
 									<Button variant="secondary">Secondary</Button>
+									<Button variant="ghost">Ghost</Button>
 								</View>
 							</View>
 						) : null}
