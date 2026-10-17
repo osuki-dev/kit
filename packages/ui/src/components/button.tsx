@@ -56,8 +56,10 @@ export function useButton(): ButtonContextValue {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const styles = StyleSheet.create({
+	// A column, as in 1.x: a row root measures its content row against the
+	// parent's width inside a wrapping column, and the button grows past it.
 	baseRoot: {
-		flexDirection: "row",
+		flexDirection: "column",
 		alignItems: "center",
 		justifyContent: "center",
 		position: "relative",
@@ -155,7 +157,6 @@ export function ButtonRoot({
 			paddingHorizontal: theme.spacing[button.paddingX],
 			borderRadius,
 			opacity: loading ? 0.68 : 1,
-			gap: theme.spacing.sm,
 			...(variantTokens.border && {
 				borderWidth: StyleSheet.hairlineWidth,
 				borderColor: theme.colors[variantTokens.border],
@@ -185,6 +186,16 @@ export function ButtonRoot({
 		pressProgress.value = withSpring(0, theme.motion.press.springOut);
 		onPressOut?.(event);
 	};
+
+	// `Button.Background` stays a layer of the root; every other part goes in
+	// one centred row, so `<Button.Icon />` and `<Button.Label />` sit side by
+	// side inside the column root.
+	const layers: React.ReactNode[] = [];
+	const content: React.ReactNode[] = [];
+	for (const child of React.Children.toArray(children)) {
+		if (React.isValidElement(child) && child.type === ButtonBackground) layers.push(child);
+		else content.push(child);
+	}
 
 	const contextValue = useMemo<ButtonContextValue>(
 		() => ({
@@ -224,7 +235,10 @@ export function ButtonRoot({
 				onPressOut={handlePressOut}
 				{...rest}
 			>
-				{children}
+				{layers}
+				{content.length > 0 ? (
+					<View style={[styles.contentRow, { gap: theme.spacing.sm }]}>{content}</View>
+				) : null}
 			</AnimatedPressable>
 		</ButtonContext.Provider>
 	);
@@ -339,8 +353,6 @@ export function Button({
 	onPressOut,
 	...rest
 }: ButtonProps) {
-	const theme = useThemeTokens();
-
 	return (
 		<ButtonRoot
 			variant={variant}
@@ -353,21 +365,19 @@ export function Button({
 			{...rest}
 		>
 			<ButtonBackground />
-			<View style={[styles.contentRow, { gap: theme.spacing.sm }]}>
-				{loading ? (
-					<ButtonSpinner testID={rest.testID ? `${rest.testID}-spinner` : undefined} />
-				) : leftIcon ? (
-					<ButtonIcon name={leftIcon} />
-				) : null}
-				{typeof children === "string" ? (
-					<ButtonLabel>{loading && loadingLabel ? loadingLabel : children}</ButtonLabel>
-				) : loading && loadingLabel ? (
-					<ButtonLabel>{loadingLabel}</ButtonLabel>
-				) : (
-					children
-				)}
-				{!loading && rightIcon ? <ButtonIcon name={rightIcon} /> : null}
-			</View>
+			{loading ? (
+				<ButtonSpinner testID={rest.testID ? `${rest.testID}-spinner` : undefined} />
+			) : leftIcon ? (
+				<ButtonIcon name={leftIcon} />
+			) : null}
+			{typeof children === "string" ? (
+				<ButtonLabel>{loading && loadingLabel ? loadingLabel : children}</ButtonLabel>
+			) : loading && loadingLabel ? (
+				<ButtonLabel>{loadingLabel}</ButtonLabel>
+			) : (
+				children
+			)}
+			{!loading && rightIcon ? <ButtonIcon name={rightIcon} /> : null}
 		</ButtonRoot>
 	);
 }
