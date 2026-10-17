@@ -10,7 +10,6 @@ import React, {
 import {
 	Pressable,
 	StyleSheet,
-	Text as RNText,
 	View,
 	type GestureResponderEvent,
 	type StyleProp,
@@ -25,6 +24,7 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import { useThemeTokens } from "../theme";
+import { Text } from "./text";
 import { Icon } from "./icon";
 
 export type TraceStepStatus = "pending" | "running" | "success" | "error";
@@ -238,20 +238,22 @@ export interface TraceTitleProps {
 export function TraceTitle({ children, numberOfLines = 1, style }: TraceTitleProps) {
 	const theme = useThemeTokens();
 	return (
-		<RNText
+		<Text
+			variant="bodySmall"
 			numberOfLines={numberOfLines}
 			style={[
 				styles.title,
 				{
 					color: theme.colors.text,
 					fontSize: 14,
+					lineHeight: 20,
 					fontWeight: "500",
 				},
 				style,
 			]}
 		>
 			{children}
-		</RNText>
+		</Text>
 	);
 }
 
@@ -322,7 +324,8 @@ export function TraceBadge({ children, variant, style }: TraceBadgeProps) {
 				style,
 			]}
 		>
-			<RNText
+			<Text
+				variant="bodySmall"
 				style={[
 					styles.badgeText,
 					{
@@ -331,7 +334,7 @@ export function TraceBadge({ children, variant, style }: TraceBadgeProps) {
 				]}
 			>
 				{content}
-			</RNText>
+			</Text>
 		</View>
 	);
 }
@@ -362,7 +365,8 @@ export function TraceContent({ children, style, textStyle, ...props }: TraceCont
 			{...props}
 		>
 			{typeof children === "string" ? (
-				<RNText
+				<Text
+					variant="bodySmall"
 					style={[
 						styles.contentText,
 						{
@@ -372,7 +376,7 @@ export function TraceContent({ children, style, textStyle, ...props }: TraceCont
 					]}
 				>
 					{children}
-				</RNText>
+				</Text>
 			) : (
 				children
 			)}
@@ -484,6 +488,7 @@ const styles = StyleSheet.create({
 	},
 	badgeText: {
 		fontSize: 11,
+		lineHeight: 14,
 		fontWeight: "600",
 		textTransform: "uppercase",
 		letterSpacing: 0.3,

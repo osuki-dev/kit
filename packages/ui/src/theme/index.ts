@@ -8,20 +8,26 @@ export {
 } from "./tokens";
 export { spacing, type SpacingToken } from "./spacing";
 export {
+	fontWeightName,
 	fonts,
 	resolveFontStyle,
 	typeScale,
 	typeStyles,
+	type FontAxisRange,
 	type FontFamily,
 	type FontDefinition,
 	type FontRegistry,
+	type FontVariationSettings,
 	type FontWeight,
+	type FontWeightValue,
 	type NativeFontWeight,
+	type ResolveFontStyleOptions,
 	type ResolvedFontStyle,
 	type TypeStyle,
 	type TypeStyleName,
 	type TypeToken,
 	type TypographyStyles,
+	type VariableFontAxes,
 } from "./typography";
 export { motion, radius, shadow, iconography, type RadiusToken } from "./motion";
 export { createTheme, extendTheme, createBaseTheme, deepMerge } from "./create-theme";

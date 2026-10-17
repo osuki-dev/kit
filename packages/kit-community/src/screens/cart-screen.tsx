@@ -20,6 +20,7 @@ import {
 	Image,
 	type ImageProps,
 	Tag,
+	resolveFontStyle,
 	useTheme,
 	useResponsiveTheme,
 	ResponsiveContainer,
@@ -302,7 +303,7 @@ export function CartScreen({
 	onScroll,
 	styleOverrides,
 }: CartScreenProps) {
-	const { colors, spacing, shadow, mode } = useTheme();
+	const { colors, spacing, shadow, mode, fonts, typeStyles } = useTheme();
 	const { pagePadding } = useResponsiveTheme();
 	const insets = useSafeAreaInsets();
 	const { t } = useI18n();
@@ -589,6 +590,7 @@ export function CartScreen({
 									style={[
 										staticStyles.promoInput,
 										{
+											...resolveFontStyle(fonts, typeStyles.body.fontFamily, "regular"),
 											color: colors.text,
 											backgroundColor: colors.surfaceRaised,
 										},

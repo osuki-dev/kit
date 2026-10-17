@@ -172,6 +172,63 @@ Weights not supplied fall back to the nearest configured weight — asking for
 `semibold` when only `bold` and `regular` exist resolves to `bold`, not to
 nothing.
 
+### Variable fonts
+
+A variable face is one loaded file with design axes. Name it as `family` and
+declare its axes, with the ranges from the font's `fvar` table:
+
+```tsx
+const theme = {
+	fonts: {
+		body: {
+			family: "InterVariable",
+			axes: {
+				wght: { min: 100, max: 900 },
+				opsz: { min: 14, max: 32 }, // optional
+				wdth: { min: 75, max: 100 }, // optional
+			},
+			width: 87.5, // optional: the wdth this role is set at
+		},
+	},
+};
+```
+
+Every weight of that role then resolves to the one family at native weight
+`"400"`, with the requested weight on the `wght` axis:
+
+```ts
+resolveFontStyle(theme.fonts, "body", "bold", { fontSize: 16 });
+// { fontFamily: "InterVariable", fontWeight: "400",
+//   fontVariationSettings: { wght: 700, opsz: 16 } }
+```
+
+- `wght` takes the named weight (`bold` is 700) or any number from 1 to 1000
+  (`<Text weight={850}>`), clamped to the declared range.
+- `opsz` follows the text size when the face has an optical size axis, the
+  way CSS `font-optical-sizing: auto` does.
+- `wdth` is set only when the role names a `width`.
+
+Why native weight 400: on Android, `expo-font` registers a loaded face under
+the normal style only, so a native 700 misses it and falls back to the system
+bold. A static family can therefore never reach 700 in an app-loaded face; a
+variable one reaches any weight it has through the axis.
+
+Every kit component that draws text resolves through this: `Text` and
+everything built on it, the fields (`Input`, `SearchInput`, `Textarea`,
+`PromptInput`, `Command`), and the navigation theme. A `fontWeight` in a
+`Text` style is treated as a weight request too, unless that style also sets
+its own `fontFamily`.
+
+On Android, `Text` keeps the axes off the paragraph and puts them on one inner
+run. React Native measures the paragraph with a paint that already carries the
+axes, the run's span then sets the same settings again, and Android ignores an
+unchanged settings string, so the run would be measured at the font's default
+instance and drawn at the requested one: heavier text overflowed its box and
+wrapped or lost letters. If you render `fontVariationSettings` yourself in a
+React Native `Text`, do the same.
+
+Variable fonts need React Native 0.88 or later, which this release requires.
+
 ## Light and dark
 
 `ThemeProvider` resolves the mode. It never hands components `"system"`; by the
