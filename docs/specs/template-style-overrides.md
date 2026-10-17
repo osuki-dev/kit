@@ -4,63 +4,63 @@ Scope: feature
 
 # Template Style Override Specification
 
-## 概述
+## Overview
 
-为所有模板提供统一的样式覆盖能力，支持容器、头部、内容区域样式以及特定组件样式覆盖。
+Provide a unified style override capability for all templates, covering container, header, and content area styles as well as specific component styles.
 
-## 核心接口
+## Core interfaces
 
 ### BaseStyleOverrides
 
-所有模板共享的基础样式覆盖接口：
+The base style override interface shared by all templates:
 
 ```typescript
 interface BaseStyleOverrides {
-	// 最外层容器样式
+	// Outermost container style
 	container?: ViewStyle;
-	// 头部区域样式（包含标题、副标题、操作按钮）
+	// Header area style (contains the title, subtitle, and action buttons)
 	header?: ViewStyle;
-	// 内容区域样式
+	// Content area style
 	content?: ViewStyle;
-	// 底部区域样式（通常包含操作按钮）
+	// Footer area style (usually contains action buttons)
 	footer?: ViewStyle;
-	// 滚动视图样式
+	// Scroll view style
 	scrollView?: ScrollViewProps["style"];
-	// 内容容器内边距
+	// Content container padding
 	contentPadding?: ResponsiveValue<number>;
 }
 ```
 
 ### ComponentStyleOverrides
 
-可覆盖的组件样式映射：
+The map of overridable component styles:
 
 ```typescript
 interface ComponentStyleOverrides {
-	// 按钮样式覆盖
+	// Button style overrides
 	button?: {
 		variant?: ButtonVariant;
 		size?: ButtonSize;
 		style?: ViewStyle;
 	};
-	// 卡片样式覆盖
+	// Card style overrides
 	card?: {
 		variant?: CardVariant;
 		padding?: SpacingToken;
 		style?: ViewStyle;
 	};
-	// 输入框样式覆盖
+	// Input style overrides
 	input?: {
 		variant?: InputVariant;
 		size?: InputSize;
 		style?: ViewStyle;
 	};
-	// 文本样式覆盖
+	// Text style overrides
 	text?: {
 		variant?: TextVariant;
 		style?: TextStyle;
 	};
-	// 列表项样式覆盖
+	// List item style overrides
 	listItem?: {
 		style?: ViewStyle;
 		iconSize?: number;
@@ -68,108 +68,108 @@ interface ComponentStyleOverrides {
 }
 ```
 
-### TemplateProps 基类
+### TemplateProps base
 
-所有模板 Props 继承此基类：
+All template props extend this base:
 
 ```typescript
 interface TemplateProps {
-	// 样式覆盖配置
+	// Style override configuration
 	styleOverrides?: BaseStyleOverrides & {
 		components?: ComponentStyleOverrides;
 	};
-	// 主题覆盖（局部主题）
+	// Theme override (local theme)
 	themeOverride?: Partial<Theme>;
-	// 是否禁用默认样式
+	// Whether to disable the default styles
 	disableDefaultStyles?: boolean;
 }
 ```
 
-## 模板特定覆盖
+## Template-specific overrides
 
-### ProductScreen 额外覆盖
+### ProductScreen additional overrides
 
 ```typescript
 interface ProductScreenStyleOverrides extends BaseStyleOverrides {
-	// 产品图片区域
+	// Product image section
 	imageSection?: ViewStyle;
-	// 产品信息区域（标题、价格、描述）
+	// Product info section (title, price, description)
 	infoSection?: ViewStyle;
-	// 规格选择区域
+	// Spec selection section
 	specsSection?: ViewStyle;
-	// 购买按钮区域
+	// Purchase button section
 	purchaseSection?: ViewStyle;
-	// 推荐产品区域
+	// Recommended products section
 	recommendationsSection?: ViewStyle;
 }
 ```
 
-### CartScreen 额外覆盖
+### CartScreen additional overrides
 
 ```typescript
 interface CartScreenStyleOverrides extends BaseStyleOverrides {
-	// 商品项样式
+	// Item style
 	item?: ViewStyle;
-	// 商品图片样式
+	// Item image style
 	itemImage?: ViewStyle;
-	// 商品信息样式
+	// Item info style
 	itemInfo?: ViewStyle;
-	// 数量调整器样式
+	// Quantity controls style
 	quantityControls?: ViewStyle;
-	// 结算摘要区域
+	// Checkout summary section
 	summarySection?: ViewStyle;
 }
 ```
 
-### ArticleScreen 额外覆盖
+### ArticleScreen additional overrides
 
 ```typescript
 interface ArticleScreenStyleOverrides extends BaseStyleOverrides {
-	// 文章标题样式
+	// Article title style
 	title?: TextStyle;
-	// 作者信息区域
+	// Author info section
 	authorSection?: ViewStyle;
-	// 文章内容样式
+	// Article body style
 	body?: TextStyle;
-	// 图片样式
+	// Image style
 	image?: ImageStyle;
-	// 标签区域样式
+	// Tags section style
 	tagsSection?: ViewStyle;
 }
 ```
 
-### CalendarScreen 额外覆盖
+### CalendarScreen additional overrides
 
 ```typescript
 interface CalendarScreenStyleOverrides extends BaseStyleOverrides {
-	// 日历头部（年月、切换按钮）
+	// Calendar header (year and month, navigation buttons)
 	calendarHeader?: ViewStyle;
-	// 星期标题行
+	// Weekday header row
 	weekDaysHeader?: ViewStyle;
-	// 日期格子样式
+	// Day cell style
 	dayCell?: ViewStyle;
-	// 选中日期样式
+	// Selected day style
 	selectedDay?: ViewStyle;
-	// 今天日期样式
+	// Today cell style
 	todayCell?: ViewStyle;
-	// 事件指示器样式
+	// Event indicator style
 	eventIndicator?: ViewStyle;
 }
 ```
 
-## 样式应用优先级
+## Style precedence
 
-样式应用遵循以下优先级（从高到低）：
+Styles are applied in the following order of precedence (highest to lowest):
 
-1. **内联动态样式** - 组件运行时计算的最具体样式
-2. **styleOverrides** - 用户传入的自定义样式
-3. **themeOverride** - 用户传入的局部主题
-4. **默认模板样式** - 模板自带的默认样式
-5. **全局主题** - 应用级别的主题配置
+1. **Inline dynamic styles** - the most specific styles, computed by the component at runtime
+2. **styleOverrides** - custom styles passed in by the user
+3. **themeOverride** - a local theme passed in by the user
+4. **Default template styles** - the template's built-in default styles
+5. **Global theme** - the app-level theme configuration
 
-## 使用示例
+## Usage examples
 
-### 基础样式覆盖
+### Basic style overrides
 
 ```tsx
 <ProductScreen
@@ -182,7 +182,7 @@ interface CalendarScreenStyleOverrides extends BaseStyleOverrides {
 />
 ```
 
-### 组件样式覆盖
+### Component style overrides
 
 ```tsx
 <CartScreen
@@ -203,7 +203,7 @@ interface CalendarScreenStyleOverrides extends BaseStyleOverrides {
 />
 ```
 
-### 主题覆盖
+### Theme override
 
 ```tsx
 <ArticleScreen
@@ -223,7 +223,7 @@ interface CalendarScreenStyleOverrides extends BaseStyleOverrides {
 />
 ```
 
-### 完全自定义（禁用默认样式）
+### Fully custom (default styles disabled)
 
 ```tsx
 <ErrorScreen
@@ -236,9 +236,9 @@ interface CalendarScreenStyleOverrides extends BaseStyleOverrides {
 />
 ```
 
-## 响应式样式
+## Responsive styles
 
-样式覆盖支持响应式值：
+Style overrides support responsive values:
 
 ```typescript
 type ResponsiveValue<T> = T | { xs?: T; sm?: T; md?: T; lg?: T; xl?: T };
@@ -249,7 +249,7 @@ interface ResponsiveStyleOverrides extends BaseStyleOverrides {
 }
 ```
 
-使用示例：
+Usage example:
 
 ```tsx
 <ProductScreen
@@ -263,18 +263,18 @@ interface ResponsiveStyleOverrides extends BaseStyleOverrides {
 />
 ```
 
-## 实现要求
+## Implementation requirements
 
-1. 每个模板必须接受 `styleOverrides` prop
-2. 样式合并使用 `StyleSheet.flatten()` 或数组形式
-3. 组件样式通过 Context 传递给子组件
-4. 支持 TypeScript 类型推断
-5. 样式覆盖不应破坏模板的响应式行为
+1. Every template must accept a `styleOverrides` prop
+2. Merge styles with `StyleSheet.flatten()` or the array form
+3. Component styles are passed to child components through Context
+4. Support TypeScript type inference
+5. Style overrides must not break the template's responsive behavior
 
-## 样式合并工具函数
+## Style merge utilities
 
 ```typescript
-// 合并默认样式和用户覆盖样式
+// Merge the default style with the user's override style
 function mergeStyles<T>(defaultStyle: T, override?: T, disableDefault?: boolean): T {
 	if (disableDefault) return override || ({} as T);
 	if (!override) return defaultStyle;
@@ -285,7 +285,7 @@ function mergeStyles<T>(defaultStyle: T, override?: T, disableDefault?: boolean)
 	};
 }
 
-// 处理响应式样式
+// Resolve responsive styles
 function resolveResponsiveStyle<T>(style: ResponsiveValue<T>, breakpoint: Breakpoint): T {
 	if (typeof style !== "object" || !("xs" in style)) {
 		return style as T;
@@ -298,10 +298,10 @@ function resolveResponsiveStyle<T>(style: ResponsiveValue<T>, breakpoint: Breakp
 }
 ```
 
-## 测试要求
+## Testing requirements
 
-1. 每个模板的样式覆盖必须通过视觉回归测试
-2. 验证样式优先级正确应用
-3. 测试响应式样式在不同屏幕尺寸下的表现
-4. 测试 `disableDefaultStyles` 行为
-5. 验证主题覆盖不影响其他页面
+1. Each template's style overrides must pass visual regression tests
+2. Verify that style precedence is applied correctly
+3. Test how responsive styles behave at different screen sizes
+4. Test the `disableDefaultStyles` behavior
+5. Verify that theme overrides do not affect other screens
