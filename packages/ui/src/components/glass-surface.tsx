@@ -34,23 +34,32 @@ interface BlurModule {
 	BlurView?: AnyComponent;
 }
 
-// Resilient dynamic loader that prevents Metro static bundling errors
-function safeRequire<T>(moduleName: string): T | null {
+// Optional native modules. Each `require` names its module literally so Metro
+// can see it: Expo's Metro config allows optional dependencies, so a missing
+// package becomes a runtime throw inside the `try` instead of a bundling error.
+// A dynamically built `require` would never resolve in a Metro bundle.
+let glassModule: GlassModule | null | undefined;
+let blurModule: BlurModule | null | undefined;
+
+function getGlassModule(): GlassModule | null {
+	if (glassModule !== undefined) return glassModule;
 	try {
-		// Evaluated dynamically to avoid bundling failures when peer packages are absent
-		// eslint-disable-next-line @typescript-eslint/no-implied-eval
-		const dynamicRequire = new Function(
-			"name",
-			"try { return typeof require !== 'undefined' ? require(name) : null; } catch (e) { return null; }",
-		);
-		return dynamicRequire(moduleName) as T | null;
+		glassModule = require("expo-glass-effect") as GlassModule;
 	} catch {
-		return null;
+		glassModule = null;
 	}
+	return glassModule;
 }
 
-const glassModule = safeRequire<GlassModule>("expo-glass-effect");
-const blurModule = safeRequire<BlurModule>("expo-blur");
+function getBlurModule(): BlurModule | null {
+	if (blurModule !== undefined) return blurModule;
+	try {
+		blurModule = require("expo-blur") as BlurModule;
+	} catch {
+		blurModule = null;
+	}
+	return blurModule;
+}
 
 /**
  * GlassSurface component
@@ -72,16 +81,13 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
 	const isDark = theme.mode === "dark";
 	const resolvedRadius = borderRadius ?? (face === "sheet" ? theme.radius.lg : theme.radius.md);
 
-	const isLiquidGlassLive =
-		Platform.OS === "ios" &&
-		Boolean(
-			glassModule?.GlassView &&
-			glassModule?.isLiquidGlassAvailable?.() &&
-			glassModule?.isGlassEffectAPIAvailable?.(),
-		);
+	const glass = Platform.OS === "ios" ? getGlassModule() : null;
+	const isLiquidGlassLive = Boolean(
+		glass?.GlassView && glass.isLiquidGlassAvailable?.() && glass.isGlassEffectAPIAvailable?.(),
+	);
 
-	if (isLiquidGlassLive && glassModule?.GlassView) {
-		const GlassView = glassModule.GlassView;
+	if (isLiquidGlassLive && glass?.GlassView) {
+		const GlassView = glass.GlassView;
 		const defaultTint =
 			face === "sheet"
 				? withAlpha(theme.colors.surfaceRaised, 0.4)
@@ -104,8 +110,9 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
 		);
 	}
 
-	if (blurModule?.BlurView) {
-		const BlurView = blurModule.BlurView;
+	const blur = getBlurModule();
+	if (blur?.BlurView) {
+		const BlurView = blur.BlurView;
 		const defaultIntensity = intensity ?? (face === "sheet" ? 50 : 78);
 		const defaultOverlay = tint ?? withAlpha(theme.colors.surfaceRaised, 0.25);
 
