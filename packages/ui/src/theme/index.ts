@@ -29,7 +29,7 @@ export {
 	type TypographyStyles,
 	type VariableFontAxes,
 } from "./typography";
-export { motion, radius, shadow, iconography, type RadiusToken } from "./motion";
+export { motion, radius, shadow, iconography, type PressEasing, type RadiusToken } from "./motion";
 export { createTheme, extendTheme, createBaseTheme, deepMerge } from "./create-theme";
 export {
 	createThemePreset,

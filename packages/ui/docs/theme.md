@@ -357,9 +357,21 @@ of control settles at while held — `control` (Button), `card` (PressableCard),
 `PressableScale` and `SegmentedControl` also stay still when the system
 reduce-motion setting is on; the selection haptic still plays.
 
+`inMs` and `outMs` time the `PressableScale` dip (and so the segmented
+option's), and `easing` is its curve, `Easing.out(Easing.cubic)` by default.
+It takes any Reanimated easing, so a bezier works too:
+
 ```tsx
-<ThemeProvider theme={{ motion: { press: { control: 0.97, surface: 0.96 } } }}>
+import { Easing } from "react-native-reanimated";
+
+<ThemeProvider
+	theme={{
+		motion: { press: { control: 0.97, surface: 0.96, easing: Easing.bezier(0.2, 0, 0, 1) } },
+	}}
+>
 ```
+
+`Button` and `PressableCard` press on springs, `springIn` and `springOut`.
 
 Translucent, image-backed and gradient-backed fills come from the surface
 decorator, below.
