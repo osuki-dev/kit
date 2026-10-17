@@ -73,7 +73,16 @@ mock.module("react-native-reanimated", () => ({
 	Layout: layout,
 	interpolateColor: () => "transparent",
 	useAnimatedStyle: (factory: () => unknown) => factory(),
-	useSharedValue: (value: unknown) => ({ value }),
+	useSharedValue: (value: unknown) => {
+		const shared = {
+			value,
+			get: () => shared.value,
+			set: (next: unknown) => {
+				shared.value = next;
+			},
+		};
+		return shared;
+	},
 	withDelay: (_delay: unknown, animation: unknown) => animation,
 	withRepeat: (animation: unknown) => animation,
 	withSpring: (value: unknown) => value,
@@ -107,6 +116,7 @@ const { Skeleton } = await import("./components/skeleton");
 const { Input, InputFrameContext } = await import("./components/input");
 const { splitFieldStyle } = await import("./utils/text-field");
 const { withHugSlack } = await import("./components/text");
+const { TabsList, TabsRoot, TabsTrigger } = await import("./components/tabs");
 
 test("Surface exposes compound subcomponents and functions as facade", () => {
 	assert.equal(typeof Surface, "function");
@@ -412,4 +422,45 @@ test("withHugSlack adds a trailing thin space on Android only", () => {
 	assert.equal(withHugSlack("", "android"), "");
 	assert.equal(withHugSlack(wide, "ios"), wide);
 	assert.equal(withHugSlack(12, "android"), "12\u2009");
+});
+
+test("Tabs segments layering leaves the track clear and paints each trigger once", () => {
+	const metas: Array<{ slot?: string; role?: string; over?: string; baseColor: string }> = [];
+	contextStore.set(SurfaceDecoratorContext, {
+		transformBackground: (color: string, meta: (typeof metas)[number]) => {
+			metas.push(meta);
+			return `tint(${color})`;
+		},
+	});
+	try {
+		const root = renderComponent(
+			React.createElement(TabsRoot, {
+				value: "a",
+				variant: "pill",
+				layering: "segments",
+				children: null,
+			}),
+		);
+		contextStore.set(root.type, root.props.value);
+		const listProvider = renderComponent(React.createElement(TabsList, { children: null }));
+		const listValue = listProvider.props.value as { trackFill: string };
+		assert.equal(listValue.trackFill, "transparent");
+		const list = listProvider.props.children as AnyElement;
+		assert.equal(flattenStyle(list.props.style).backgroundColor, "transparent");
+		contextStore.set(listProvider.type, listValue);
+
+		const { colors, components } = defaultTheme;
+		const fillOf = (value: string) => {
+			const trigger = renderComponent(React.createElement(TabsTrigger, { value, children: null }));
+			const style = trigger.props.style as (state: { pressed: boolean }) => unknown;
+			return flattenStyle(style({ pressed: false })).backgroundColor;
+		};
+		assert.equal(fillOf("a"), `tint(${colors[components.Tabs.activeBackground]})`);
+		assert.equal(fillOf("b"), `tint(${colors[components.Tabs.background]})`);
+		const selected = metas.find((meta) => meta.slot === "tabs.selected");
+		assert.equal(selected?.role, "surface");
+		assert.equal(selected?.over, undefined);
+	} finally {
+		contextStore.clear();
+	}
 });

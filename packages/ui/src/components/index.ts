@@ -163,6 +163,7 @@ export {
 	type TabsBadgeProps,
 	type TabsContextValue,
 	type TabsIndicator,
+	type TabsLayering,
 	type TabsLabelProps,
 	type TabsListProps,
 	type TabsMeta,

@@ -164,6 +164,11 @@ line is.
 | `Dialog`      | A decision, with a tone that colours the icon: `default`, `success`, `warning`, `danger`. Composed via `Dialog.Root` / `Trigger` / `Content` / `Header` / `Icon` / `HeaderText` / `Title` / `Description` / `Body` / `Actions` / `Action` / `Close`. | `visible`, `onClose`, `title`, `message`, `icon`, `tone`, `actions`, `actionLayout`                                                        |
 | `Tooltip`     | One sentence of help attached to a control, without a screen of its own.                                                                                                                                                                             | `content`, `children`, `title`, `placement`, `visible`, `onVisibleChange`, `defaultVisible`, `disabled`                                    |
 
+`Tabs` in the `pill` variant paints its track on the list and the selection
+over it by default (`layering="overlay"`). `layering="segments"` leaves the
+list clear and has each trigger paint its own fill instead, which is what a
+translucent pill wants (see [theme.md](./theme.md#surface-decoration)).
+
 `Sheet` is the one namespace that is **not** callable on its own — there is no
 `<Sheet />`. Use `BottomSheet` for the convenience form. `Modal`, `Dialog` and
 `Tabs` are callable and namespaced at the same time.
