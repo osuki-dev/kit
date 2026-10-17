@@ -12,6 +12,10 @@ It provides configurable typography, semantic theme tokens, native-feeling contr
 - **Accessible**: 44px touch targets, semantic colors
 - **Responsive**: Breakpoint-aware components
 
+## Upgrading from 1.x
+
+See [the 2.0 migration guide](https://github.com/osuki-dev/kit/blob/main/docs/migrating-to-2.0.md).
+
 ## Installation
 
 ```bash
