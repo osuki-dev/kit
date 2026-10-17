@@ -73,6 +73,7 @@ export type {
 	RadiusScale,
 	SemanticTokens,
 	SheetTokens,
+	ShadowToken,
 	SurfaceTokens,
 	SpacingScale,
 	TabsTokens,

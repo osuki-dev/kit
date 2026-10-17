@@ -339,6 +339,7 @@ The ones that shape an app's whole appearance:
 | Token                                                                                       | Controls                                          |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `Button.radius`, `Input.radius`, `Input.searchRadius`                                       | control corners                                   |
+| `Button.{variant}.shadow`                                                                   | light-mode lift of a filled button (`ghost` flat) |
 | `Card.radius`                                                                               | which radius token each `Card` `radius` maps to   |
 | `Tabs.radius`, `Tabs.background`, `Tabs.activeBackground`                                   | the `pill` tabs track and selected trigger        |
 | `Tabs.activeForeground`, `Tabs.inactiveForeground`, `Tabs.indicator`                        | tab labels and the underline                      |

@@ -252,7 +252,12 @@ export function ButtonBackground({ style, children, ...props }: ButtonBackground
 	const { resolvedBackgroundColor, borderRadius, meta, variant, disabled } = useButton();
 	const theme = useThemeTokens();
 	const variantTokens = theme.components.Button[variant];
-	const lift = !disabled && variantTokens.background !== "transparent" && theme.mode === "light";
+	const shadowToken = variantTokens.shadow ?? "pill";
+	const lift =
+		!disabled &&
+		shadowToken !== "none" &&
+		variantTokens.background !== "transparent" &&
+		theme.mode === "light";
 
 	return (
 		<View
@@ -263,7 +268,7 @@ export function ButtonBackground({ style, children, ...props }: ButtonBackground
 				{
 					backgroundColor: resolvedBackgroundColor,
 					borderRadius,
-					...(lift ? theme.shadow.pill : {}),
+					...(lift ? theme.shadow[shadowToken] : {}),
 				},
 				style,
 			]}
