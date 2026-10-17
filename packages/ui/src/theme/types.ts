@@ -43,6 +43,7 @@ export interface ThemeColors {
 export type ColorToken = keyof ThemeColors;
 export type SpaceToken = keyof typeof spacing;
 export type RadiusToken = keyof typeof radius;
+export type ShadowToken = keyof typeof shadow;
 export type SpacingScale = Record<SpaceToken, number>;
 export type RadiusScale = Record<RadiusToken, number>;
 
@@ -78,6 +79,11 @@ export interface ButtonVariantTokens {
 	background: ColorToken | "transparent";
 	foreground: ColorToken;
 	border?: ColorToken;
+	/**
+	 * Light-mode lift under an enabled button with a fill. Defaults to `pill`;
+	 * `ghost` is `none`, so a ghost given a fill stays flat.
+	 */
+	shadow?: ShadowToken;
 }
 
 export interface ButtonTokens {
