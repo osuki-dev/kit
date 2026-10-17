@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { View, ScrollView, StyleSheet, Pressable } from "react-native";
+import { router } from "expo-router";
 import {
 	Screen,
 	TopBar,
@@ -132,6 +133,14 @@ export default function ThemingAndIconsScreen() {
 							External applications can inject surface background transforms, card fills, and icon
 							resolvers without altering primitive component code or incurring CSS-in-JS overhead.
 						</Text>
+						<Button
+							variant="secondary"
+							style={{ marginTop: 12 }}
+							onPress={() => router.push("/custom-theme")}
+							testID="open-custom-theme"
+						>
+							Open the custom-theme screen
+						</Button>
 					</Card>
 
 					{/* 1. Vercel Surface Decorator Playground */}
