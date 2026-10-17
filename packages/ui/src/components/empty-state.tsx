@@ -40,7 +40,13 @@ export function EmptyStateRoot({
 	);
 }
 
-export function EmptyStateIcon({ name, size = "default" }: { name: IconName; size?: "default" | "compact" }) {
+export function EmptyStateIcon({
+	name,
+	size = "default",
+}: {
+	name: IconName;
+	size?: "default" | "compact";
+}) {
 	const theme = useThemeTokens();
 	const compact = size === "compact";
 	const dimension = compact ? 48 : 64;
@@ -65,9 +71,19 @@ export function EmptyStateIcon({ name, size = "default" }: { name: IconName; siz
 	);
 }
 
-export function EmptyStateTitle({ children, size = "default" }: { children?: ReactNode; size?: "default" | "compact" }) {
+export function EmptyStateTitle({
+	children,
+	size = "default",
+}: {
+	children?: ReactNode;
+	size?: "default" | "compact";
+}) {
 	return (
-		<Text variant={size === "compact" ? "body" : "subheading"} colorKey="text" style={{ textAlign: "center" }}>
+		<Text
+			variant={size === "compact" ? "body" : "subheading"}
+			colorKey="text"
+			style={{ textAlign: "center" }}
+		>
 			{children}
 		</Text>
 	);

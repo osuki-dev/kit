@@ -1,11 +1,13 @@
 # Repository boundary
 
 This repository is public and MIT licensed. It contains two published packages
-and one showcase app:
+and two showcase apps:
 
 - `packages/ui` — `@osuki-dev/ui`, the UI primitives and theme
 - `packages/kit-community` — `@osuki-dev/kit-community`, the screen templates
 - `apps/native` — the Expo showcase app that exercises both
+- `apps/showcase` — a focused Expo app for the 2.0 primitives, AI elements,
+  composition theming, and templates
 
 That is the whole scope. Never add product business logic, production
 credentials, license enforcement, or deployment automation here. These packages

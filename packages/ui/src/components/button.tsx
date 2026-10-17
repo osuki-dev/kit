@@ -106,7 +106,9 @@ export function ButtonRoot({
 	const flatStyle = StyleSheet.flatten(style);
 	const fillOverride = readStringFill(style);
 	const borderRadius =
-		typeof flatStyle?.borderRadius === "number" ? flatStyle.borderRadius : theme.radius[button.radius];
+		typeof flatStyle?.borderRadius === "number"
+			? flatStyle.borderRadius
+			: theme.radius[button.radius];
 
 	const backgroundToken = disabled ? "surfaceRaised" : variantTokens.background;
 	const tokenColor =

@@ -157,8 +157,10 @@ export function Calendar({
 			<View style={styles.grid}>
 				{cells.map((day, index) => {
 					if (!day) return <View key={`empty-${index}`} style={styles.cell} />;
-					const isSelected = mode === "single" ? day === selected : day === bounds.from || day === bounds.to;
-					const inSpan = mode === "range" && bounds.from && bounds.to && day >= bounds.from && day <= bounds.to;
+					const isSelected =
+						mode === "single" ? day === selected : day === bounds.from || day === bounds.to;
+					const inSpan =
+						mode === "range" && bounds.from && bounds.to && day >= bounds.from && day <= bounds.to;
 					let background = "transparent";
 					let color = theme.colors.text;
 					if (isSelected) {
@@ -180,7 +182,9 @@ export function Calendar({
 								style={[
 									styles.day,
 									{ backgroundColor: background },
-									isToday && !isSelected ? { borderColor: theme.colors.primary, borderWidth: StyleSheet.hairlineWidth } : null,
+									isToday && !isSelected
+										? { borderColor: theme.colors.primary, borderWidth: StyleSheet.hairlineWidth }
+										: null,
 								]}
 							>
 								<Text variant="bodySmall" color={color}>

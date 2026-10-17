@@ -145,7 +145,13 @@ export function PopoverContent({ children, width = 280, style, ...props }: Popov
 	if (left < theme.spacing.md) left = theme.spacing.md;
 
 	return (
-		<Modal transparent visible animationType="fade" onRequestClose={actions.close} statusBarTranslucent>
+		<Modal
+			transparent
+			visible
+			animationType="fade"
+			onRequestClose={actions.close}
+			statusBarTranslucent
+		>
 			<View style={styles.backdrop}>
 				<Pressable style={StyleSheet.absoluteFill} onPress={actions.close} />
 				<View

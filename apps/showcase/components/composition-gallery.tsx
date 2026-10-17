@@ -75,7 +75,12 @@ export function CompositionGallery() {
 				</Popover.Content>
 			</Popover.Root>
 
-			<Combobox options={OPTIONS} value={choice} onChange={setChoice} placeholder="Choose a section" />
+			<Combobox
+				options={OPTIONS}
+				value={choice}
+				onChange={setChoice}
+				placeholder="Choose a section"
+			/>
 
 			<Field.Root required>
 				<Field.Label>Weight</Field.Label>

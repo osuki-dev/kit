@@ -141,10 +141,7 @@ export function CommandInput({
 	const { state, actions, meta } = useCommand();
 	return (
 		<View
-			style={[
-				styles.inputRow,
-				{ borderBottomColor: theme.colors.border, gap: theme.spacing.sm },
-			]}
+			style={[styles.inputRow, { borderBottomColor: theme.colors.border, gap: theme.spacing.sm }]}
 		>
 			<Icon name="Search" size={16} color={theme.colors.textMuted} />
 			<TextInput
@@ -192,7 +189,13 @@ export interface CommandItemProps {
 	children?: ReactNode;
 }
 
-export function CommandItem({ value, keywords = "", disabled = false, onSelect, children }: CommandItemProps) {
+export function CommandItem({
+	value,
+	keywords = "",
+	disabled = false,
+	onSelect,
+	children,
+}: CommandItemProps) {
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
 	const id = useId();
@@ -242,13 +245,7 @@ export interface CommandProps extends CommandRootProps {
 	empty?: ReactNode;
 }
 
-export function Command({
-	options,
-	onSelect,
-	placeholder,
-	empty,
-	...props
-}: CommandProps) {
+export function Command({ options, onSelect, placeholder, empty, ...props }: CommandProps) {
 	return (
 		<CommandRoot {...props}>
 			<CommandInput placeholder={placeholder} />

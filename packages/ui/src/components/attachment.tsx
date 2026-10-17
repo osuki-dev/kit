@@ -83,7 +83,10 @@ export function AttachmentStatusIcon({ status = "ready" }: { status?: Attachment
 	return null;
 }
 
-export function AttachmentRemove({ accessibilityLabel = "Remove attachment", ...props }: PressableProps) {
+export function AttachmentRemove({
+	accessibilityLabel = "Remove attachment",
+	...props
+}: PressableProps) {
 	const theme = useThemeTokens();
 	return (
 		<Pressable

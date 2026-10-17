@@ -129,7 +129,11 @@ export function AvatarFallback({
 		);
 	}
 	return (
-		<Text style={{ fontSize: fontSizeMap[size], color: colors.text }} weight="bold" transform="uppercase">
+		<Text
+			style={{ fontSize: fontSizeMap[size], color: colors.text }}
+			weight="bold"
+			transform="uppercase"
+		>
 			{initials.slice(0, 2).toUpperCase()}
 		</Text>
 	);
@@ -159,12 +163,17 @@ export function AvatarStatus({ testID, size = "md" }: { testID?: string; size?: 
 
 function AvatarFacade({ source, initials, size = "md", isOnline, style, testID }: AvatarProps) {
 	let face: React.ReactNode = <AvatarFallback size={size} />;
-	if (source) face = <AvatarImage source={source} size={size} testID={testID ? `${testID}-image` : undefined} />;
+	if (source)
+		face = (
+			<AvatarImage source={source} size={size} testID={testID ? `${testID}-image` : undefined} />
+		);
 	else if (initials) face = <AvatarFallback initials={initials} size={size} />;
 	return (
 		<AvatarRoot size={size} style={style} testID={testID}>
 			{face}
-			{isOnline ? <AvatarStatus size={size} testID={testID ? `${testID}-status` : undefined} /> : null}
+			{isOnline ? (
+				<AvatarStatus size={size} testID={testID ? `${testID}-status` : undefined} />
+			) : null}
 		</AvatarRoot>
 	);
 }

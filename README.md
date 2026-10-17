@@ -93,6 +93,14 @@ cd apps/native
 bun run ios       # or: bun run android
 ```
 
+`apps/showcase` is a smaller Expo app dedicated to the 2.0 surface: the
+primitives, the AI elements, composition theming, and the templates, one tab
+each.
+
+```sh
+bun run dev:showcase
+```
+
 `ios/` and `android/` are generated, not committed. Every native setting that
 must survive regeneration lives in `apps/native/app.json` — bundle identifiers,
 icons, splash screen, iOS privacy manifest, config plugins. Editing the

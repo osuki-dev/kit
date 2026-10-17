@@ -56,54 +56,54 @@ version installed:
 
 ### Core Components
 
-| Component       | Description                          | Props                                   |
-| --------------- | ------------------------------------ | --------------------------------------- |
-| `Text`          | Typography and overflow primitive    | `variant`, `transform`, `overflowMode`  |
-| `Button`        | Action buttons with 4 variants       | `variant`, `disabled`, `onPress`        |
-| `Card`          | Content containers                   | `variant`, `border`, `padding`          |
-| `Surface`       | Visual background container          | `variant`                               |
-| `Screen`        | Full-screen native layout            | `variant`, `safeArea`                   |
-| `ScrollScreen`  | Full-screen scroll owner             | `variant`, `safeArea`, scroll props     |
-| `Input`         | Form text inputs                     | `variant`, `label`, `secureTextEntry`   |
-| `Textarea`      | Multi-line text input                | `label`, `minRows`, `maxRows`           |
-| `SearchInput`   | Search field with clear action       | `value`, `onChangeText`, `onClear`      |
-| `Select`        | Bottom-sheet option picker           | `options`, `value`, `onChange`          |
-| `DateInput`     | Date, time, and datetime picker      | `mode`, `value`, `onChange`             |
-| `Menu`          | Triggered option/action menu         | `items`, `selectedId`, `onSelect`       |
-| `RadioGroup`    | Single-select choice list            | `options`, `value`, `onChange`          |
-| `OtpInput`      | One-time-code entry cells            | `length`, `value`, `onChange`           |
-| `Stepper`       | Numeric stepper control              | `value`, `min`, `max`, `onChange`       |
-| `FieldGroup`    | Form field wrapper                   | `label`, `helper`, `error`              |
-| `Field`         | Composable form field                | `Root`, `Label`, `Description`, `Error` |
-| `InputGroup`    | Field with addons                    | `Root`, `Addon`, `Input`                |
-| `Combobox`      | Searchable picker                    | `options`, `value`, `onChange`          |
-| `Command`       | Filterable action list               | `Root`, `Input`, `Item`, `Empty`        |
-| `Calendar`      | Month grid                           | `mode`, `value`, `onChange`             |
-| `ButtonGroup`   | Joined actions                       | `children`                              |
-| `Collapsible`   | Single disclosure                    | `Root`, `Trigger`, `Content`            |
-| `Accordion`     | Stacked disclosures                  | `type`, `Item`, `Trigger`, `Content`    |
-| `Popover`       | Anchored panel                       | `Root`, `Trigger`, `Content`            |
-| `Attachment`    | File or image row                    | `title`, `status`, `onRemove`           |
-| `Message`       | Conversation turn                    | `align`, `Author`, `Bubble`, `Time`     |
-| `Bubble`        | Message content shell                | `children`                              |
-| `MessageScroller` | Conversation scroll                | `follow`                                |
-| `Tabs`          | Composable section switching         | `Root`, `List`, `Trigger`, `Label`      |
-| `Alert`         | Inline status messages               | `variant`, `title`, `message`           |
-| `ToastProvider` | App-level toast notifications        | `placement`, `maxToasts`                |
-| `Modal`         | Composable centered overlay          | `Root`, `Trigger`, `Content`, `Close`   |
-| `Dialog`        | Composable decision modal            | `Root`, `Content`, `Actions`, `Close`   |
-| `Sheet`         | Composable bottom overlay primitives | `Root`, `Trigger`, `Content`, `Body`    |
-| `BottomSheet`   | Convenient composed sheet            | `maxHeight`, `bodyStyle`, `bottomInset` |
-| `ActionSheet`   | Mobile action list                   | `actions`, `onAction`, `visible`        |
-| `Tooltip`       | Inline help popover                  | `content`, `children`, `visible`        |
-| `TopBar`        | Screen title bar                     | `title`, `onBack`, `actions`            |
-| `Toolbar`       | Icon action toolbar                  | `actions`, `variant`, `density`         |
-| `Stack`         | Token-based layout stack             | `direction`, `flow`, `widthMode`        |
-| `Section`       | Reusable screen section              | `title`, `description`, `action`        |
-| `EmptyState`    | Reusable no-data state               | `title`, `message`, `actionLabel`       |
-| `ErrorView`     | Reusable failure state               | `message`, `onRetry`                    |
-| `LoadingView`   | Full-section loading state           | `label`, `size`                         |
-| `TwoStepAction` | Double-tap inline confirmation       | `label`, `confirmLabel`, `onConfirm`    |
+| Component         | Description                          | Props                                   |
+| ----------------- | ------------------------------------ | --------------------------------------- |
+| `Text`            | Typography and overflow primitive    | `variant`, `transform`, `overflowMode`  |
+| `Button`          | Action buttons with 4 variants       | `variant`, `disabled`, `onPress`        |
+| `Card`            | Content containers                   | `variant`, `border`, `padding`          |
+| `Surface`         | Visual background container          | `variant`                               |
+| `Screen`          | Full-screen native layout            | `variant`, `safeArea`                   |
+| `ScrollScreen`    | Full-screen scroll owner             | `variant`, `safeArea`, scroll props     |
+| `Input`           | Form text inputs                     | `variant`, `label`, `secureTextEntry`   |
+| `Textarea`        | Multi-line text input                | `label`, `minRows`, `maxRows`           |
+| `SearchInput`     | Search field with clear action       | `value`, `onChangeText`, `onClear`      |
+| `Select`          | Bottom-sheet option picker           | `options`, `value`, `onChange`          |
+| `DateInput`       | Date, time, and datetime picker      | `mode`, `value`, `onChange`             |
+| `Menu`            | Triggered option/action menu         | `items`, `selectedId`, `onSelect`       |
+| `RadioGroup`      | Single-select choice list            | `options`, `value`, `onChange`          |
+| `OtpInput`        | One-time-code entry cells            | `length`, `value`, `onChange`           |
+| `Stepper`         | Numeric stepper control              | `value`, `min`, `max`, `onChange`       |
+| `FieldGroup`      | Form field wrapper                   | `label`, `helper`, `error`              |
+| `Field`           | Composable form field                | `Root`, `Label`, `Description`, `Error` |
+| `InputGroup`      | Field with addons                    | `Root`, `Addon`, `Input`                |
+| `Combobox`        | Searchable picker                    | `options`, `value`, `onChange`          |
+| `Command`         | Filterable action list               | `Root`, `Input`, `Item`, `Empty`        |
+| `Calendar`        | Month grid                           | `mode`, `value`, `onChange`             |
+| `ButtonGroup`     | Joined actions                       | `children`                              |
+| `Collapsible`     | Single disclosure                    | `Root`, `Trigger`, `Content`            |
+| `Accordion`       | Stacked disclosures                  | `type`, `Item`, `Trigger`, `Content`    |
+| `Popover`         | Anchored panel                       | `Root`, `Trigger`, `Content`            |
+| `Attachment`      | File or image row                    | `title`, `status`, `onRemove`           |
+| `Message`         | Conversation turn                    | `align`, `Author`, `Bubble`, `Time`     |
+| `Bubble`          | Message content shell                | `children`                              |
+| `MessageScroller` | Conversation scroll                  | `follow`                                |
+| `Tabs`            | Composable section switching         | `Root`, `List`, `Trigger`, `Label`      |
+| `Alert`           | Inline status messages               | `variant`, `title`, `message`           |
+| `ToastProvider`   | App-level toast notifications        | `placement`, `maxToasts`                |
+| `Modal`           | Composable centered overlay          | `Root`, `Trigger`, `Content`, `Close`   |
+| `Dialog`          | Composable decision modal            | `Root`, `Content`, `Actions`, `Close`   |
+| `Sheet`           | Composable bottom overlay primitives | `Root`, `Trigger`, `Content`, `Body`    |
+| `BottomSheet`     | Convenient composed sheet            | `maxHeight`, `bodyStyle`, `bottomInset` |
+| `ActionSheet`     | Mobile action list                   | `actions`, `onAction`, `visible`        |
+| `Tooltip`         | Inline help popover                  | `content`, `children`, `visible`        |
+| `TopBar`          | Screen title bar                     | `title`, `onBack`, `actions`            |
+| `Toolbar`         | Icon action toolbar                  | `actions`, `variant`, `density`         |
+| `Stack`           | Token-based layout stack             | `direction`, `flow`, `widthMode`        |
+| `Section`         | Reusable screen section              | `title`, `description`, `action`        |
+| `EmptyState`      | Reusable no-data state               | `title`, `message`, `actionLabel`       |
+| `ErrorView`       | Reusable failure state               | `message`, `onRetry`                    |
+| `LoadingView`     | Full-section loading state           | `label`, `size`                         |
+| `TwoStepAction`   | Double-tap inline confirmation       | `label`, `confirmLabel`, `onConfirm`    |
 
 ### Data Display
 

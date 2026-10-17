@@ -59,6 +59,8 @@ dogfood-output/
 tmp
 temp
 # Expo prebuild output. Everything that must survive a prebuild belongs in
-# apps/native/app.json, not in these generated projects.
+# each app's app.json, not in these generated projects.
 /apps/native/android
 /apps/native/ios
+/apps/showcase/android
+/apps/showcase/ios
