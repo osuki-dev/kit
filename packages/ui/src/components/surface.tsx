@@ -15,7 +15,9 @@ import {
 	useThemeTokens,
 	withoutStringFill,
 	type SurfaceMeta,
+	type SurfaceSlot,
 } from "../theme";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export type SurfaceVariant = "page" | "surface" | "raised";
 export type ScreenSafeArea = "none" | "top" | "bottom" | "both";
@@ -30,7 +32,7 @@ const absoluteFill: ViewStyle = {
 
 export interface SurfaceContextValue {
 	variant: SurfaceVariant;
-	slot?: string;
+	slot?: SurfaceSlot;
 	baseColor: string;
 	resolvedBackgroundColor: string;
 	meta: SurfaceMeta;
@@ -48,15 +50,22 @@ export function useSurface(): SurfaceContextValue {
 
 export interface SurfaceRootProps extends ViewProps {
 	variant?: SurfaceVariant;
-	slot?: string;
+	slot?: SurfaceSlot;
 	disabled?: boolean;
 	selected?: boolean;
 	children?: React.ReactNode;
 }
 
+/** The slot each variant paints when no `slot` is given. */
+const VARIANT_SLOTS: Record<SurfaceVariant, SurfaceSlot> = {
+	page: "screens.page",
+	surface: "surfaces.surface",
+	raised: "surfaces.raised",
+};
+
 export function SurfaceRoot({
 	variant = "surface",
-	slot,
+	slot: slotProp,
 	disabled,
 	selected,
 	style,
@@ -64,6 +73,7 @@ export function SurfaceRoot({
 	accessibilityState,
 	...props
 }: SurfaceRootProps) {
+	const slot = slotProp ?? VARIANT_SLOTS[variant];
 	const theme = useThemeTokens();
 	const surfaceToken = theme.components.Surface[variant];
 	const flatStyle = StyleSheet.flatten(style);
@@ -74,7 +84,7 @@ export function SurfaceRoot({
 	const resolvedDisabled = disabled ?? accessibilityState?.disabled;
 	const resolvedSelected = selected ?? accessibilityState?.selected;
 
-	const meta: SurfaceMeta = useMemo(
+	const meta: SurfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot,
 			variant,
@@ -126,7 +136,6 @@ export interface SurfaceBackgroundProps extends ViewProps {
 
 export function SurfaceBackground({ style, children, ...props }: SurfaceBackgroundProps) {
 	const { resolvedBackgroundColor, meta } = useSurface();
-	const decorator = useSurfaceDecorator();
 
 	return (
 		<View
@@ -143,7 +152,7 @@ export function SurfaceBackground({ style, children, ...props }: SurfaceBackgrou
 			]}
 			{...props}
 		>
-			{decorator?.renderDecoration?.(meta)}
+			<SurfaceDecoration {...meta} />
 			{children}
 		</View>
 	);
@@ -163,7 +172,7 @@ export function SurfaceContent({ style, children, ...props }: SurfaceContentProp
 
 export interface SurfaceProps extends ViewProps {
 	variant?: SurfaceVariant;
-	slot?: string;
+	slot?: SurfaceSlot;
 	disabled?: boolean;
 	selected?: boolean;
 }
@@ -231,14 +240,14 @@ export function Screen({
 export interface ScrollScreenProps extends Omit<ScrollViewProps, "contentInsetAdjustmentBehavior"> {
 	variant?: SurfaceVariant;
 	safeArea?: ScreenSafeArea;
-	slot?: string;
+	slot?: SurfaceSlot;
 	contentInsetAdjustmentBehavior?: ScrollViewProps["contentInsetAdjustmentBehavior"];
 }
 
 export function ScrollScreen({
 	variant = "page",
 	safeArea = "none",
-	slot = "screens.scroll",
+	slot = "screens.page",
 	style,
 	contentContainerStyle,
 	showsVerticalScrollIndicator = false,
@@ -248,12 +257,12 @@ export function ScrollScreen({
 }: ScrollScreenProps) {
 	const theme = useThemeTokens();
 	const insets = useSafeAreaInsets();
-	const decorator = useSurfaceDecorator();
+	const decorated = useSurfaceDecorator()?.renderDecoration !== undefined;
 	const surfaceToken = theme.components.Surface[variant];
 	const fillOverride = readStringFill(style);
 	const baseColor = fillOverride ?? theme.colors[surfaceToken];
 
-	const meta: SurfaceMeta = useMemo(
+	const meta: SurfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot,
 			variant,
@@ -273,16 +282,31 @@ export function ScrollScreen({
 		[insets.bottom, insets.top, safeArea],
 	);
 
-	return (
+	const scroll = (
 		<ScrollView
-			style={[{ flex: 1, backgroundColor: resolvedBackgroundColor }, withoutStringFill(style)]}
+			style={[
+				{ flex: 1, backgroundColor: decorated ? "transparent" : resolvedBackgroundColor },
+				withoutStringFill(style),
+			]}
 			contentContainerStyle={[containerStyle, contentContainerStyle]}
 			showsVerticalScrollIndicator={showsVerticalScrollIndicator}
 			keyboardShouldPersistTaps={keyboardShouldPersistTaps}
 			{...props}
 		>
-			{decorator?.renderDecoration?.(meta)}
 			{children}
 		</ScrollView>
 	);
+	if (!decorated) return scroll;
+
+	// The decoration stays put behind the content instead of scrolling with it.
+	return (
+		<View style={[styles.fixedGround, { backgroundColor: resolvedBackgroundColor }]}>
+			<SurfaceDecoration {...meta} />
+			{scroll}
+		</View>
+	);
 }
+
+const styles = StyleSheet.create({
+	fixedGround: { flex: 1, position: "relative" },
+});

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Pressable, View, type ViewProps, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Text } from "./text";
 
 export type TooltipPlacement = "top" | "bottom";
@@ -88,6 +88,10 @@ export function TooltipContent({
 	bubbleStyle?: ViewStyle;
 }) {
 	const theme = useThemeTokens();
+	const tooltipFill = useResolvedSurfaceFill(theme.colors.surfaceRaised, {
+		slot: "tooltips.background",
+		baseColor: theme.colors.surfaceRaised,
+	});
 	return (
 		<View
 			testID={testID ? `${testID}-bubble` : undefined}
@@ -99,7 +103,7 @@ export function TooltipContent({
 					paddingHorizontal: theme.spacing.md,
 					paddingVertical: theme.spacing.sm,
 					borderRadius: theme.radius.md,
-					backgroundColor: theme.colors.surfaceRaised,
+					backgroundColor: tooltipFill,
 					borderWidth: 1,
 					borderColor: theme.colors.border,
 				},

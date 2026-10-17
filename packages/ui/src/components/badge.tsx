@@ -48,7 +48,13 @@ export function BadgeRoot({
 	const fill = useResolvedSurfaceFill(
 		baseColor,
 		React.useMemo(
-			() => ({ slot: "badges.background", variant, baseColor, borderRadius: radius.pill }),
+			() => ({
+				slot: "badges.background",
+				role: "mark",
+				variant,
+				baseColor,
+				borderRadius: radius.pill,
+			}),
 			[baseColor, radius.pill, variant],
 		),
 	);
@@ -65,7 +71,13 @@ export function BadgeRoot({
 export function BadgeLabel({ children }: { children?: BadgeProps["children"] }) {
 	const { colors } = useThemeTokens();
 	return (
-		<Text variant="caption" color={colors.background} weight="bold" transform="uppercase">
+		<Text
+			variant="caption"
+			color={colors.background}
+			weight="bold"
+			transform="uppercase"
+			hugSlack={false}
+		>
 			{badgeLabel(children)}
 		</Text>
 	);

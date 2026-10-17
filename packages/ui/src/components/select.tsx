@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { ScrollView, View, type ViewProps, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Sheet } from "./bottom-sheet";
 import { FieldGroup } from "./field-group";
 import { Icon } from "./icon";
@@ -49,6 +49,10 @@ const SelectView: React.FC<SelectProps> = ({
 	...props
 }) => {
 	const theme = useThemeTokens();
+	const triggerFill = useResolvedSurfaceFill(theme.colors.surface, {
+		slot: "selects.trigger",
+		baseColor: theme.colors.surface,
+	});
 	const haptics = useHaptics();
 	const [open, setOpen] = useState(false);
 	const selectedOption = options.find((option) => option.value === value);
@@ -65,10 +69,11 @@ const SelectView: React.FC<SelectProps> = ({
 			borderWidth: 1,
 			borderRadius: theme.radius.lg,
 			borderColor: error ? theme.colors.danger : theme.colors.border,
-			backgroundColor: theme.colors.surface,
+			backgroundColor: triggerFill,
 			opacity: disabled ? 0.56 : 1,
 		}),
 		[
+			triggerFill,
 			disabled,
 			error,
 			theme.colors.border,

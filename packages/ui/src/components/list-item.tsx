@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { TouchableOpacity, View, type TouchableOpacityProps, type ViewStyle } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Text } from "./text";
 import { Icon, type IconName } from "./icon";
 import { useHaptics } from "./haptics";
@@ -73,6 +73,11 @@ export const ListItemRoot: React.FC<ListItemProps> = ({
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
 	const scale = useSharedValue(1);
+	const rowBase =
+		theme.components.ListItem.background === "transparent"
+			? "transparent"
+			: theme.colors[theme.components.ListItem.background];
+	const rowFill = useResolvedSurfaceFill(rowBase, { slot: "rows.background", baseColor: rowBase });
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [{ scale: scale.value }],
@@ -107,10 +112,9 @@ export const ListItemRoot: React.FC<ListItemProps> = ({
 			opacity: disabled ? 0.4 : 1,
 			borderBottomWidth: separator === "bottom" ? 1 : 0,
 			borderBottomColor: theme.colors[theme.semantic.divider],
-			backgroundColor:
-				tokens.background === "transparent" ? "transparent" : theme.colors[tokens.background],
+			backgroundColor: rowFill,
 		}),
-		[disabled, separator, theme.colors, theme.semantic.divider, theme.spacing, tokens],
+		[disabled, rowFill, separator, theme.colors, theme.semantic.divider, theme.spacing, tokens],
 	);
 
 	const content = (

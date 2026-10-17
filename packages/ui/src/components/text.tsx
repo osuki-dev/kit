@@ -21,6 +21,7 @@ import Animated, {
 } from "react-native-reanimated";
 import {
 	resolveFontStyle,
+	useTextPlate,
 	useThemeTokens,
 	type FontWeightValue,
 	type TypeStyleName,
@@ -40,7 +41,18 @@ export function withHugSlack(children: React.ReactNode, os: string = Platform.OS
 		return `${children}${HUG_SLACK}`;
 	}
 	if (typeof children === "number") return `${children}${HUG_SLACK}`;
-	return children;
+	if (!hasContent(children)) return children;
+	// Nested runs and arrays get the slack as one more run after them.
+	return [children, HUG_SLACK];
+}
+
+/** An empty `Text` stays zero-width, so a row that relies on that keeps collapsing. */
+function hasContent(children: React.ReactNode): boolean {
+	if (children === null || children === undefined || children === false || children === "") {
+		return false;
+	}
+	if (Array.isArray(children)) return children.some(hasContent);
+	return true;
 }
 
 /** True inside a kit `Text`, where a child `Text` is a run, not a paragraph. */
@@ -81,12 +93,18 @@ export interface TextProps extends RNTextProps {
 	/**
 	 * Android only. Appends a thin space after the text so an italic or wide
 	 * face does not lose the edge of its last glyph to the line clip. Defaults
-	 * to the role's `overhang` in the theme's font registry, so it is off for
+	 * to the role's `trailingSlack` in the theme's font registry, so it is off for
 	 * upright faces. Ignored on nested and selectable text, which it would
 	 * otherwise put mid-sentence or into the clipboard. Pass `false` for text
 	 * in a box of its own size, such as a count in a round badge.
 	 */
 	hugSlack?: boolean;
+	/**
+	 * Text that stands directly on the background rather than inside a card
+	 * or control. It takes the plate a `TextPlateProvider` publishes, so it
+	 * stays legible over a decorated ground; without a provider it is plain.
+	 */
+	plated?: boolean;
 	/** Explicit text transform; inherit preserves the typography preset */
 	transform?: "inherit" | "none" | "uppercase";
 	/** Single-line overflow behavior */
@@ -135,6 +153,7 @@ export const Text: React.FC<TextProps> = ({
 	marqueeDelayMs = 700,
 	marqueeSpeed = 56,
 	hugSlack,
+	plated = false,
 	style,
 	children,
 	maxFontSizeMultiplier,
@@ -170,7 +189,8 @@ export const Text: React.FC<TextProps> = ({
 		return colors.textMuted;
 	}, [color, colorKey, colors, variant]);
 
-	const callerStyle = StyleSheet.flatten(style) ?? undefined;
+	const plate = useTextPlate();
+	const callerStyle = StyleSheet.flatten(plated && plate ? [plate, style] : style) ?? undefined;
 	// A caller style that names its own family owns its weight too. Otherwise a
 	// `fontWeight` in it is a weight request like `weight`, resolved against the
 	// theme's face instead of reaching the native side as a bare number.
@@ -208,7 +228,7 @@ export const Text: React.FC<TextProps> = ({
 		],
 	);
 	const nested = React.useContext(NestedTextContext);
-	const wantsSlack = hugSlack ?? fonts[typeStyle.fontFamily]?.overhang ?? false;
+	const wantsSlack = hugSlack ?? fonts[typeStyle.fontFamily]?.trailingSlack ?? false;
 	const renderedChildren =
 		wantsSlack && !nested && !rest.selectable ? withHugSlack(children) : children;
 	const flattenedStyle = callerStyle;

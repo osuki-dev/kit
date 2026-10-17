@@ -20,9 +20,12 @@ import {
 	useResolvedSurfaceFill,
 	useSurfaceDecorator,
 	useThemeTokens,
+	type SurfaceSlot,
+	type SurfaceMeta,
 } from "../theme";
 import { TextField } from "../utils/text-field";
 import { Text } from "./text";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export type InputVariant = "underline" | "outline";
 export type InputSize = "default" | "compact";
@@ -36,7 +39,7 @@ interface InputFrame {
 	borderRadius: number;
 	errorFill: string;
 	decorationMeta: {
-		slot: string;
+		slot: SurfaceSlot;
 		variant: string;
 		baseColor: string;
 		borderRadius: number;
@@ -98,7 +101,7 @@ export const InputRoot: React.FC<InputProps> = ({
 
 	const controlBase =
 		input.background === "transparent" ? "transparent" : theme.colors[input.background];
-	const controlMeta = useMemo(
+	const controlMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "inputs.background",
 			variant,
@@ -108,7 +111,7 @@ export const InputRoot: React.FC<InputProps> = ({
 		[controlBase, input.radius, theme.radius, variant],
 	);
 	const controlFill = useResolvedSurfaceFill(controlBase, controlMeta);
-	const errorMeta = useMemo(
+	const errorMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "inputs.error",
 			variant,
@@ -264,7 +267,7 @@ export const InputRoot: React.FC<InputProps> = ({
 export function InputLabel({ children }: { children?: ReactNode }) {
 	if (!children) return null;
 	return (
-		<Text variant="label" colorKey="textMuted">
+		<Text variant="label" colorKey="textMuted" plated>
 			{children}
 		</Text>
 	);
@@ -284,7 +287,7 @@ export function InputControl({ style }: { style?: TextStyle }) {
 					pointerEvents="none"
 					style={[StyleSheet.absoluteFill, { borderRadius: frame.borderRadius }]}
 				>
-					{decorator.renderDecoration(frame.decorationMeta)}
+					<SurfaceDecoration {...frame.decorationMeta} />
 				</View>
 			) : null}
 			<TextField
@@ -326,7 +329,7 @@ export function InputError({ children, testID }: { children?: ReactNode; testID?
 export function InputHint({ children }: { children?: ReactNode }) {
 	if (!children) return null;
 	return (
-		<Text variant="caption" colorKey="textDisabled">
+		<Text variant="caption" colorKey="textDisabled" plated>
 			{children}
 		</Text>
 	);

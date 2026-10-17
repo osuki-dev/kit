@@ -51,12 +51,12 @@ export const Section: React.FC<SectionProps> = ({
 				>
 					<View style={{ flex: 1, minWidth: 0, gap: theme.spacing.xs }}>
 						{title && (
-							<Text variant="subheading" colorKey="text" numberOfLines={2}>
+							<Text variant="subheading" colorKey="text" numberOfLines={2} plated>
 								{title}
 							</Text>
 						)}
 						{description && (
-							<Text variant="bodySmall" colorKey="textMuted" numberOfLines={3}>
+							<Text variant="bodySmall" colorKey="textMuted" numberOfLines={3} plated>
 								{description}
 							</Text>
 						)}

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { ScrollView, View, type ViewProps, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Sheet } from "./bottom-sheet";
 import { Icon, type IconName } from "./icon";
 import { Text } from "./text";
@@ -46,6 +46,10 @@ const MenuView: React.FC<MenuProps> = ({
 	...props
 }) => {
 	const theme = useThemeTokens();
+	const triggerFill = useResolvedSurfaceFill(theme.colors.surfaceRaised, {
+		slot: "menus.trigger",
+		baseColor: theme.colors.surfaceRaised,
+	});
 	const haptics = useHaptics();
 	const [open, setOpen] = useState(false);
 	const selectedItem = items.find((item) => item.id === selectedId);
@@ -60,12 +64,13 @@ const MenuView: React.FC<MenuProps> = ({
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
 			borderRadius: theme.radius.pill,
-			backgroundColor: theme.colors.surfaceRaised,
+			backgroundColor: triggerFill,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 			opacity: disabled ? 0.56 : 1,
 		}),
 		[
+			triggerFill,
 			disabled,
 			theme.colors.border,
 			theme.colors.surfaceRaised,

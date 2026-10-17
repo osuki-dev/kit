@@ -10,7 +10,7 @@ import React, {
 import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeOutUp, Layout } from "react-native-reanimated";
-import { useThemeTokens, type ColorToken } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens, type ColorToken } from "../theme";
 import { Icon, type IconName } from "./icon";
 import { Text } from "./text";
 
@@ -248,6 +248,10 @@ interface ToastCardProps {
 const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, style, onDismiss }) => {
 	const theme = useThemeTokens();
 	const tokens = toastTokens[toast.variant];
+	const toastFill = useResolvedSurfaceFill(theme.colors[tokens.background], {
+		slot: "toasts.background",
+		baseColor: theme.colors[tokens.background],
+	});
 
 	return (
 		<Animated.View
@@ -263,7 +267,7 @@ const ToastCard: React.FC<ToastCardProps> = ({ toast, maxWidth, style, onDismiss
 					gap: theme.spacing.sm,
 					padding: theme.spacing.md,
 					borderRadius: theme.radius.lg,
-					backgroundColor: theme.colors[tokens.background],
+					backgroundColor: toastFill,
 					borderWidth: 1,
 					borderColor: theme.colors.border,
 					...(theme.mode === "light" ? theme.shadow.soft : {}),

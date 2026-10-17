@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, ScrollView, View, type ViewStyle } from "react-native";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Sheet, type BottomSheetProps } from "./bottom-sheet";
 import { type IconName } from "./icon";
 import { Text } from "./text";
@@ -37,6 +37,10 @@ const ActionSheetView: React.FC<ActionSheetProps> = ({
 	...sheetProps
 }) => {
 	const theme = useThemeTokens();
+	const cancelFill = useResolvedSurfaceFill(theme.colors.surface, {
+		slot: "sheets.action",
+		baseColor: theme.colors.surface,
+	});
 	const {
 		visible,
 		title,
@@ -101,7 +105,7 @@ const ActionSheetView: React.FC<ActionSheetProps> = ({
 							alignItems: "center",
 							justifyContent: "center",
 							borderRadius: theme.radius.md,
-							backgroundColor: theme.colors.surface,
+							backgroundColor: cancelFill,
 							borderWidth: 1,
 							borderColor: theme.colors.border,
 							marginTop: theme.spacing.sm,

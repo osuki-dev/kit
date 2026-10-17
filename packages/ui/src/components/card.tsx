@@ -3,11 +3,12 @@ import { StyleSheet, View, type ViewProps, type ViewStyle } from "react-native";
 import {
 	readStringFill,
 	useResolvedSurfaceFill,
-	useSurfaceDecorator,
 	useThemeTokens,
 	withoutStringFill,
 	type SurfaceMeta,
+	type SurfaceSlot,
 } from "../theme";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export type CardVariant = "default" | "raised" | "flat";
 export type CardBorder = "none" | "subtle";
@@ -27,7 +28,7 @@ export interface CardMeta {
 	border: CardBorder;
 	radius: CardRadius;
 	padding: CardPadding;
-	slot: string;
+	slot: SurfaceSlot;
 	baseColor: string;
 	resolvedBackgroundColor: string;
 	borderRadius: number;
@@ -52,7 +53,7 @@ export interface CardRootProps extends ViewProps {
 	border?: CardBorder;
 	radius?: CardRadius;
 	padding?: CardPadding;
-	slot?: string;
+	slot?: SurfaceSlot;
 	children?: React.ReactNode;
 }
 
@@ -78,7 +79,7 @@ export function CardRoot({
 			? flatStyle.borderRadius
 			: theme.radius[card.radius[radius]];
 
-	const surfaceMeta: SurfaceMeta = useMemo(
+	const surfaceMeta: SurfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot,
 			variant,
@@ -146,9 +147,8 @@ export interface CardBackgroundProps extends ViewProps {
 export function CardBackground({ style, children, ...props }: CardBackgroundProps) {
 	const { meta } = useCard();
 	const theme = useThemeTokens();
-	const decorator = useSurfaceDecorator();
 	const lift = theme.mode === "light" && meta.radius !== "none";
-	const surfaceMeta: SurfaceMeta = useMemo(
+	const surfaceMeta: SurfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: meta.slot,
 			variant: meta.variant,
@@ -178,7 +178,7 @@ export function CardBackground({ style, children, ...props }: CardBackgroundProp
 				pointerEvents="none"
 				style={[absoluteFill, { borderRadius: meta.borderRadius, overflow: "hidden" }]}
 			>
-				{decorator?.renderDecoration?.(surfaceMeta)}
+				<SurfaceDecoration {...surfaceMeta} />
 				{children}
 			</View>
 		</View>
@@ -226,7 +226,7 @@ export interface CardProps extends ViewProps {
 	border?: CardBorder;
 	radius?: CardRadius;
 	padding?: CardPadding;
-	slot?: string;
+	slot?: SurfaceSlot;
 }
 
 export function Card({

@@ -89,11 +89,13 @@ export function ToggleControl({ testID }: { testID?: string }) {
 	const { state, actions, meta } = useToggle();
 	const off = useResolvedSurfaceFill(colors.surfaceRaised, {
 		slot: "toggles.track",
+		role: "mark",
 		variant: "off",
 		baseColor: colors.surfaceRaised,
 	});
 	const on = useResolvedSurfaceFill(colors.primary, {
 		slot: "toggles.track",
+		role: "mark",
 		variant: "on",
 		baseColor: colors.primary,
 		selected: true,

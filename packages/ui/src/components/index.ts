@@ -66,6 +66,7 @@ export {
 	type SurfaceContentProps,
 	type SurfaceContextValue,
 } from "./surface";
+export { SurfaceDecoration, type SurfaceDecorationProps } from "./surface-decoration";
 export {
 	HapticsProvider,
 	useHaptics,
@@ -161,7 +162,9 @@ export {
 	type TabsActions,
 	type TabsBadgeProps,
 	type TabsContextValue,
+	type TabsIndicator,
 	type TabsLabelProps,
+	type TabsListProps,
 	type TabsMeta,
 	type TabsProps,
 	type TabsRootProps,

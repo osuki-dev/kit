@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { useThemeTokens } from "../theme";
+import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Icon } from "./icon";
 import { Text } from "./text";
 
@@ -148,6 +148,10 @@ export function SheetContent({
 	const insets = useSafeAreaInsets();
 	const window = useWindowDimensions();
 	const sheet = theme.components.Sheet;
+	const sheetFill = useResolvedSurfaceFill(theme.colors[sheet.background], {
+		slot: "sheets.background",
+		baseColor: theme.colors[sheet.background],
+	});
 	const sheetStyle = useMemo<ViewStyle>(
 		() => ({
 			width: "100%",
@@ -160,11 +164,12 @@ export function SheetContent({
 			paddingTop: theme.spacing[sheet.paddingTop],
 			paddingBottom: bottomInset ?? Math.max(insets.bottom, theme.spacing[sheet.paddingBottom]),
 			gap: theme.spacing.md,
-			backgroundColor: theme.colors[sheet.background],
+			backgroundColor: sheetFill,
 			borderTopWidth: 1,
 			borderColor: theme.colors.border,
 		}),
 		[
+			sheetFill,
 			bottomInset,
 			insets.bottom,
 			insets.top,

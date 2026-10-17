@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	View,
 	type ViewProps,
+	type StyleProp,
 	type ViewStyle,
 } from "react-native";
 import ExpoSegmentedControl from "@expo/ui/community/segmented-control";
@@ -14,9 +15,11 @@ import {
 	useSurfaceDecorator,
 	useThemeTokens,
 	withoutStringFill,
+	type SurfaceMeta,
 } from "../theme";
 import { Text } from "./text";
 import { useHaptics } from "./haptics";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export interface SegmentedControlOption {
 	label: string;
@@ -29,7 +32,7 @@ export interface SegmentedControlProps extends Omit<ViewProps, "style"> {
 	value: string;
 	onChange: (value: string) => void;
 	variant?: "pill" | "rounded";
-	style?: ViewStyle;
+	style?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -49,7 +52,7 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	testID,
 	...rest
 }) => {
-	const { colors, components, mode, radius, shadow } = useThemeTokens();
+	const { colors, components, mode, radius, shadow, spacing } = useThemeTokens();
 	const tokens = components.SegmentedControl;
 	const decorator = useSurfaceDecorator();
 	const { feedback } = useHaptics();
@@ -68,7 +71,7 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 		optionRadius = radius.pill;
 	}
 
-	const trackMeta = useMemo(
+	const trackMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "segmented.track",
 			variant,
@@ -77,17 +80,21 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 		}),
 		[trackBase, trackRadius, variant],
 	);
-	const selectedMeta = useMemo(
+	const trackFill = useResolvedSurfaceFill(trackBase, trackMeta);
+	// The track is painted once; the selection is an overlay on it, so a
+	// decorator sees the fill underneath and can avoid multiplying itself.
+	const selectedMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "segmented.selected",
+			role: "overlay",
+			over: trackFill,
 			variant,
 			baseColor: selectedBase,
 			selected: true,
 			borderRadius: optionRadius,
 		}),
-		[optionRadius, selectedBase, variant],
+		[optionRadius, selectedBase, trackFill, variant],
 	);
-	const trackFill = useResolvedSurfaceFill(trackBase, trackMeta);
 	const selectedFill = useResolvedSurfaceFill(selectedBase, selectedMeta);
 
 	const select = useCallback(
@@ -100,12 +107,14 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 
 	const trackStyle = useMemo(() => {
 		const next: ViewStyle = {
+			height: tokens.height,
+			padding: spacing[tokens.padding],
 			borderRadius: trackRadius,
 			backgroundColor: trackFill,
 		};
 		if (mode === "light") Object.assign(next, shadow.soft);
 		return next;
-	}, [mode, shadow.soft, trackFill, trackRadius]);
+	}, [mode, shadow.soft, spacing, tokens.height, tokens.padding, trackFill, trackRadius]);
 
 	const decorated =
 		decorator?.transformBackground !== undefined || decorator?.renderDecoration !== undefined;
@@ -138,7 +147,7 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	if (decorator?.renderDecoration) {
 		decoration = (
 			<View collapsable pointerEvents="none" style={styles.decoration}>
-				{decorator.renderDecoration(trackMeta)}
+				<SurfaceDecoration {...trackMeta} />
 			</View>
 		);
 	}
@@ -229,7 +238,7 @@ const Segment = memo(function Segment({
 			}}
 			testID={testID}
 		>
-			<Text variant="label" color={textColor} transform="uppercase">
+			<Text variant="label" color={textColor}>
 				{label}
 			</Text>
 		</Pressable>
@@ -245,8 +254,6 @@ function segmentOpacity(disabled: boolean, pressed: boolean) {
 const styles = StyleSheet.create({
 	track: {
 		flexDirection: "row",
-		height: 44,
-		padding: 4,
 		overflow: "hidden",
 	},
 	segment: {

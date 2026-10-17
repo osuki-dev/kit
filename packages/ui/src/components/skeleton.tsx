@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from "react";
 import {
-	StyleSheet,
 	View,
 	type DimensionValue,
 	type StyleProp,
@@ -13,7 +12,13 @@ import Animated, {
 	withRepeat,
 	withTiming,
 } from "react-native-reanimated";
-import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
+import {
+	readStringFill,
+	useResolvedSurfaceFill,
+	useThemeTokens,
+	withoutStringFill,
+	type SurfaceMeta,
+} from "../theme";
 
 export type SkeletonVariant = "text" | "rect" | "circle";
 
@@ -48,15 +53,14 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 	const theme = useThemeTokens();
 	const opacity = useSharedValue(0.62);
 	const lineCount = Math.max(1, lines);
-	const fillMeta = useMemo(
-		() => ({
-			slot: "skeleton.fill",
-			variant,
-			baseColor: theme.colors[theme.components.Skeleton.background],
-		}),
-		[theme.colors[theme.components.Skeleton.background], variant],
+	// A string `backgroundColor` on `style` replaces the token, and still goes
+	// through the decorator like every other fill.
+	const baseColor = readStringFill(style) ?? theme.colors[theme.components.Skeleton.background];
+	const fillMeta = useMemo<SurfaceMeta>(
+		() => ({ slot: "skeleton.fill", variant, baseColor }),
+		[baseColor, variant],
 	);
-	const fill = useResolvedSurfaceFill(theme.colors[theme.components.Skeleton.background], fillMeta);
+	const fill = useResolvedSurfaceFill(baseColor, fillMeta);
 
 	useEffect(() => {
 		if (motion === "static") {
@@ -80,21 +84,19 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 	);
 
 	if (lineCount === 1) {
-		return <AnimatedView style={[baseStyle, animatedStyle, style]} {...props} />;
+		return <AnimatedView style={[baseStyle, animatedStyle, withoutStringFill(style)]} {...props} />;
 	}
 
-	// A multi-line skeleton draws its fill on the lines, not on the wrapper, so a
-	// consumer's `backgroundColor` has to travel down to them. Leaving it on the
-	// wrapper as well would paint the gaps and double up a translucent fill.
-	const { backgroundColor: fillOverride, ...wrapperStyle } = StyleSheet.flatten(style) ?? {};
-	const lineFill = fillOverride === undefined ? undefined : { backgroundColor: fillOverride };
+	// A multi-line skeleton draws its fill on the lines, not on the wrapper:
+	// painting the wrapper too would fill the gaps and double a translucent fill.
+	const wrapperStyle = withoutStringFill(style);
 
 	return (
 		<View style={[{ gap: gap ?? theme.spacing.sm }, wrapperStyle]} {...props}>
 			{Array.from({ length: lineCount }).map((_, index) => (
 				<AnimatedView
 					key={index}
-					style={[baseStyle, animatedStyle, lineFill, index === lineCount - 1 && { width: "72%" }]}
+					style={[baseStyle, animatedStyle, index === lineCount - 1 && { width: "72%" }]}
 				/>
 			))}
 		</View>

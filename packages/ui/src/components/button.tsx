@@ -8,19 +8,25 @@ import {
 	type ViewProps,
 	type ViewStyle,
 } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+	useAnimatedStyle,
+	useReducedMotion,
+	useSharedValue,
+	withSpring,
+} from "react-native-reanimated";
 import {
 	readStringFill,
 	useResolvedSurfaceFill,
-	useSurfaceDecorator,
 	useThemeTokens,
 	withoutStringFill,
 	type SurfaceMeta,
+	type SurfaceSlot,
 } from "../theme";
 import { useHaptics } from "./haptics";
 import { Icon, type IconName } from "./icon";
 import { Spinner, type SpinnerProps } from "./spinner";
 import { Text, type TextProps } from "./text";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
 
@@ -28,7 +34,7 @@ export interface ButtonContextValue {
 	variant: ButtonVariant;
 	disabled: boolean;
 	loading: boolean;
-	slot: string;
+	slot: SurfaceSlot;
 	baseColor: string;
 	resolvedBackgroundColor: string;
 	textColor: string;
@@ -80,7 +86,7 @@ export interface ButtonRootProps extends Omit<PressableProps, "style" | "childre
 	variant?: ButtonVariant;
 	disabled?: boolean;
 	loading?: boolean;
-	slot?: string;
+	slot?: SurfaceSlot;
 	style?: StyleProp<ViewStyle>;
 	children?: React.ReactNode;
 }
@@ -99,6 +105,7 @@ export function ButtonRoot({
 	const theme = useThemeTokens();
 	const haptics = useHaptics();
 	const pressProgress = useSharedValue(0);
+	const reduceMotion = useReducedMotion();
 	const pressDepth = 1 - theme.motion.press.control;
 
 	const button = theme.components.Button;
@@ -118,7 +125,7 @@ export function ButtonRoot({
 
 	const resolvedSlot = slot ?? `buttons.${variant}.background`;
 
-	const surfaceMeta: SurfaceMeta = useMemo(
+	const surfaceMeta: SurfaceMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: resolvedSlot,
 			variant,
@@ -168,21 +175,14 @@ export function ButtonRoot({
 	const handlePressIn: PressableProps["onPressIn"] = (event) => {
 		if (!isDisabled) {
 			haptics.feedback("light");
-			pressProgress.value = withSpring(1, {
-				stiffness: 520,
-				damping: 34,
-				mass: 0.72,
-			});
+			// Reduce motion keeps the haptic and drops the movement.
+			if (!reduceMotion) pressProgress.value = withSpring(1, theme.motion.press.springIn);
 		}
 		onPressIn?.(event);
 	};
 
 	const handlePressOut: PressableProps["onPressOut"] = (event) => {
-		pressProgress.value = withSpring(0, {
-			stiffness: 420,
-			damping: 30,
-			mass: 0.78,
-		});
+		pressProgress.value = withSpring(0, theme.motion.press.springOut);
 		onPressOut?.(event);
 	};
 
@@ -237,7 +237,6 @@ export interface ButtonBackgroundProps extends ViewProps {
 export function ButtonBackground({ style, children, ...props }: ButtonBackgroundProps) {
 	const { resolvedBackgroundColor, borderRadius, meta, variant, disabled } = useButton();
 	const theme = useThemeTokens();
-	const decorator = useSurfaceDecorator();
 	const variantTokens = theme.components.Button[variant];
 	const lift = !disabled && variantTokens.background !== "transparent" && theme.mode === "light";
 
@@ -261,7 +260,7 @@ export function ButtonBackground({ style, children, ...props }: ButtonBackground
 				pointerEvents="none"
 				style={[styles.background, { borderRadius, overflow: "hidden" }]}
 			>
-				{decorator?.renderDecoration?.(meta)}
+				<SurfaceDecoration {...meta} />
 				{children}
 			</View>
 		</View>
@@ -280,7 +279,7 @@ export function ButtonLabel({ style, children, ...props }: ButtonLabelProps) {
 		<Text
 			variant="button"
 			color={textColor}
-			transform="uppercase"
+			transform="inherit"
 			numberOfLines={1}
 			adjustsFontSizeToFit
 			minimumFontScale={0.72}
@@ -319,7 +318,7 @@ export interface ButtonProps extends Omit<PressableProps, "style"> {
 	loadingLabel?: string;
 	leftIcon?: IconName;
 	rightIcon?: IconName;
-	slot?: string;
+	slot?: SurfaceSlot;
 	style?: StyleProp<ViewStyle>;
 }
 

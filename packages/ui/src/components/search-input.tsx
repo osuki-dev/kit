@@ -19,9 +19,11 @@ import {
 	useResolvedSurfaceFill,
 	useSurfaceDecorator,
 	useThemeTokens,
+	type SurfaceMeta,
 } from "../theme";
 import { TextField } from "../utils/text-field";
 import { Icon } from "./icon";
+import { SurfaceDecoration } from "./surface-decoration";
 
 export interface SearchInputProps extends Omit<TextInputProps, "style"> {
 	value: string;
@@ -52,7 +54,7 @@ export const SearchInputRoot: React.FC<SearchInputProps> = ({
 	const showClear = value.length > 0;
 	const controlBase =
 		input.background === "transparent" ? "transparent" : theme.colors[input.background];
-	const controlMeta = useMemo(
+	const controlMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "inputs.search",
 			variant: "search",
@@ -128,7 +130,7 @@ export const SearchInputRoot: React.FC<SearchInputProps> = ({
 		>
 			{decorator?.renderDecoration ? (
 				<View collapsable pointerEvents="none" style={StyleSheet.absoluteFill}>
-					{decorator.renderDecoration(controlMeta)}
+					<SurfaceDecoration {...controlMeta} />
 				</View>
 			) : null}
 			<Icon name="Search" size={18} color={theme.colors.textMuted} />

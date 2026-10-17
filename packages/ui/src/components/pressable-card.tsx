@@ -1,6 +1,11 @@
 import React, { useMemo } from "react";
 import { Pressable, type PressableProps, type ViewStyle } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+	useAnimatedStyle,
+	useReducedMotion,
+	useSharedValue,
+	withSpring,
+} from "react-native-reanimated";
 import { useThemeTokens } from "../theme";
 import { useHaptics } from "./haptics";
 import type { CardBorder } from "./card";
@@ -48,6 +53,7 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 	const card = theme.components.Card;
 	const variantTokens = card[variant];
 	const pressProgress = useSharedValue(0);
+	const reduceMotion = useReducedMotion();
 
 	const animatedContentStyle = useAnimatedStyle(() => ({
 		opacity: 1 - pressProgress.value * 0.06,
@@ -91,21 +97,14 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 	const handlePressIn: PressableProps["onPressIn"] = (event) => {
 		if (!disabled) {
 			haptics.feedback("light");
-			pressProgress.value = withSpring(1, {
-				stiffness: 520,
-				damping: 34,
-				mass: 0.72,
-			});
+			// Reduce motion keeps the haptic and drops the movement.
+			if (!reduceMotion) pressProgress.value = withSpring(1, theme.motion.press.springIn);
 		}
 		onPressIn?.(event);
 	};
 
 	const handlePressOut: PressableProps["onPressOut"] = (event) => {
-		pressProgress.value = withSpring(0, {
-			stiffness: 420,
-			damping: 30,
-			mass: 0.78,
-		});
+		pressProgress.value = withSpring(0, theme.motion.press.springOut);
 		onPressOut?.(event);
 	};
 

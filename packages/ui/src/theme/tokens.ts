@@ -166,6 +166,8 @@ export const componentTokens: ComponentTokens = {
 	SegmentedControl: {
 		radius: "lg",
 		optionRadius: "md",
+		height: 44,
+		padding: "xs",
 		background: "surfaceRaised",
 		activeBackground: "surface",
 		activeForeground: "text",
