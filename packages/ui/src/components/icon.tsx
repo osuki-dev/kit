@@ -159,20 +159,6 @@ function combineTransforms(
 	return [...baseTransform, rotationTransform] as any;
 }
 
-function safeRequire<T>(moduleName: string): T | null {
-	try {
-		// Evaluated dynamically to avoid bundling failures when peer packages are absent
-		// eslint-disable-next-line @typescript-eslint/no-implied-eval
-		const dynamicRequire = new Function(
-			"name",
-			"try { return typeof require !== 'undefined' ? require(name) : null; } catch (e) { return null; }",
-		);
-		return dynamicRequire(moduleName) as T | null;
-	} catch {
-		return null;
-	}
-}
-
 // Lazy / safe Lucide loader
 let lucideModule: Record<string, React.ComponentType<any>> | null = null;
 let lucideAttempted = false;
@@ -219,9 +205,13 @@ let nativeNanoIconsAttempted = false;
 function getNativeNanoIconsModule() {
 	if (nativeNanoIconsAttempted) return nativeNanoIconsModule;
 	nativeNanoIconsAttempted = true;
-	nativeNanoIconsModule = safeRequire<{
-		createNanoIconSet?: (glyphMap: any, ...args: any[]) => React.ComponentType<any>;
-	}>("react-native-nano-icons");
+	try {
+		// A literal name, so Metro sees the optional dependency. Expo's Metro config
+		// allows optional dependencies, so a missing package throws here at runtime.
+		nativeNanoIconsModule = require("react-native-nano-icons");
+	} catch {
+		nativeNanoIconsModule = null;
+	}
 	return nativeNanoIconsModule;
 }
 
