@@ -28,7 +28,7 @@ import {
 	withoutStringFill,
 	type SurfaceMeta,
 } from "../theme";
-import { TextField } from "../utils/text-field";
+import { BodyTextField } from "../utils/text-field";
 import { Icon } from "./icon";
 import { Spinner } from "./spinner";
 import { SurfaceDecoration } from "./surface-decoration";
@@ -240,7 +240,7 @@ export function PromptInputTextarea({
 	);
 
 	return (
-		<TextField
+		<BodyTextField
 			editable={!meta.disabled}
 			multiline
 			value={state.value}

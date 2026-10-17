@@ -115,7 +115,7 @@ const { SurfaceDecoratorProvider, SurfaceDecoratorContext, useSurfaceDecorator }
 	await import("./theme/decorator-context");
 const { Skeleton } = await import("./components/skeleton");
 const { Input, InputFrameContext } = await import("./components/input");
-const { splitFieldStyle } = await import("./utils/text-field");
+const { splitFieldStyle, TextField } = await import("./utils/text-field");
 const { withHugSlack } = await import("./components/text");
 const { TabsList, TabsRoot, TabsTrigger } = await import("./components/tabs");
 
@@ -414,6 +414,46 @@ test("splitFieldStyle keeps placement on the wrapper and type on the field", () 
 	assert.equal("flex" in parts.input, false);
 	assert.equal(parts.placeholder.fontSize, 16);
 	assert.equal(parts.placeholder.padding, 0);
+});
+
+test("TextField drops value beside span children and falls back to the short placeholder", () => {
+	const render = (props: Record<string, unknown>) => {
+		const previous = internals.H;
+		internals.H = dispatcher;
+		try {
+			const field = TextField as unknown as {
+				render: (props: unknown, ref: unknown) => AnyElement;
+			};
+			return field.render(props, null);
+		} finally {
+			internals.H = previous;
+		}
+	};
+	const partsOf = (wrapper: AnyElement) =>
+		React.Children.toArray(wrapper.props.children as React.ReactNode) as AnyElement[];
+	const props = {
+		value: "",
+		placeholder: "Ask an agent, or mention one with @",
+		shortPlaceholder: "Ask an agent",
+		style: { fontSize: 14 },
+		children: "",
+	};
+
+	const first = render(props);
+	const [input, , probe] = partsOf(first);
+	assert.equal("value" in input!.props, false, "a value beside span children is not passed on");
+	assert.equal(flattenStyle(input!.props.style).fontFamily, undefined, "no family is imposed");
+	assert.equal(flattenStyle(first.props.style).minHeight, Math.ceil(14 * 1.35));
+	assert.equal(input!.props.placeholder, props.placeholder);
+
+	const measured = probe!.props.children as AnyElement;
+	const onTextLayout = measured.props.onTextLayout as (event: unknown) => void;
+	onTextLayout({ nativeEvent: { lines: [{}, {}] } });
+	const [wrapped] = partsOf(render(props));
+	assert.equal(wrapped!.props.placeholder, "Ask an agent", "a wrapping placeholder is shortened");
+
+	const [plain] = partsOf(render({ value: "draft", style: { fontSize: 14 } }));
+	assert.equal(plain!.props.value, "draft", "a field without spans stays controlled");
 });
 
 test("withHugSlack adds a trailing thin space on Android only", () => {

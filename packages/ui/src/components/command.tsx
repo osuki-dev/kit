@@ -12,7 +12,7 @@ import { Pressable, ScrollView, StyleSheet, View, type ViewProps } from "react-n
 import { useThemeTokens } from "../theme";
 import { Icon } from "./icon";
 import { Text } from "./text";
-import { TextField } from "../utils/text-field";
+import { BodyTextField } from "../utils/text-field";
 import { useHaptics } from "./haptics";
 
 export interface CommandState {
@@ -145,7 +145,7 @@ export function CommandInput({
 			style={[styles.inputRow, { borderBottomColor: theme.colors.border, gap: theme.spacing.sm }]}
 		>
 			<Icon name="Search" size={16} color={theme.colors.textMuted} />
-			<TextField
+			<BodyTextField
 				value={state.query}
 				editable={!meta.disabled}
 				autoFocus={autoFocus}

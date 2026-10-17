@@ -91,36 +91,48 @@ alias one of them at the import.
 Everything that produces a value. All of them are controlled: you hold the
 value, they tell you when it should change.
 
-| Component          | What it solves                                                                                                                                  | Main props                                                                                          |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `FieldGroup`       | Label, description, helper text, error and required marker around any control — including your own. Use it instead of hand-rolling a label row. | `label`, `description`, `helper`, `error`, `required`, `disabled`, `children`                       |
-| `Input`            | Single-line text, with the label and error states already wired.                                                                                | `label`, `value`, `onChangeText`, `variant`, `size`, `error`, `helper`, plus `TextInputProps`       |
-| `Textarea`         | Multi-line text that grows between a row floor and ceiling.                                                                                     | `label`, `value`, `onChangeText`, `minRows`, `maxRows`, `error`, `helper`                           |
-| `SearchInput`      | A filter field with the leading glyph and the clear button already there.                                                                       | `value`, `onChangeText`, `onClear`, `placeholder`                                                   |
-| `TextField`        | Your own field in the theme's face: the bare input under the kit's fields, placeholder drawn by `Text`, no fill, border or label.               | `TextInputProps`; `children` for value spans, `placeholder`, `placeholderTextColor`                 |
-| `Select`           | Picking one option out of a list, presented as a bottom sheet rather than a platform picker.                                                    | `options`, `value`, `onChange`, `label`, `placeholder`, `helper`, `error`, `required`, `sheetTitle` |
-| `Menu`             | Picking one option out of a list when the trigger is a button rather than a field. Same sheet, different affordance.                            | `items`, `onSelect`, `selectedId`, `label`, `triggerLabel`, `placeholder`, `sheetTitle`             |
-| `DateInput`        | A date, a time, or both, without importing a picker library per platform.                                                                       | `mode`, `value` (ISO string), `onChange`, `label`, `helper`, `error`, `applyLabel`, `todayLabel`    |
-| `RadioGroup`       | One choice out of a few, all visible at once.                                                                                                   | `options`, `value`, `onChange`, `label`, `error`, `direction`, `size`                               |
-| `SegmentedControl` | One choice out of two to four, as a compact switch rather than a list.                                                                          | `options`, `value`, `onChange`, `variant`, `radius`, `optionRadius`                                 |
-| `Checkbox`         | One independent boolean inside a row you lay out yourself.                                                                                      | `checked`, `onToggle`, `size`, `disabled`                                                           |
-| `Toggle`           | One boolean that takes effect immediately, as a switch.                                                                                         | `value`, `onValueChange`, `disabled`                                                                |
-| `Stepper`          | A small integer the user nudges rather than types — quantity, count, servings.                                                                  | `value`, `onChange`, `min`, `max`, `step`, `label`, `formatValue`                                   |
-| `OtpInput`         | A one-time code, one cell per digit, with paste and autofill behaving.                                                                          | `value`, `length`, `onChange`, `onComplete`, `label`, `error`                                       |
+| Component          | What it solves                                                                                                                                  | Main props                                                                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `FieldGroup`       | Label, description, helper text, error and required marker around any control — including your own. Use it instead of hand-rolling a label row. | `label`, `description`, `helper`, `error`, `required`, `disabled`, `children`                           |
+| `Input`            | Single-line text, with the label and error states already wired.                                                                                | `label`, `value`, `onChangeText`, `variant`, `size`, `error`, `helper`, plus `TextInputProps`           |
+| `Textarea`         | Multi-line text that grows between a row floor and ceiling.                                                                                     | `label`, `value`, `onChangeText`, `minRows`, `maxRows`, `error`, `helper`                               |
+| `SearchInput`      | A filter field with the leading glyph and the clear button already there.                                                                       | `value`, `onChangeText`, `onClear`, `placeholder`                                                       |
+| `TextField`        | Your own field: the bare input under the kit's fields, placeholder drawn by `Text`, no fill, border or label.                                   | `TextInputProps`; `children` for value spans, `placeholder`, `shortPlaceholder`, `placeholderTextColor` |
+| `Select`           | Picking one option out of a list, presented as a bottom sheet rather than a platform picker.                                                    | `options`, `value`, `onChange`, `label`, `placeholder`, `helper`, `error`, `required`, `sheetTitle`     |
+| `Menu`             | Picking one option out of a list when the trigger is a button rather than a field. Same sheet, different affordance.                            | `items`, `onSelect`, `selectedId`, `label`, `triggerLabel`, `placeholder`, `sheetTitle`                 |
+| `DateInput`        | A date, a time, or both, without importing a picker library per platform.                                                                       | `mode`, `value` (ISO string), `onChange`, `label`, `helper`, `error`, `applyLabel`, `todayLabel`        |
+| `RadioGroup`       | One choice out of a few, all visible at once.                                                                                                   | `options`, `value`, `onChange`, `label`, `error`, `direction`, `size`                                   |
+| `SegmentedControl` | One choice out of two to four, as a compact switch rather than a list.                                                                          | `options`, `value`, `onChange`, `variant`, `radius`, `optionRadius`                                     |
+| `Checkbox`         | One independent boolean inside a row you lay out yourself.                                                                                      | `checked`, `onToggle`, `size`, `disabled`                                                               |
+| `Toggle`           | One boolean that takes effect immediately, as a switch.                                                                                         | `value`, `onValueChange`, `disabled`                                                                    |
+| `Stepper`          | A small integer the user nudges rather than types — quantity, count, servings.                                                                  | `value`, `onChange`, `min`, `max`, `step`, `label`, `formatValue`                                       |
+| `OtpInput`         | A one-time code, one cell per digit, with paste and autofill behaving.                                                                          | `value`, `length`, `onChange`, `onComplete`, `label`, `error`                                           |
 
 `Select` and `Menu` both take `disabled` on individual options, so a temporarily
 unavailable choice can stay visible instead of disappearing.
 
-`TextField` is what the kit's own fields are built on. It sets the value and
-the placeholder in the theme's body face (variable axes included) at the
-style's size and weight, keeps placement styles on a wrapper, and passes
-`children` to the native input, so highlighted spans are nested `Text` runs
-(leave `value` unset when you pass them; the runs are the value):
+`TextField` is what the kit's own fields are built on. It draws the
+placeholder with `Text` at the style's family, size and weight, keeps
+placement styles on a wrapper, and passes `children` to the native input, so
+highlighted spans are nested `Text` runs. With `children` it does not pass
+`value` to the native input (React Native refuses both), but a controlled
+field can still pass `value` alongside: it decides whether the field is empty
+and so whether the placeholder shows.
+
+A style that names no `fontFamily` leaves the input's family to the platform
+(the kit's own fields set the theme's body face themselves); the drawn
+placeholder then falls back to the body face, and its line is sized from the
+style's `fontSize`, or the body size when there is none. `shortPlaceholder` is
+shown instead of `placeholder` when the full text would wrap at the field's
+width, measured once by an invisible copy, so an empty field stays one line
+high:
 
 ```tsx
 <TextField
+	value={query}
 	onChangeText={setQuery}
-	placeholder="Filter commands"
+	placeholder="Filter commands, or type @ to mention one"
+	shortPlaceholder="Filter commands"
 	placeholderTextColor={colors.textSubtle}
 	style={{ flex: 1, fontSize: 15 }}
 >
