@@ -21,14 +21,17 @@ CI, and repository policy.
 `@osuki-dev/ui` and `@osuki-dev/kit-community` are `fixed` — they always release
 together on the same version, so the support matrix stays meaningful.
 
-During `0.x`:
+Since `1.0`:
 
 | Change                                    | Bump                         |
 | ----------------------------------------- | ---------------------------- |
 | Bug fix, no API change                    | patch                        |
 | New component, prop, or variant           | minor                        |
-| Removed or renamed export                 | minor (breaking, documented) |
-| **Renamed a semantic or component token** | minor (breaking, documented) |
+| Removed or renamed export                 | major (breaking, documented) |
+| **Renamed a semantic or component token** | major (breaking, documented) |
+| Raised a peer dependency floor            | major (breaking, documented) |
+
+During `0.x` the breaking rows were minors.
 
 The token case is easy to get wrong. Consumers key their theme overrides on
 token names, so renaming one breaks them exactly like removing an export. Say so
@@ -64,6 +67,37 @@ Then, depending on whether unreleased changesets exist:
 
 So a release is: merge the version PR. Nothing else.
 
+The workflow uses `changesets/action@v2`, which requires `@changesets/cli` 3.
+The action passes its token to the version and publish scripts as
+`GITHUB_TOKEN`, which `@changesets/changelog-github` needs to link PRs and
+authors.
+
+## Pre-releases
+
+The repository is in changesets pre-release mode with the `beta` tag:
+`.changeset/pre.json` holds `{ "mode": "pre", "tag": "beta" }`. While it is
+there:
+
+- `changeset version` produces `X.Y.Z-beta.N` instead of `X.Y.Z`. The first
+  version PR after entering 2.0 pre mode turns `1.1.0` plus a `major` changeset
+  into `2.0.0-beta.0` for both packages.
+- Consumed changesets move to `.changeset/pre/` instead of being deleted. They
+  are kept for the final changelog; edit or delete one there if it no longer
+  applies to the stable release.
+- The version PR is titled `chore: version packages (beta)`.
+- `changeset publish` publishes under the `beta` dist-tag, so
+  `npm install @osuki-dev/ui` keeps resolving the latest stable release and
+  `@osuki-dev/ui@beta` opts in.
+- Every further changeset merged to `main` produces the next `beta.N`.
+
+To release the stable version, open a PR that runs `bunx changeset pre exit`
+and commits the change to `.changeset/pre.json`. The next version PR then
+produces `2.0.0` from everything in `.changeset/pre/` plus anything new, and
+publishes it as `latest`.
+
+To check what a version PR would produce without opening one, run
+`bunx changeset status --verbose`.
+
 ## Publishing credentials
 
 There are none. Publishing uses
@@ -97,7 +131,7 @@ therefore builds explicitly rather than relying on either behavior:
 ## Peer ranges
 
 `@osuki-dev/kit-community` depends on `@osuki-dev/ui` with a caret range
-(`^1.0.1`). This is deliberate: changesets rewrites internal dependency ranges
+(`^1.1.0`, rewritten to `^2.0.0-beta.0` by the first 2.0 version PR). This is deliberate: changesets rewrites internal dependency ranges
 on every version bump, and it can only preserve an upper bound when the range
 uses a form it understands. A `>=0.2.0 <1.0.0` range was silently rewritten to
 `>=0.2.1`, which would have let a future major satisfy it. It drifted back to a
