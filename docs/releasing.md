@@ -90,6 +90,21 @@ there:
   `@osuki-dev/ui@beta` opts in.
 - Every further changeset merged to `main` produces the next `beta.N`.
 
+### What a beta promises
+
+- A `beta.N` may break the API of the beta before it. Every such break is
+  stated in its changeset, so the changelog of each beta lists it.
+- Nothing deprecated during the betas survives into `2.0.0`: it is removed
+  before the stable release, not carried as a 2.x deprecation.
+- Renaming a token, a component token field or a surface slot is a break, in
+  a beta as everywhere else.
+- From `2.0.0` on, the table above applies again.
+
+The package versions in `package.json` stay at the last stable release
+(`1.1.0`) until the first version PR. Changesets computes the prerelease from
+them; hand-bumping a `package.json` to `2.0.0` would make it publish
+`3.0.0-beta.0`.
+
 To release the stable version, open a PR that runs `bunx changeset pre exit`
 and commits the change to `.changeset/pre.json`. The next version PR then
 produces `2.0.0` from everything in `.changeset/pre/` plus anything new, and

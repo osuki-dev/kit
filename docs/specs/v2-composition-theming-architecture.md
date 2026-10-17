@@ -1,7 +1,7 @@
 # @osuki-dev/ui 2.0.0: Composition Theming and AI Elements Architecture Specification
 
-> **Version**: 2.0.0-draft  
-> **Status**: In active execution (`feat/composition-theming-icons`)  
+> **Version**: 2.0.0  
+> **Status**: Implemented; ships first as `2.0.0-beta.0`, which CI publishes after the branch reaches `main` and the version PR is merged (not published yet). Consumers upgrade with [the migration guide](../migrating-to-2.0.md)  
 > **Target package**: `packages/ui` (`@osuki-dev/ui`)  
 > **Date**: October 2026
 
@@ -143,7 +143,7 @@ Each string fill is painted once. Unselected tabs and segments stay transparent 
 7. **`TransientPill`**. Short-lived floating pill for an immediate gesture or action.
 8. **Typography robustness.**
    - `Input`, `SearchInput`, `Textarea`, and `PromptInput` draw the placeholder with `Text`, so Android inherits the custom font. This stays inside those components. There is no extra public field component.
-   - `HugSlack` appends a thin space (`\u2009`) on Android so italic and wide glyphs are not clipped at the line end.
+   - Hug slack appends a thin space (`\u2009`) on Android so italic and wide glyphs are not clipped at the line end. It is opt-in: a font role's `trailingSlack` turns it on for every `Text` in that role, `hugSlack` sets it per `Text`, and nested and selectable text never get it.
 
 ---
 
@@ -177,7 +177,7 @@ Move WCAG 4.5:1 / 3:1 contrast and alpha work out of render. A global LRU caches
 ## 3. Dependencies
 
 ```
-packages/ui/package.json (2.0.0)
+packages/ui/package.json (2.0)
 ```
 
 ### Removed hard dependencies
@@ -187,13 +187,14 @@ packages/ui/package.json (2.0.0)
 
 ### Optional peer dependencies
 
+Declared in `peerDependenciesMeta` as optional, and loaded with a literal `require` inside a `try`, which Expo's Metro config resolves as an optional dependency:
+
 - `react-native-nano-icons` (recommended glyph engine)
-- `expo-glass-effect` (optional, iOS 26 Liquid Glass)
-- `expo-blur` (optional blur)
-- `@expo/ui` (optional SwiftUI components)
-- `react-native-reanimated` (optional UI-thread motion)
-- `react-native-keyboard-controller` (optional interactive keyboard scrolling)
-- `expo-image` (optional image cache)
+- `expo-glass-effect` (iOS 26 Liquid Glass in `GlassSurface`)
+- `expo-blur` (blur fallback in `GlassSurface`)
+- `lucide-react-native` and `react-native-svg` (the Lucide fallback in `Icon`)
+
+`@expo/ui`, `expo-font`, `expo-image`, `expo-router`, `react-native-reanimated`, `react-native-keyboard-controller` and `react-native-safe-area-context` stay required peers: components import them directly.
 
 Every optional dependency fails soft and falls back when it is absent.
 
