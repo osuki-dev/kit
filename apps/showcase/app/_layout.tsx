@@ -84,6 +84,10 @@ export default function RootLayout() {
 									>
 										<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 										<Stack.Screen
+											name="custom-theme"
+											options={{ headerShown: true, title: "Custom theme" }}
+										/>
+										<Stack.Screen
 											name="template-preview"
 											options={{
 												headerShown: false,
