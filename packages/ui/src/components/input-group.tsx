@@ -2,7 +2,7 @@ import React, { type ReactNode } from "react";
 import { StyleSheet, View, type TextInputProps, type ViewProps } from "react-native";
 import { useThemeTokens } from "../theme";
 import { Text } from "./text";
-import { TextField } from "../utils/text-field";
+import { BodyTextField } from "../utils/text-field";
 
 export interface InputGroupRootProps extends ViewProps {
 	children?: ReactNode;
@@ -61,7 +61,7 @@ export interface InputGroupInputProps extends Omit<TextInputProps, "style"> {
 export function InputGroupInput({ disabled = false, ...props }: InputGroupInputProps) {
 	const theme = useThemeTokens();
 	return (
-		<TextField
+		<BodyTextField
 			editable={!disabled}
 			placeholderTextColor={theme.colors.textDisabled}
 			style={[styles.input, { color: theme.colors.text }]}

@@ -161,8 +161,8 @@ Everything an app used to wrap kit components for now goes through the theme:
   that keeps an overhanging last glyph from being clipped (centred and
   shrink-wrapped labels excepted, see
   [theme.md](../packages/ui/docs/theme.md#trailing-slack)). See
-  [theme.md](../packages/ui/docs/theme.md#variable-fonts). `TextField` sets
-  your own fields in the same faces.
+  [theme.md](../packages/ui/docs/theme.md#variable-fonts). `TextField` draws
+  your own fields' placeholders in the same faces.
 
 ```tsx
 const profile: ThemeOverride = {

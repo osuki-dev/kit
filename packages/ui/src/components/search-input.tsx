@@ -21,7 +21,7 @@ import {
 	useThemeTokens,
 	type SurfaceMeta,
 } from "../theme";
-import { TextField } from "../utils/text-field";
+import { BodyTextField } from "../utils/text-field";
 import { Icon } from "./icon";
 import { SurfaceDecoration } from "./surface-decoration";
 
@@ -134,7 +134,7 @@ export const SearchInputRoot: React.FC<SearchInputProps> = ({
 				</View>
 			) : null}
 			<Icon name="Search" size={18} color={theme.colors.textMuted} />
-			<TextField
+			<BodyTextField
 				testID={testID}
 				value={value}
 				onChangeText={onChangeText}

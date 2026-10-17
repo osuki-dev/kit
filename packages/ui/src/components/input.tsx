@@ -24,7 +24,7 @@ import {
 	type SurfaceSlot,
 	type SurfaceMeta,
 } from "../theme";
-import { TextField } from "../utils/text-field";
+import { BodyTextField } from "../utils/text-field";
 import { Text } from "./text";
 import { SurfaceDecoration } from "./surface-decoration";
 
@@ -291,7 +291,7 @@ export function InputControl({ style }: { style?: TextStyle }) {
 					<SurfaceDecoration {...frame.decorationMeta} />
 				</View>
 			) : null}
-			<TextField
+			<BodyTextField
 				style={[frame.textStyle, style]}
 				placeholderTextColor={frame.placeholderColor}
 				onFocus={frame.onFocus}
