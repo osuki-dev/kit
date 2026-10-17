@@ -1,5 +1,31 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0-beta.1
+
+### Minor Changes
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`cae9956`](https://github.com/osuki-dev/kit/commit/cae99562404f1884e2287e2340df72cba2578875) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add a per-variant `shadow` token to `components.Button` (`primary`, `secondary` and `destructive` keep `pill`; `ghost` is `none`). A ghost button given a fill through `components.Button.ghost.background` now stays flat instead of gaining the light-mode pill shadow. `ShadowToken` is exported.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`aee2309`](https://github.com/osuki-dev/kit/commit/aee2309bac548207fd4710bc8ab6eaa9c47a1367) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Export `TextField` and `TextFieldProps`: the bare field under the kit's inputs, a `TextInput` set in the theme's body face (variable axes included) with its placeholder drawn by `Text` in the same face and no chrome. An app can now compose its own fonted field with custom value spans and placeholder without re-implementing it.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`2012410`](https://github.com/osuki-dev/kit/commit/2012410289677c76d4a212120037248b6231829c) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add `components.Input.hint`, the colour of the helper line under a field (default `textDisabled`, as before). The `Input` error pill now appears without its drop-in and layout spring when the system reduce-motion setting is on. A hand-built `ComponentTokens` object must add `Input.hint`; `createTheme` and `ThemeProvider` fill it in.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`6cce591`](https://github.com/osuki-dev/kit/commit/6cce5916664a3cb6d7db96fb65fe21d438808e96) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add `motion.press.easing`, the curve of the `PressableScale` dip (and so of `SegmentedControl` options), `Easing.out(Easing.cubic)` by default. It takes any Reanimated easing, such as `Easing.bezier(0.2, 0, 0, 1)`; `PressEasing` is exported. `DeepPartial` now keeps a function member of a union whole, so a theme override can set it. A hand-built `OsukiTheme` must add `motion.press.easing`; `createTheme` and `ThemeProvider` fill it in.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`68ebca6`](https://github.com/osuki-dev/kit/commit/68ebca617c2bb1bbac10b2c5e406744d0fb9b364) Thanks [@ryuhzk](https://github.com/ryuhzk)! - `SegmentedControl` options now dip to the new `motion.press.segment` scale (0.96) while held, through `PressableScale`, and hold still under reduce motion, instead of dimming to a fixed 0.72 opacity. The selection haptic is unchanged. A hand-built `OsukiTheme` must add `motion.press.segment`; `createTheme` and `ThemeProvider` fill it in.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`164cfd6`](https://github.com/osuki-dev/kit/commit/164cfd66ac0215feed912a627c65f4c87a01ef12) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add `components.Tabs.optionRadius`, the radius of the selected `pill` trigger, the sliding indicator and, with `segments` layering, every trigger, so a 2pt pill can sit inside a 4pt track. It defaults to `Tabs.radius`, so nothing changes until it is set.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`b70425a`](https://github.com/osuki-dev/kit/commit/b70425af0d05a24e6e5d922b008feb1a9f91eb4d) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add `layering` to `Tabs.Root` and the `Tabs` facade. The default, `overlay`, keeps the 2.0 behaviour: the list paints the `pill` track and the selection is an overlay on it. `segments` leaves the list clear and has each trigger paint its own fill, `tabs.track` (variant `segment`) when idle and `tabs.selected` as a `surface` when selected, so a translucent fill is never stacked on itself. `TabsLayering` is exported.
+
+### Patch Changes
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`cb7d1f7`](https://github.com/osuki-dev/kit/commit/cb7d1f72a2b7f5262aa585d05a261cf7b559924d) Thanks [@ryuhzk](https://github.com/ryuhzk)! - The `Button` root is a column again, as in 1.x. The 2.0 row root measured its content against the parent inside a wrapping column, so buttons there grew to twice their width with off-centre labels. `Button.Root` now keeps `Button.Background` as a layer and lays every other part out in one centred row, so compound buttons render as before.
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`6b092d6`](https://github.com/osuki-dev/kit/commit/6b092d68109da445c58b5daf688b0de7cb27d1eb) Thanks [@ryuhzk](https://github.com/ryuhzk)! - `Button` labels, `Tabs.Label` and `Tag` no longer take the Android trailing slack from a font role's `trailingSlack`: they are centred or as wide as their label, and the slack moved them off centre or widened the chip. Each takes `hugSlack` to turn it back on (`Tag.Label` and `Tag` gained the prop, with a `TagLabelProps` type).
+
+- [#14](https://github.com/osuki-dev/kit/pull/14) [`2664159`](https://github.com/osuki-dev/kit/commit/2664159b2c551db82d56ba1b7290832279ce55ab) Thanks [@ryuhzk](https://github.com/ryuhzk)! - On Android, `Text` now appends the trailing slack after the inner `fontVariationSettings` run, at the paragraph's face, instead of inside it. Inside the run its advance followed the requested weight, so centred labels in a variable face moved by a fraction of a point.
+
 ## 2.0.0-beta.0
 
 ### Major Changes
