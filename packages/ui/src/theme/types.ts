@@ -149,7 +149,13 @@ export interface ListItemTokens {
 export interface TabsTokens {
 	height: number;
 	padding: SpaceToken;
+	/** Track radius of the `pill` variant. */
 	radius: RadiusToken;
+	/**
+	 * Radius of the selected trigger, the sliding indicator and, with
+	 * `segments` layering, every trigger. Defaults to `radius`.
+	 */
+	optionRadius?: RadiusToken;
 	background: ColorToken;
 	activeBackground: ColorToken;
 	activeForeground: ColorToken;

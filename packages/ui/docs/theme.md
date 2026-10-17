@@ -342,6 +342,7 @@ The ones that shape an app's whole appearance:
 | `Button.{variant}.shadow`                                                                   | light-mode lift of a filled button (`ghost` flat) |
 | `Card.radius`                                                                               | which radius token each `Card` `radius` maps to   |
 | `Tabs.radius`, `Tabs.background`, `Tabs.activeBackground`                                   | the `pill` tabs track and selected trigger        |
+| `Tabs.optionRadius`                                                                         | the selected trigger and indicator (`radius`)     |
 | `Tabs.activeForeground`, `Tabs.inactiveForeground`, `Tabs.indicator`                        | tab labels and the underline                      |
 | `SegmentedControl.radius`, `SegmentedControl.optionRadius`                                  | the `rounded` segmented track and selected option |
 | `SegmentedControl.background`, `activeBackground`, `activeForeground`, `inactiveForeground` | segmented fills and labels                        |

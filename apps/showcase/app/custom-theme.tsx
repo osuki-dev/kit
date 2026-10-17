@@ -40,7 +40,7 @@ const PROFILES: Record<Profile, ThemeOverride> = {
 		components: {
 			Button: { radius: "sm" },
 			Input: { radius: "sm", searchRadius: "sm" },
-			Tabs: { radius: "sm" },
+			Tabs: { radius: "sm", optionRadius: "xs" },
 			SegmentedControl: { radius: "sm", optionRadius: "xs" },
 		},
 		motion: { press: { control: 1, surface: 0.97 } },
