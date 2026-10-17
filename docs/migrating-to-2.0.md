@@ -281,3 +281,18 @@ In Muqun that is the whole `@osuki-dev/ui` patch,
 `src/components/segmented-control.tsx`, the hand-drawn pill in
 `src/components/settings-segmented.tsx`, and
 `src/components/fonted-text-input.tsx`.
+
+## 8. New in beta.2
+
+`2.0.0-beta.2` removes the last reasons to keep a wrapper for 1.x parity.
+
+| What changed                                                                                                                                       | What you can delete                                                                                    |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `radius` and `optionRadius` props on `Tabs.Root`, the `Tabs` facade and `SegmentedControl`, overriding the theme's radius tokens for one instance. | A local tabs or segmented control that only existed to give one group different corners.               |
+| The `Tabs` sliding indicator travels on `motion.segmented.easing` as well as its `duration`; a theme override can set any four bezier values.      | A hand-drawn sliding pill kept for its curve.                                                          |
+| `TextField` with `children` no longer passes `value` to the native input, and takes `shortPlaceholder`.                                            | A local fonted field that only existed for mention spans in a controlled field or a short placeholder. |
+
+One break for `TextField` callers: a style without `fontFamily` is no longer
+set in the theme's body face, and the placeholder line follows the style's
+`fontSize` (or the body size) instead of a fixed 16. Name the family in the
+style to keep the beta.1 look. The kit's own fields are unchanged.
