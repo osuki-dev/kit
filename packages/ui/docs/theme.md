@@ -351,9 +351,10 @@ The ones that shape an app's whole appearance:
 
 Press feedback is a theme setting too. `motion.press` holds the scale each kind
 of control settles at while held — `control` (Button), `card` (PressableCard),
-`row` (ListItem), `chip` (Tag), and `surface` (the `PressableScale` default).
-Set one to `1` to turn its dip off. `PressableScale` also stays still when the
-system reduce-motion setting is on.
+`row` (ListItem), `chip` (Tag), `segment` (a `SegmentedControl` option), and
+`surface` (the `PressableScale` default). Set one to `1` to turn its dip off.
+`PressableScale` and `SegmentedControl` also stay still when the system
+reduce-motion setting is on; the selection haptic still plays.
 
 ```tsx
 <ThemeProvider theme={{ motion: { press: { control: 0.97, surface: 0.96 } } }}>

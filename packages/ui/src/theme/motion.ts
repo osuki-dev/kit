@@ -28,6 +28,7 @@ export const motion = {
 		card: 0.99, // PressableCard
 		row: 0.98, // ListItem
 		chip: 0.96, // Tag
+		segment: 0.96, // SegmentedControl option
 		surface: 0.985, // PressableScale
 		// PressableScale timing: the dip arrives under the finger and leaves slower.
 		inMs: 80,
