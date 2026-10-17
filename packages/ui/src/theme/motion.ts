@@ -3,6 +3,17 @@
  * Percussive, mechanical precision — no spring, no bounce
  */
 
+import type { EasingFunction, EasingFunctionFactory } from "react-native-reanimated";
+
+/** A Reanimated easing: `Easing.out(Easing.cubic)`, `Easing.bezier(...)`, ... */
+export type PressEasing = EasingFunction | EasingFunctionFactory;
+
+/** `Easing.out(Easing.cubic)`, written out so the theme does not load Reanimated. */
+function easeOutCubic(t: number): number {
+	"worklet";
+	return 1 - (1 - t) ** 3;
+}
+
 export const motion = {
 	// Durations
 	micro: 150, // Micro-interactions
@@ -33,6 +44,9 @@ export const motion = {
 		// PressableScale timing: the dip arrives under the finger and leaves slower.
 		inMs: 80,
 		outMs: 120,
+		// PressableScale curve, both ways. Any Reanimated easing, such as
+		// `Easing.bezier(0.2, 0, 0, 1)`.
+		easing: easeOutCubic as PressEasing,
 		// Button and PressableCard springs.
 		springIn: { stiffness: 520, damping: 34, mass: 0.72 },
 		springOut: { stiffness: 420, damping: 30, mass: 0.78 },

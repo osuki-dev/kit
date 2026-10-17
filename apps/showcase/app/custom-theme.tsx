@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, View, type TextStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Easing } from "react-native-reanimated";
 import {
 	Button,
 	Card,
@@ -43,7 +44,7 @@ const PROFILES: Record<Profile, ThemeOverride> = {
 			Tabs: { radius: "sm", optionRadius: "xs" },
 			SegmentedControl: { radius: "sm", optionRadius: "xs" },
 		},
-		motion: { press: { control: 1, surface: 0.97 } },
+		motion: { press: { control: 1, surface: 0.97, easing: Easing.bezier(0.2, 0, 0, 1) } },
 	},
 };
 

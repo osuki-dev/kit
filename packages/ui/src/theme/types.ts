@@ -198,13 +198,15 @@ export interface TextTokens {
 }
 
 /** Number literals widened, so a theme override can set any value. */
-type Widen<T> = T extends number
-	? number
-	: T extends readonly unknown[]
-		? T
-		: T extends object
-			? { [K in keyof T]: Widen<T[K]> }
-			: T;
+type Widen<T> = T extends (...args: never[]) => unknown
+	? T
+	: T extends number
+		? number
+		: T extends readonly unknown[]
+			? T
+			: T extends object
+				? { [K in keyof T]: Widen<T[K]> }
+				: T;
 
 /** `motion` as a theme carries it: the same keys, any values. */
 export type MotionTokens = Widen<typeof motion>;
@@ -243,12 +245,15 @@ export type Theme = OsukiTheme;
 export type Colors = ThemeColors;
 export type { FontFamily, FontWeight, TypeStyle, TypeStyleName, TextStyle };
 
+/** Distributes over a union, so a function member is kept whole. */
+type DeepPartialValue<V> = V extends (...args: never[]) => unknown
+	? V
+	: V extends object
+		? DeepPartial<V>
+		: V;
+
 export type DeepPartial<T> = {
-	[P in keyof T]?: T[P] extends (...args: never[]) => unknown
-		? T[P]
-		: T[P] extends object
-			? DeepPartial<T[P]>
-			: T[P];
+	[P in keyof T]?: DeepPartialValue<T[P]>;
 };
 
 export type ThemeOverride = DeepPartial<Omit<OsukiTheme, "mode">> & {
