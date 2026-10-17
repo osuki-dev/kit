@@ -150,6 +150,24 @@ export default function CustomThemeScreen() {
 							testID="custom-theme-tabs"
 						/>
 
+						<Section
+							title="Segment tabs"
+							description="layering=segments: each trigger paints its own fill, nothing stacks."
+						>
+							<Tabs
+								variant="pill"
+								layering="segments"
+								value={tab}
+								onChange={setTab}
+								options={[
+									{ label: "Cards", value: "cards" },
+									{ label: "Fields", value: "fields" },
+									{ label: "Empty", value: "empty" },
+								]}
+								testID="custom-theme-segment-tabs"
+							/>
+						</Section>
+
 						{tab === "cards" ? (
 							<View style={styles.stack}>
 								<Card variant="raised" border="subtle">

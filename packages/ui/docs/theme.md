@@ -405,6 +405,11 @@ The contract:
   `pill` variant, `SegmentedControl`) is an `overlay`, and its meta carries the
   resolved fill underneath as `over`, so a translucent policy can avoid
   multiplying itself or return an opaque fill for it.
+- `Tabs` can instead lay its fills side by side: `layering="segments"` on
+  `Tabs.Root` (or the `Tabs` facade) leaves the list clear and has each idle
+  trigger paint `tabs.track` (variant `segment`) and the selected one paint
+  `tabs.selected` as a `surface` with no `over`. Nothing is stacked, so a
+  translucent fill shows the background once, not twice.
 - Use `multiplyAlpha` for opacity, not `withAlpha`: `withAlpha` replaces the
   alpha, so it would make an already translucent token such as `primarySubtle`
   more opaque.
@@ -418,34 +423,34 @@ The contract:
 A slot names a fill. Decorator policies key on these names, so renaming one is
 a breaking change, like renaming a token.
 
-| Slot                                  | Painted by                                                | Role      |
-| ------------------------------------- | --------------------------------------------------------- | --------- |
-| `screens.page`                        | `Screen`, `ScrollScreen`, page `Surface`                  | `surface` |
-| `surfaces.surface`, `surfaces.raised` | `Surface` variants                                        | `surface` |
-| `cards.decoration`                    | `Card`                                                    | `surface` |
-| `buttons.{variant}.background`        | `Button` (`primary`, `secondary`, `ghost`, `destructive`) | `surface` |
-| `inputs.background`, `inputs.search`  | `Input`, `Textarea`, `SearchInput`                        | `surface` |
-| `inputs.error`                        | the `Input` error pill                                    | `surface` |
-| `prompt.background`                   | `PromptInput`                                             | `surface` |
-| `tabs.track`                          | `Tabs.List` (`pill`)                                      | `surface` |
-| `tabs.selected`                       | the selected `pill` trigger or indicator                  | `overlay` |
-| `tabs.badge`                          | `Tabs.Badge`                                              | `mark`    |
-| `segmented.track`                     | `SegmentedControl`                                        | `surface` |
-| `segmented.selected`                  | the selected segment                                      | `overlay` |
-| `toggles.track`                       | `Toggle`                                                  | `mark`    |
-| `tags.background`                     | `Tag`                                                     | `surface` |
-| `badges.background`                   | `Badge`                                                   | `mark`    |
-| `skeleton.fill`                       | `Skeleton`                                                | `surface` |
-| `empty.icon`                          | the `EmptyState` icon well                                | `surface` |
-| `alerts.{variant}`                    | `Alert` (`info`, `success`, `warning`, `danger`)          | `surface` |
-| `code.{variant}`                      | `CodeBlock` (`default`, `diff`, `terminal`, `compact`)    | `surface` |
-| `sheets.background`, `sheets.action`  | `Sheet` body, `ActionSheet` cancel                        | `surface` |
-| `dialogs.background`                  | `Modal` and `Dialog` content                              | `surface` |
-| `popovers.background`                 | `Popover`                                                 | `surface` |
-| `tooltips.background`                 | `Tooltip`                                                 | `surface` |
-| `toasts.background`                   | toasts                                                    | `surface` |
-| `menus.trigger`, `selects.trigger`    | `Menu` and `Select` triggers                              | `surface` |
-| `rows.background`                     | `ListItem`, when its token sets a fill                    | `surface` |
+| Slot                                  | Painted by                                                | Role                                |
+| ------------------------------------- | --------------------------------------------------------- | ----------------------------------- |
+| `screens.page`                        | `Screen`, `ScrollScreen`, page `Surface`                  | `surface`                           |
+| `surfaces.surface`, `surfaces.raised` | `Surface` variants                                        | `surface`                           |
+| `cards.decoration`                    | `Card`                                                    | `surface`                           |
+| `buttons.{variant}.background`        | `Button` (`primary`, `secondary`, `ghost`, `destructive`) | `surface`                           |
+| `inputs.background`, `inputs.search`  | `Input`, `Textarea`, `SearchInput`                        | `surface`                           |
+| `inputs.error`                        | the `Input` error pill                                    | `surface`                           |
+| `prompt.background`                   | `PromptInput`                                             | `surface`                           |
+| `tabs.track`                          | `Tabs.List` (`pill`), or each idle trigger in `segments`  | `surface`                           |
+| `tabs.selected`                       | the selected `pill` trigger or indicator                  | `overlay` (`surface` in `segments`) |
+| `tabs.badge`                          | `Tabs.Badge`                                              | `mark`                              |
+| `segmented.track`                     | `SegmentedControl`                                        | `surface`                           |
+| `segmented.selected`                  | the selected segment                                      | `overlay`                           |
+| `toggles.track`                       | `Toggle`                                                  | `mark`                              |
+| `tags.background`                     | `Tag`                                                     | `surface`                           |
+| `badges.background`                   | `Badge`                                                   | `mark`                              |
+| `skeleton.fill`                       | `Skeleton`                                                | `surface`                           |
+| `empty.icon`                          | the `EmptyState` icon well                                | `surface`                           |
+| `alerts.{variant}`                    | `Alert` (`info`, `success`, `warning`, `danger`)          | `surface`                           |
+| `code.{variant}`                      | `CodeBlock` (`default`, `diff`, `terminal`, `compact`)    | `surface`                           |
+| `sheets.background`, `sheets.action`  | `Sheet` body, `ActionSheet` cancel                        | `surface`                           |
+| `dialogs.background`                  | `Modal` and `Dialog` content                              | `surface`                           |
+| `popovers.background`                 | `Popover`                                                 | `surface`                           |
+| `tooltips.background`                 | `Tooltip`                                                 | `surface`                           |
+| `toasts.background`                   | toasts                                                    | `surface`                           |
+| `menus.trigger`, `selects.trigger`    | `Menu` and `Select` triggers                              | `surface`                           |
+| `rows.background`                     | `ListItem`, when its token sets a fill                    | `surface`                           |
 
 Scrims, pressed tints, handles and other decorative tints are not slots and do
 not go through the decorator.

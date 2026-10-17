@@ -43,6 +43,13 @@ export type TabsSize = "default" | "compact";
  * moving when the system reduce-motion setting is on.
  */
 export type TabsIndicator = "static" | "slide";
+/**
+ * Who paints the `pill` fills. `overlay` paints the track once on the list and
+ * the selection over it. `segments` leaves the list clear and has each trigger
+ * paint its own fill, the track's when idle and the selection's when
+ * selected, so a translucent fill is never stacked on itself.
+ */
+export type TabsLayering = "overlay" | "segments";
 
 export interface TabsState {
 	value: string;
@@ -57,6 +64,7 @@ export interface TabsMeta {
 	variant: TabsVariant;
 	size: TabsSize;
 	indicator: TabsIndicator;
+	layering: TabsLayering;
 }
 
 export interface TabsContextValue {
@@ -71,7 +79,7 @@ interface TriggerLayout {
 }
 
 interface TabsListContextValue {
-	/** The resolved track fill, which a selected pill is drawn over. */
+	/** The resolved track fill, which an `overlay` selection is drawn over. */
 	trackFill: string;
 	reportLayout: (value: string, layout: TriggerLayout) => void;
 }
@@ -88,6 +96,8 @@ export interface TabsRootProps {
 	variant?: TabsVariant;
 	size?: TabsSize;
 	indicator?: TabsIndicator;
+	/** Who paints the `pill` fills. Defaults to `overlay`. */
+	layering?: TabsLayering;
 }
 
 export function TabsRoot({
@@ -98,6 +108,7 @@ export function TabsRoot({
 	variant = "underline",
 	size = "default",
 	indicator = "static",
+	layering = "overlay",
 }: TabsRootProps) {
 	const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
 	const controlled = controlledValue !== undefined;
@@ -113,9 +124,9 @@ export function TabsRoot({
 		() => ({
 			state: { value },
 			actions: { setValue },
-			meta: { controlled, variant, size, indicator },
+			meta: { controlled, variant, size, indicator, layering },
 		}),
-		[controlled, indicator, setValue, size, value, variant],
+		[controlled, indicator, layering, setValue, size, value, variant],
 	);
 	return <TabsContext.Provider value={contextValue}>{children}</TabsContext.Provider>;
 }
@@ -126,20 +137,24 @@ export function useTabs(): TabsContextValue {
 	return context;
 }
 
-/** The `pill` selection fill, drawn over the track it sits on. */
-function useSelectionFill(trackFill: string, radius: number): string {
+/**
+ * The `pill` selection fill: an overlay on the track in `overlay` layering, a
+ * surface of its own in `segments` layering, where nothing is under it.
+ */
+function useSelectionFill(trackFill: string, radius: number, layering: TabsLayering): string {
 	const theme = useThemeTokens();
 	const base = theme.colors[theme.components.Tabs.activeBackground];
+	const segments = layering === "segments";
 	const meta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "tabs.selected",
-			role: "overlay",
-			over: trackFill,
+			role: segments ? "surface" : "overlay",
+			over: segments ? undefined : trackFill,
 			baseColor: base,
 			selected: true,
 			borderRadius: radius,
 		}),
-		[base, radius, trackFill],
+		[base, radius, segments, trackFill],
 	);
 	return useResolvedSurfaceFill(base, meta);
 }
@@ -149,9 +164,10 @@ export interface TabsListProps extends Omit<ViewProps, "style"> {
 }
 
 /**
- * The row of triggers. In the `pill` variant it paints the track once, with
- * its decoration once, and every selection is an overlay on top of it: the
- * same layering rule as `SegmentedControl`.
+ * The row of triggers. In the `pill` variant with `overlay` layering it paints
+ * the track once, with its decoration once, and every selection is an overlay
+ * on top of it: the same layering rule as `SegmentedControl`. With `segments`
+ * layering it stays clear and the triggers paint.
  */
 export function TabsList({ style, children, ...props }: TabsListProps) {
 	const theme = useThemeTokens();
@@ -159,8 +175,11 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 	const { state, meta } = useTabs();
 	const tabs = theme.components.Tabs;
 	const pill = meta.variant === "pill";
+	const paintsTrack = pill && meta.layering === "overlay";
 	const radius = pill ? theme.radius[tabs.radius] : 0;
-	const trackBase = pill ? (readStringFill(style) ?? theme.colors[tabs.background]) : "transparent";
+	const trackBase = paintsTrack
+		? (readStringFill(style) ?? theme.colors[tabs.background])
+		: (readStringFill(style) ?? "transparent");
 	const trackMeta = useMemo<SurfaceMeta>(
 		() => ({
 			slot: "tabs.track",
@@ -171,7 +190,7 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 		[meta.variant, radius, trackBase],
 	);
 	const trackFill = useResolvedSurfaceFill(trackBase, trackMeta);
-	const selectionFill = useSelectionFill(trackFill, radius);
+	const selectionFill = useSelectionFill(trackFill, radius, meta.layering);
 
 	const [layouts, setLayouts] = useState<Record<string, TriggerLayout>>({});
 	const reportLayout = useCallback((value: string, layout: TriggerLayout) => {
@@ -236,7 +255,7 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 	return (
 		<TabsListContext.Provider value={listContext}>
 			<View accessibilityRole="tablist" style={[listStyle, withoutStringFill(style)]} {...props}>
-				{pill ? <SurfaceDecoration {...trackMeta} /> : null}
+				{paintsTrack ? <SurfaceDecoration {...trackMeta} /> : null}
 				{sliding ? (
 					<Animated.View
 						pointerEvents="none"
@@ -272,9 +291,27 @@ export function TabsTrigger({
 	const tabs = theme.components.Tabs;
 	const pill = meta.variant === "pill";
 	const sliding = meta.indicator === "slide";
+	const segments = pill && meta.layering === "segments";
 	const radius = pill ? theme.radius[tabs.radius] : 0;
-	const selectionFill = useSelectionFill(list?.trackFill ?? "transparent", radius);
-	const fill = pill && selected && !sliding ? selectionFill : "transparent";
+	const selectionFill = useSelectionFill(list?.trackFill ?? "transparent", radius, meta.layering);
+	const segmentBase = segments ? theme.colors[tabs.background] : "transparent";
+	const segmentMeta = useMemo<SurfaceMeta>(
+		() => ({
+			slot: "tabs.track",
+			variant: "segment",
+			baseColor: segmentBase,
+			disabled,
+			borderRadius: radius,
+		}),
+		[disabled, radius, segmentBase],
+	);
+	const segmentFill = useResolvedSurfaceFill(segmentBase, segmentMeta);
+	// In `segments` layering an idle trigger paints the track's fill and the
+	// selected one the selection's; a sliding indicator paints the selection.
+	const idleSegment = segments && !selected;
+	let fill = "transparent";
+	if (pill && selected && !sliding) fill = selectionFill;
+	else if (idleSegment) fill = segmentFill;
 	const reportLayout = list?.reportLayout;
 	const handleLayout = useCallback(
 		(event: LayoutChangeEvent) => {
@@ -334,6 +371,7 @@ export function TabsTrigger({
 			]}
 			{...props}
 		>
+			{idleSegment ? <SurfaceDecoration {...segmentMeta} /> : null}
 			<TabsTriggerContext.Provider value={selected}>{children}</TabsTriggerContext.Provider>
 		</Pressable>
 	);
@@ -433,6 +471,7 @@ export interface TabsProps extends Omit<ViewProps, "style" | "children"> {
 	variant?: TabsVariant;
 	size?: TabsSize;
 	indicator?: TabsIndicator;
+	layering?: TabsLayering;
 	style?: StyleProp<ViewStyle>;
 }
 
@@ -443,6 +482,7 @@ function TabsFacade({
 	variant = "underline",
 	size = "default",
 	indicator = "static",
+	layering = "overlay",
 	style,
 	testID,
 	...props
@@ -454,6 +494,7 @@ function TabsFacade({
 			variant={variant}
 			size={size}
 			indicator={indicator}
+			layering={layering}
 		>
 			<TabsList style={style} testID={testID} {...props}>
 				{options.map((option) => (
