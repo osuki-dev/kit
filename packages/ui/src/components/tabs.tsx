@@ -177,6 +177,7 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 	const pill = meta.variant === "pill";
 	const paintsTrack = pill && meta.layering === "overlay";
 	const radius = pill ? theme.radius[tabs.radius] : 0;
+	const optionRadius = pill ? theme.radius[tabs.optionRadius ?? tabs.radius] : 0;
 	const trackBase = paintsTrack
 		? (readStringFill(style) ?? theme.colors[tabs.background])
 		: (readStringFill(style) ?? "transparent");
@@ -190,7 +191,7 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 		[meta.variant, radius, trackBase],
 	);
 	const trackFill = useResolvedSurfaceFill(trackBase, trackMeta);
-	const selectionFill = useSelectionFill(trackFill, radius, meta.layering);
+	const selectionFill = useSelectionFill(trackFill, optionRadius, meta.layering);
 
 	const [layouts, setLayouts] = useState<Record<string, TriggerLayout>>({});
 	const reportLayout = useCallback((value: string, layout: TriggerLayout) => {
@@ -245,11 +246,11 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 				? {
 						top: theme.spacing[tabs.padding],
 						bottom: theme.spacing[tabs.padding],
-						borderRadius: radius,
+						borderRadius: optionRadius,
 						backgroundColor: selectionFill,
 					}
 				: { bottom: 0, height: 2, backgroundColor: theme.colors[tabs.indicator] },
-		[pill, radius, selectionFill, tabs.indicator, tabs.padding, theme.colors, theme.spacing],
+		[optionRadius, pill, selectionFill, tabs.indicator, tabs.padding, theme.colors, theme.spacing],
 	);
 
 	return (
@@ -292,7 +293,7 @@ export function TabsTrigger({
 	const pill = meta.variant === "pill";
 	const sliding = meta.indicator === "slide";
 	const segments = pill && meta.layering === "segments";
-	const radius = pill ? theme.radius[tabs.radius] : 0;
+	const radius = pill ? theme.radius[tabs.optionRadius ?? tabs.radius] : 0;
 	const selectionFill = useSelectionFill(list?.trackFill ?? "transparent", radius, meta.layering);
 	const segmentBase = segments ? theme.colors[tabs.background] : "transparent";
 	const segmentMeta = useMemo<SurfaceMeta>(
