@@ -1,5 +1,17 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0-beta.2
+
+### Minor Changes
+
+- [#16](https://github.com/osuki-dev/kit/pull/16) [`056a304`](https://github.com/osuki-dev/kit/commit/056a304742a1b40dd07c45807ed777c59017d5c7) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add `radius` and `optionRadius` props to `Tabs.Root`, the `Tabs` facade and `SegmentedControl`: radius token names that override `components.Tabs` / `components.SegmentedControl` for that instance only, sliding indicator and `segments` layering included, so one tab group can stay pill-shaped in a theme whose other segmented controls are square. `TabsMeta` gains the matching optional `radius` and `optionRadius`.
+
+- [#16](https://github.com/osuki-dev/kit/pull/16) [`e57a6a5`](https://github.com/osuki-dev/kit/commit/e57a6a50f4b1456706235e9626f8fd217ef2519c) Thanks [@ryuhzk](https://github.com/ryuhzk)! - `TextField` fits a controlled field drawn as spans: with `children` it no longer passes `value` to the native input (React Native refuses both), and still uses it to decide whether the placeholder shows. It gains `shortPlaceholder`, shown when the full placeholder would wrap at the field's width. Breaking for beta.1 `TextField` callers: a style that names no `fontFamily` is no longer set in the theme's body face (name the family to keep it), and the placeholder line is sized from the style's `fontSize`, falling back to the theme's body size rather than a fixed 16. `Input`, `Textarea`, `SearchInput`, `PromptInput`, `InputGroup` and `Command` keep the body face.
+
+### Patch Changes
+
+- [#16](https://github.com/osuki-dev/kit/pull/16) [`172204f`](https://github.com/osuki-dev/kit/commit/172204f3d1da18d39c88396eea9bc7984a9b99fb) Thanks [@ryuhzk](https://github.com/ryuhzk)! - The `Tabs` sliding indicator now travels on the theme's `motion.segmented.easing` as well as its `duration`, instead of Reanimated's default curve; it still lands without travelling under reduce motion. `MotionTokens` widens readonly number tuples, so a theme override can set `motion.segmented.easing` (and the other bezier presets) to any four values.
+
 ## 2.0.0-beta.1
 
 ### Minor Changes
