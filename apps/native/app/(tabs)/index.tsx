@@ -5,8 +5,8 @@ import {
 	Platform,
 	Pressable,
 	ScrollView,
-	StatusBar as NativeStatusBar,
 	StyleSheet,
+	type ScrollViewInstance,
 	View,
 	useWindowDimensions,
 } from "react-native";
@@ -335,7 +335,7 @@ function HomeHeader({
 	const { width } = useWindowDimensions();
 	const { items } = useCart();
 	const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-	const heroScrollRef = useRef<ScrollView>(null);
+	const heroScrollRef = useRef<ScrollViewInstance>(null);
 	const [heroIndex, setHeroIndex] = useState(0);
 	const [featuredIndex, setFeaturedIndex] = useState(0);
 	const searchProgress = useSharedValue(0);
@@ -695,14 +695,6 @@ export default function Home() {
 	const displayItems = items.length > 0 ? items : homeFallbackProducts;
 	const featuredProducts = homeFallbackProducts.slice(0, 3);
 
-	useEffect(() => {
-		if (Platform.OS !== "android") {
-			return;
-		}
-
-		NativeStatusBar.setTranslucent(true);
-		NativeStatusBar.setBackgroundColor("transparent");
-	}, []);
 	const listData = useMemo<ProductListEntry[]>(() => {
 		if (layout === "single") {
 			return displayItems.map((item) => ({ type: "single", id: item.id, item }));

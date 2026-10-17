@@ -4,6 +4,7 @@ import {
 	TextInput,
 	View,
 	type StyleProp,
+	type TextInputInstance,
 	type TextInputProps,
 	type TextStyle,
 	type ViewStyle,
@@ -104,7 +105,9 @@ export function splitFieldStyle(style: TextInputProps["style"]): {
 	};
 }
 
-export const TextField = forwardRef<TextInput, TextInputProps>(function TextField(
+export const TextField: React.ForwardRefExoticComponent<
+	TextInputProps & React.RefAttributes<TextInputInstance>
+> = forwardRef<TextInputInstance, TextInputProps>(function TextField(
 	{
 		style,
 		placeholder,

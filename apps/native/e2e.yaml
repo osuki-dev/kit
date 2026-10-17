@@ -8,7 +8,6 @@ env:
   BASE_URL: "https://api.example.com"
   DEBUG: "true"
 
-
 # Commands Section
 ---
 # Launch the application under test

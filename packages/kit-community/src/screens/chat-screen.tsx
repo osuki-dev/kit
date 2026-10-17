@@ -1,5 +1,13 @@
 import React from "react";
-import { View, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput } from "react-native";
+import {
+	View,
+	ScrollView,
+	StyleSheet,
+	TouchableOpacity,
+	Image,
+	TextInput,
+	type ScrollViewInstance,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -98,7 +106,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
 	const insets = useSafeAreaInsets();
 	const { colors, fonts, spacing, typeStyles } = useTheme();
 	const { pagePadding } = useResponsiveTheme();
-	const scrollViewRef = React.useRef<ScrollView>(null);
+	const scrollViewRef = React.useRef<ScrollViewInstance>(null);
 
 	// Scroll to bottom when messages change
 	React.useEffect(() => {

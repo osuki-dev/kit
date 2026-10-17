@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { ScrollView, type ScrollViewProps } from "react-native";
+import { ScrollView, type ScrollViewInstance, type ScrollViewProps } from "react-native";
 
 export interface MessageScrollerProps extends ScrollViewProps {
 	/** Keep the latest message in view until the reader scrolls away. */
@@ -18,7 +18,7 @@ export function MessageScroller({
 	children,
 	...props
 }: MessageScrollerProps) {
-	const ref = useRef<ScrollView>(null);
+	const ref = useRef<ScrollViewInstance>(null);
 	const pinned = useRef(true);
 
 	return (

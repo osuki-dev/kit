@@ -34,7 +34,7 @@ jobs:
       pull-requests: write # open the "Version Packages" PR
       id-token: write # npm trusted publishing (OIDC)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # changesets diffs against the base branch
 
@@ -53,7 +53,7 @@ jobs:
       # provenance, then sends the empty token and the registry answers
       # `404 Not Found - PUT`, which reads like a missing package rather than an
       # auth failure. The registry defaults to npmjs.org anyway.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -74,21 +74,26 @@ jobs:
 
       - name: Create the version PR, or publish
         id: changesets
-        uses: changesets/action@v1
+        # v2 of the action requires @changesets/cli 3. It pushes the version
+        # commit through the GitHub API with the default `github-token`, and
+        # understands pre-release mode (`.changeset/pre.json`), where it titles
+        # the PR with the pre-release tag and publishes under that dist-tag.
+        uses: changesets/action@v2
         with:
-          # `version` writes the bumps and changelogs; the action opens a PR
-          # with them. Merging that PR runs this workflow again with no
-          # changesets left, and `publish` then goes to npm.
-          version: bun run version:packages
-          publish: bun run release:packages
-          title: "chore: version packages"
-          commit: "chore: version packages"
+          # `version-script` writes the bumps and changelogs; the action opens
+          # a PR with them. Merging that PR runs this workflow again with no
+          # changesets left, and `publish-script` then goes to npm.
+          version-script: bun run version:packages
+          publish-script: bun run release:packages
+          pr-title: "chore: version packages"
+          commit-message: "chore: version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
       - name: Report
         if: steps.changesets.outputs.published == 'true'
+        env:
+          PUBLISHED: ${{ steps.changesets.outputs.published-packages }}
         run: |
           echo "### Published" >> "$GITHUB_STEP_SUMMARY"
-          echo '${{ steps.changesets.outputs.publishedPackages }}' >> "$GITHUB_STEP_SUMMARY"
+          echo "$PUBLISHED" >> "$GITHUB_STEP_SUMMARY"

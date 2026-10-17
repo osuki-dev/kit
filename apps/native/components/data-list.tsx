@@ -62,7 +62,7 @@ export function DataList<T>({
 		onScroll,
 		scrollEventThrottle: 16,
 		showsVerticalScrollIndicator: false,
-		ListHeaderComponent,
+		ListHeaderComponent: ListHeaderComponent ?? undefined,
 		refreshControl: onRefresh ? (
 			<RefreshControl
 				refreshing={refreshing}
@@ -101,7 +101,7 @@ export function DataList<T>({
 			<View style={{ paddingVertical: spacing["lg"] }}>
 				<ActivityIndicator color={colors.primary} />
 			</View>
-		) : null,
+		) : undefined,
 	};
 
 	if (Platform.OS === "web") {

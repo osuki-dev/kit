@@ -1,11 +1,5 @@
 import { useCallback, useRef } from "react";
-import {
-	Pressable,
-	StyleSheet,
-	TextInput,
-	View,
-	type TextInput as TextInputRef,
-} from "react-native";
+import { Pressable, StyleSheet, TextInput, View, type TextInputInstance } from "react-native";
 import { useFocusEffect } from "expo-router";
 
 import { Icon, resolveFontStyle, useTheme } from "@osuki-dev/ui";
@@ -23,7 +17,7 @@ export function SearchHeaderInput({
 	onClear: () => void;
 }) {
 	const { colors, fonts, mode, shadow, typeStyles } = useTheme();
-	const inputRef = useRef<TextInputRef>(null);
+	const inputRef = useRef<TextInputInstance>(null);
 
 	useFocusEffect(
 		useCallback(() => {

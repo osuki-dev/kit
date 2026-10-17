@@ -17,19 +17,28 @@ Nothing is bundled. The kit expects the host app to own every native module it
 touches, so that an app has one copy of Reanimated, one copy of safe-area
 context, and one keyboard strategy.
 
-| Package                            | Range                  | Needed for                                                 |
-| ---------------------------------- | ---------------------- | ---------------------------------------------------------- |
-| `react`                            | `>=19.2.3`             | everything                                                 |
-| `react-native`                     | `>=0.85.0`             | everything                                                 |
-| `react-native-safe-area-context`   | `>=5.7.0`              | `Screen`, `ScrollScreen`, `TopBar`, sheets                 |
-| `react-native-reanimated`          | `>=4.3.1`              | `Text` marquee, `PressableScale`, sheets, toasts, skeleton |
-| `react-native-svg`                 | `>=15.15.4`            | `Icon`                                                     |
-| `lucide-react-native`              | `^0.487.0 \|\| ^1.0.0` | `Icon`                                                     |
-| `react-native-keyboard-controller` | `>=1.21.6`             | the four `Keyboard*` components                            |
-| `expo-font`                        | `>=57.0.0`             | `FontLoader`                                               |
-| `expo-image`                       | `>=56.0.0`             | `Image`                                                    |
-| `expo-router`                      | `>=57.0.4`             | `createNavigationTheme`, `useNavigationTheme`              |
-| `@expo/ui`                         | `>=57.0.4`             | `DateInput`                                                |
+| Package                            | Range      | Needed for                                                 |
+| ---------------------------------- | ---------- | ---------------------------------------------------------- |
+| `react`                            | `>=19.3.0` | everything                                                 |
+| `react-native`                     | `>=0.88.0` | everything                                                 |
+| `react-native-safe-area-context`   | `>=5.10.0` | `Screen`, `ScrollScreen`, `TopBar`, sheets                 |
+| `react-native-reanimated`          | `>=4.7.0`  | `Text` marquee, `PressableScale`, sheets, toasts, skeleton |
+| `react-native-keyboard-controller` | `>=1.22.0` | the four `Keyboard*` components                            |
+| `expo-font`                        | `>=58.0.0` | `FontLoader`                                               |
+| `expo-image`                       | `>=58.0.0` | `Image`                                                    |
+| `expo-router`                      | `>=58.0.0` | `createNavigationTheme`, `useNavigationTheme`              |
+| `@expo/ui`                         | `>=58.0.0` | `DateInput`, `SegmentedControl`, `Slider` on iOS           |
+
+These are optional. Each one is loaded only when present, and the component
+falls back without it:
+
+| Package                   | Range                  | Used by                                              |
+| ------------------------- | ---------------------- | ---------------------------------------------------- |
+| `lucide-react-native`     | `^0.487.0 \|\| ^1.0.0` | `Icon` names no `IconProvider` resolver claims       |
+| `react-native-svg`        | `>=15.16.0`            | required by `lucide-react-native`                    |
+| `react-native-nano-icons` | `>=1.0.0`              | `createNanoIconSet` glyphs drawn natively            |
+| `expo-glass-effect`       | `>=58.0.0`             | `GlassSurface` Liquid Glass on iOS 26                |
+| `expo-blur`               | `>=58.0.0`             | `GlassSurface` blur when Liquid Glass is unavailable |
 
 `react-native-worklets` is not listed above because Reanimated 4 declares it
 itself — install it alongside Reanimated, not because of this kit.

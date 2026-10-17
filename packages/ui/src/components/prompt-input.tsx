@@ -12,10 +12,9 @@ import {
 	StyleSheet,
 	View,
 	type GestureResponderEvent,
-	type NativeSyntheticEvent,
 	type StyleProp,
-	type TextInputContentSizeChangeEventData,
-	type TextInputKeyPressEventData,
+	type TextInputContentSizeChangeEvent,
+	type TextInputKeyPressEvent,
 	type TextInputProps,
 	type TextStyle,
 	type ViewProps,
@@ -201,7 +200,7 @@ export function PromptInputTextarea({
 	const [inputHeight, setInputHeight] = useState(calculatedMinHeight);
 
 	const handleContentSizeChange = useCallback(
-		(event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+		(event: TextInputContentSizeChangeEvent) => {
 			const height = event.nativeEvent.contentSize.height;
 			setInputHeight(Math.max(calculatedMinHeight, Math.min(calculatedMaxHeight, height)));
 		},
@@ -225,7 +224,7 @@ export function PromptInputTextarea({
 	);
 
 	const handleKeyPress = useCallback(
-		(event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+		(event: TextInputKeyPressEvent) => {
 			onKeyPress?.(event);
 			if (Platform.OS === "web") {
 				const nativeEvent = event.nativeEvent as unknown as KeyboardEvent;

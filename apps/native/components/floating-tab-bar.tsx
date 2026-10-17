@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from "react-native";
-import type { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
+import type { BottomTabBarProps } from "expo-router/tabs";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { BlurView } from "expo-blur";
 
@@ -149,7 +149,8 @@ function FloatingTabItem({
 export function FloatingTabBar({
 	state,
 	descriptors: _descriptors,
-	navigation,
+	emitter,
+	navigateToTab,
 	insets,
 }: BottomTabBarProps) {
 	const { colors, spacing, radius, mode, shadow } = useTheme();
@@ -227,14 +228,14 @@ export function FloatingTabBar({
 
 					const onPress = () => {
 						haptics.feedback(active ? "selection" : "light");
-						const event = navigation.emit({
+						const event = emitter.emit({
 							type: "tabPress",
 							target: route.key,
 							canPreventDefault: true,
 						});
 
 						if (!active && !event.defaultPrevented) {
-							navigation.navigate(route.name, route.params);
+							navigateToTab(route.key);
 						}
 					};
 
