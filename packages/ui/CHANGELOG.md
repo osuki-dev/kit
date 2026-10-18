@@ -1,5 +1,13 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- [#18](https://github.com/osuki-dev/kit/pull/18) [`342eecd`](https://github.com/osuki-dev/kit/commit/342eecd3858b712edbb0790638dc9b0586aca0bd) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Play PressableScale, PressableCard, Button, ListItem and Tag haptics only on confirmed presses or handled long presses. Scrolling and cancelled presses remain silent while press animations and caller press-in/out handlers stay unchanged.
+
+- [#18](https://github.com/osuki-dev/kit/pull/18) [`342eecd`](https://github.com/osuki-dev/kit/commit/342eecd3858b712edbb0790638dc9b0586aca0bd) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Restore `tabs.selected` artwork for static and sliding pill selections. On iOS, use the themed segmented control when radii, component tokens, fills or foreground colours are customized, while preserving the system control for the default appearance.
+
 ## 2.0.0-beta.2
 
 ### Minor Changes

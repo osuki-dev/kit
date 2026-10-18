@@ -1,6 +1,6 @@
 {
 	"name": "@osuki-dev/kit-community",
-	"version": "2.0.0-beta.2",
+	"version": "2.0.0-beta.3",
 	"private": false,
 	"description": "Open-source community screen templates for Osuki Expo and React Native apps.",
 	"keywords": [
