@@ -52,7 +52,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
  */
 export const TagRoot: React.FC<
 	Omit<TagProps, "children" | "hugSlack"> & { children?: React.ReactNode }
-> = ({ children, variant = "default", disabled = false, style, onPress, ...rest }) => {
+> = ({ children, variant = "default", disabled = false, style, onPress, onLongPress, ...rest }) => {
 	const { colors, mode, motion, shadow } = useThemeTokens();
 	const haptics = useHaptics();
 	const scale = useSharedValue(1);
@@ -61,9 +61,23 @@ export const TagRoot: React.FC<
 		transform: [{ scale: scale.value }],
 	}));
 
-	const handlePressIn = () => {
+	// Native press recognition suppresses onPress after a handled long press.
+	// Keeping feedback here leaves responder cancellation (including scrolling) silent.
+	const handlePress: TouchableOpacityProps["onPress"] = () => {
 		if (!disabled && onPress) {
 			haptics.feedback("selection");
+			onPress();
+		}
+	};
+	const handleLongPress: TouchableOpacityProps["onLongPress"] = (event) => {
+		if (!disabled && onLongPress) {
+			haptics.feedback("selection");
+			onLongPress(event);
+		}
+	};
+
+	const handlePressIn = () => {
+		if (!disabled && onPress) {
 			scale.value = withSpring(motion.press.chip, {
 				stiffness: 400,
 				damping: 25,
@@ -102,10 +116,11 @@ export const TagRoot: React.FC<
 	if (onPress) {
 		return (
 			<AnimatedTouchableOpacity
-				onPress={onPress}
+				onPress={handlePress}
 				disabled={disabled}
 				accessibilityRole="button"
 				accessibilityState={{ disabled }}
+				onLongPress={onLongPress ? handleLongPress : undefined}
 				onPressIn={handlePressIn}
 				onPressOut={handlePressOut}
 				activeOpacity={1}

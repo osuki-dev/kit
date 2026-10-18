@@ -21,7 +21,7 @@ export interface PressableScaleProps extends Omit<PressableProps, "style" | "chi
 	 * at 0.99 looks dead. Defaults to the theme's `motion.press.surface`.
 	 */
 	pressedScale?: number;
-	/** Haptic played on press-in. `"none"` opts a control out entirely. */
+	/** Haptic played on a confirmed press or long press. `"none"` opts a control out entirely. */
 	feedback?: PressableScaleFeedback;
 	/** Additional styles; the press transform is always composed on top. */
 	style?: StyleProp<ViewStyle>;
@@ -61,6 +61,8 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
 	children,
 	disabled,
 	feedback = "selection",
+	onPress,
+	onLongPress,
 	onPressIn,
 	onPressOut,
 	pressedScale,
@@ -78,29 +80,34 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
 		transform: [{ scale: scale.value }],
 	}));
 
+	// Native press recognition suppresses onPress after a handled long press.
+	// Keeping feedback here leaves responder cancellation (including scrolling) silent.
+	const handlePress: PressableProps["onPress"] = (event) => {
+		if (!disabled && onPress) {
+			if (feedback !== "none") haptics.feedback(feedback);
+			onPress(event);
+		}
+	};
+	const handleLongPress: PressableProps["onLongPress"] = (event) => {
+		if (!disabled && onLongPress) {
+			if (feedback !== "none") haptics.feedback(feedback);
+			onLongPress(event);
+		}
+	};
+
 	const handlePressIn = useCallback<NonNullable<PressableProps["onPressIn"]>>(
 		(event) => {
 			if (disabled) {
 				onPressIn?.(event);
 				return;
 			}
-			if (feedback !== "none") haptics.feedback(feedback);
 			scale.value = withTiming(restingScale, {
 				duration: motion.press.inMs,
 				easing: motion.press.easing,
 			});
 			onPressIn?.(event);
 		},
-		[
-			disabled,
-			feedback,
-			haptics,
-			motion.press.easing,
-			motion.press.inMs,
-			onPressIn,
-			restingScale,
-			scale,
-		],
+		[disabled, motion.press.easing, motion.press.inMs, onPressIn, restingScale, scale],
 	);
 
 	const handlePressOut = useCallback<NonNullable<PressableProps["onPressOut"]>>(
@@ -118,6 +125,8 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
 		<AnimatedPressable
 			{...rest}
 			disabled={disabled}
+			onPress={onPress ? handlePress : undefined}
+			onLongPress={onLongPress ? handleLongPress : undefined}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
 			style={[style, animatedStyle]}

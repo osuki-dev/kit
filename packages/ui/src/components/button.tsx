@@ -99,6 +99,8 @@ export function ButtonRoot({
 	loading = false,
 	slot,
 	style,
+	onPress,
+	onLongPress,
 	onPressIn,
 	onPressOut,
 	children,
@@ -173,10 +175,24 @@ export function ButtonRoot({
 		variantTokens.border,
 	]);
 
+	// Native press recognition suppresses onPress after a handled long press.
+	// Keeping feedback here leaves responder cancellation (including scrolling) silent.
+	const handlePress: PressableProps["onPress"] = (event) => {
+		if (!isDisabled && onPress) {
+			haptics.feedback("light");
+			onPress(event);
+		}
+	};
+	const handleLongPress: PressableProps["onLongPress"] = (event) => {
+		if (!isDisabled && onLongPress) {
+			haptics.feedback("light");
+			onLongPress(event);
+		}
+	};
+
 	const handlePressIn: PressableProps["onPressIn"] = (event) => {
 		if (!isDisabled) {
-			haptics.feedback("light");
-			// Reduce motion keeps the haptic and drops the movement.
+			// Reduce motion drops the movement; confirmed actions still have feedback.
 			if (!reduceMotion) pressProgress.value = withSpring(1, theme.motion.press.springIn);
 		}
 		onPressIn?.(event);
@@ -231,6 +247,8 @@ export function ButtonRoot({
 				disabled={isDisabled}
 				accessibilityRole="button"
 				accessibilityState={{ disabled: isDisabled, busy: loading }}
+				onPress={onPress ? handlePress : undefined}
+				onLongPress={onLongPress ? handleLongPress : undefined}
 				onPressIn={handlePressIn}
 				onPressOut={handlePressOut}
 				{...rest}

@@ -35,6 +35,7 @@ mock.module("react-native", () => ({
 	ActivityIndicator: "ActivityIndicator",
 	Image: "Image",
 	Pressable: "Pressable",
+	TouchableOpacity: "TouchableOpacity",
 	ScrollView: "ScrollView",
 	StyleSheet: {
 		absoluteFill: {},
@@ -103,8 +104,13 @@ mock.module("expo-router/react-navigation", () => ({
 	DefaultTheme: { dark: false, colors: {}, fonts: {} },
 }));
 
+mock.module("@expo/ui/community/segmented-control", () => ({ default: "SystemSegmentedControl" }));
+
 const React = (await import("react")).default;
-const { defaultTheme } = await import("./theme");
+const { defaultTheme, createTheme } = await import("./theme");
+let fallbackTheme = defaultTheme;
+const { SegmentedControl } = await import("./components/segmented-control");
+const { SurfaceDecoration } = await import("./components/surface-decoration");
 const { Button, ButtonRoot, ButtonBackground, ButtonLabel, ButtonIcon, ButtonSpinner } =
 	await import("./components/button");
 const { Card, CardRoot, CardBackground, CardHeader, CardContent, CardFooter } =
@@ -202,7 +208,7 @@ const contextStore = new Map<unknown, unknown>();
 
 const dispatcher = {
 	useCallback: (fn: unknown) => fn,
-	useContext: (ctx: unknown) => contextStore.get(ctx) ?? defaultTheme,
+	useContext: (ctx: unknown) => contextStore.get(ctx) ?? fallbackTheme,
 	useDebugValue: () => {},
 	useEffect: () => {},
 	useId: () => ":r0:",
@@ -501,6 +507,157 @@ test("Tabs segments layering leaves the track clear and paints each trigger once
 		const selected = metas.find((meta) => meta.slot === "tabs.selected");
 		assert.equal(selected?.role, "surface");
 		assert.equal(selected?.over, undefined);
+	} finally {
+		contextStore.clear();
+	}
+});
+
+test("Tabs paints selected artwork exactly once on its actual static or sliding surface", () => {
+	for (const layering of ["overlay", "segments"] as const) {
+		for (const indicator of ["static", "slide"] as const) {
+			const calls: Array<{ slot?: string; role?: string; over?: string }> = [];
+			contextStore.set(SurfaceDecoratorContext, {
+				renderDecoration: (meta: (typeof calls)[number]) => {
+					calls.push(meta);
+					return meta.slot === "tabs.selected" ? React.createElement("Artwork") : null;
+				},
+			});
+			try {
+				const root = renderComponent(
+					React.createElement(TabsRoot, {
+						value: "a",
+						variant: "pill",
+						layering,
+						indicator,
+						children: null,
+					}),
+				);
+				contextStore.set(root.type, root.props.value);
+				const list = renderComponent(React.createElement(TabsList, { children: null }));
+				contextStore.set(list.type, list.props.value);
+				const visit = (node: unknown): void => {
+					for (const child of React.Children.toArray(node as React.ReactNode)) {
+						if (!React.isValidElement(child)) continue;
+						const element = child as AnyElement;
+						if (element.type === SurfaceDecoration) renderComponent(element);
+						else visit(element.props.children);
+					}
+				};
+				visit(list.props.children);
+				for (const value of ["a", "b"]) {
+					visit(renderComponent(React.createElement(TabsTrigger, { value, children: null })));
+				}
+				const selected = calls.filter((meta) => meta.slot === "tabs.selected");
+				assert.equal(selected.length, 1, `${layering}/${indicator}`);
+				assert.equal(selected[0]?.role, layering === "segments" ? "surface" : "overlay");
+				assert.equal(
+					selected[0]?.over,
+					layering === "segments" ? undefined : defaultTheme.colors.surfaceRaised,
+				);
+			} finally {
+				contextStore.clear();
+			}
+		}
+	}
+});
+
+test("iOS segmented control preserves the system default but honors custom selection appearance", () => {
+	const props = {
+		options: [
+			{ label: "A", value: "a" },
+			{ label: "B", value: "b" },
+		],
+		value: "a",
+		onChange: () => {},
+	};
+	const render = (extra = {}) =>
+		renderComponent(React.createElement(SegmentedControl, { ...props, ...extra }));
+	try {
+		const system = render().props.children as AnyElement;
+		assert.equal(system.type, "SystemSegmentedControl");
+		const segments = (root: AnyElement) =>
+			React.Children.toArray(root.props.children as React.ReactNode) as AnyElement[];
+		const custom = segments(render({ optionRadius: "none" }));
+		assert.equal(custom[0]?.props.radius, 0);
+		assert.equal(custom[0]?.props.selected, true);
+		assert.equal(custom[0]?.props.fill, defaultTheme.colors.surface);
+		fallbackTheme = createTheme("light", {
+			components: { SegmentedControl: { optionRadius: "sm", activeBackground: "primary" } },
+		});
+		const themed = segments(render());
+		assert.equal(themed[0]?.props.radius, fallbackTheme.radius.sm);
+		assert.equal(themed[0]?.props.fill, fallbackTheme.colors.primary);
+		fallbackTheme = createTheme("light", { colors: { text: "#123456" } });
+		assert.notEqual(segments(render())[0]?.type, "SystemSegmentedControl");
+	} finally {
+		fallbackTheme = defaultTheme;
+		contextStore.clear();
+	}
+});
+
+test("press feedback waits for native recognition and preserves cancellation", async () => {
+	const { HapticsProvider } = await import("./components/haptics");
+	const { PressableScale } = await import("./components/pressable-scale");
+	const { PressableCard } = await import("./components/pressable-card");
+	const { ListItemRoot } = await import("./components/list-item");
+	const { TagRoot } = await import("./components/tag");
+	const calls: string[] = [];
+	const provider = renderComponent(
+		React.createElement(HapticsProvider, {
+			enabled: true,
+			children: null,
+			feedback: () => {
+				calls.push("haptic");
+			},
+		}),
+	);
+	contextStore.set(provider.type, provider.props.value);
+	try {
+		for (const Component of [PressableScale, PressableCard, ButtonRoot, ListItemRoot, TagRoot]) {
+			const render = (extra: Record<string, unknown> = {}) => {
+				const element = renderComponent(
+					React.createElement(Component as React.ComponentType<any>, {
+						title: "Row",
+						children: "Content",
+						onPress: () => calls.push("press"),
+						...extra,
+					}),
+				);
+				return Component === ButtonRoot ? (element.props.children as AnyElement) : element;
+			};
+			const control = render();
+			calls.length = 0;
+			(control.props.onPressIn as Function)({});
+			(control.props.onPressOut as Function)({});
+			assert.equal(calls.length, 0, "cancelled press/scroll has no haptic or action");
+			assert.equal(control.props.onLongPress, undefined, "no artificial long-press handler");
+			(control.props.onPress as Function)({});
+			assert.deepEqual(calls, ["haptic", "press"]);
+			calls.length = 0;
+			const long = render({ onLongPress: () => calls.push("long") });
+			(long.props.onPressIn as Function)({});
+			(long.props.onLongPress as Function)({});
+			(long.props.onPressOut as Function)({});
+			assert.deepEqual(calls, ["haptic", "long"], "recognized long press has one feedback");
+			calls.length = 0;
+			const disabled = render({ disabled: true, onLongPress: () => calls.push("long") });
+			(disabled.props.onPress as Function)({});
+			(disabled.props.onLongPress as Function)({});
+			assert.equal(calls.length, 0);
+		}
+		calls.length = 0;
+		const silent = renderComponent(
+			React.createElement(PressableScale, {
+				feedback: "none",
+				onPress: () => calls.push("press"),
+				onPressIn: () => calls.push("in"),
+				onPressOut: () => calls.push("out"),
+			}),
+		);
+		(silent.props.onPressIn as Function)({});
+		(silent.props.onPressOut as Function)({});
+		(silent.props.onPress as Function)({});
+		assert.deepEqual(calls, ["in", "out", "press"]);
 	} finally {
 		contextStore.clear();
 	}

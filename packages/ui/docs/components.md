@@ -166,6 +166,10 @@ Things that are tappable, and rows whose whole point is to be tapped.
 | `PressableCard`  | A whole card that is one tap target, with the press feedback already correct.                                                                                            | `onPress`, `children`, `variant`, `border`, `radius`, `padding`, `disabled`                               |
 | `PressableScale` | Adding a press dip and a haptic to something that is otherwise not a kit component.                                                                                      | `pressedScale`, `feedback`, `children`                                                                    |
 
+PressableScale, PressableCard, Button, ListItem and Tag play haptics only after
+a press or a handled long press is recognized. A touch cancelled by scrolling
+stays silent. Press-in/out animations and caller handlers keep their timing.
+
 A string child becomes the label; for an icon, use `leftIcon` / `rightIcon`,
 which take an `IconName`. For anything else, compose the parts:
 
@@ -213,8 +217,9 @@ translucent pill wants (see [theme.md](./theme.md#surface-decoration)).
 `optionRadius` radius token names for one instance whose corners differ from
 the theme's `components.Tabs` / `components.SegmentedControl` tokens (see
 [theme.md](./theme.md#overriding-the-theme)). On iOS, an undecorated
-`SegmentedControl` without disabled options is the system control, which draws
-its own segments; `radius` still shapes its track.
+`SegmentedControl` with default appearance and no disabled options uses the
+system control. Custom radii, component tokens, fills or foreground colours use
+the themed implementation so those choices also reach the selection.
 
 `Sheet` is the one namespace that is **not** callable on its own — there is no
 `<Sheet />`. Use `BottomSheet` for the convenience form. `Modal`, `Dialog` and

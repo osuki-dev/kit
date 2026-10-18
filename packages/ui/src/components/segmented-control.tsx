@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import ExpoSegmentedControl from "@expo/ui/community/segmented-control";
 import {
+	osukiDarkTheme,
+	osukiLightTheme,
 	readStringFill,
 	useResolvedSurfaceFill,
 	useSurfaceDecorator,
@@ -51,8 +53,8 @@ export interface SegmentedControlProps extends Omit<ViewProps, "style"> {
  *
  * Unselected options stay clear, so the track is the only paint behind them.
  * Both colors go through the surface decorator once. A system control is used
- * on iOS only when nothing is decorating fills — that widget cannot take a
- * custom opacity.
+ * on iOS only with default appearance, no disabled options and no fill
+ * decorator; custom appearance uses the themed implementation.
  */
 export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 	options,
@@ -128,7 +130,27 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 
 	const decorated =
 		decorator?.transformBackground !== undefined || decorator?.renderDecoration !== undefined;
-	const useSystemControl = Platform.OS === "ios" && !hasDisabledOptions && !decorated;
+	// UIKit owns its selection shape and label colours. Use the themed
+	// implementation whenever those defaults have been customized.
+	const defaults = mode === "dark" ? osukiDarkTheme : osukiLightTheme;
+	const defaultTokens = defaults.components.SegmentedControl;
+	const customAppearance =
+		radiusToken !== undefined ||
+		optionRadiusToken !== undefined ||
+		variant !== "rounded" ||
+		readStringFill(style) !== undefined ||
+		Object.entries(defaultTokens).some(
+			([key, value]) => tokens[key as keyof typeof tokens] !== value,
+		) ||
+		trackRadius !== defaults.radius[defaultTokens.radius] ||
+		optionRadius !== defaults.radius[defaultTokens.optionRadius] ||
+		spacing[tokens.padding] !== defaults.spacing[defaultTokens.padding] ||
+		trackBase !== defaults.colors[defaultTokens.background] ||
+		selectedBase !== defaults.colors[defaultTokens.activeBackground] ||
+		colors[tokens.activeForeground] !== defaults.colors[defaultTokens.activeForeground] ||
+		colors[tokens.inactiveForeground] !== defaults.colors[defaultTokens.inactiveForeground];
+	const useSystemControl =
+		Platform.OS === "ios" && !hasDisabledOptions && !decorated && !customAppearance;
 
 	if (useSystemControl) {
 		return (
