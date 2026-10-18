@@ -174,7 +174,7 @@ export function useTabs(): TabsContextValue {
  * The `pill` selection fill: an overlay on the track in `overlay` layering, a
  * surface of its own in `segments` layering, where nothing is under it.
  */
-function useSelectionFill(trackFill: string, radius: number, layering: TabsLayering): string {
+function useSelection(trackFill: string, radius: number, layering: TabsLayering) {
 	const theme = useThemeTokens();
 	const base = theme.colors[theme.components.Tabs.activeBackground];
 	const segments = layering === "segments";
@@ -189,7 +189,8 @@ function useSelectionFill(trackFill: string, radius: number, layering: TabsLayer
 		}),
 		[base, radius, segments, trackFill],
 	);
-	return useResolvedSurfaceFill(base, meta);
+	const fill = useResolvedSurfaceFill(base, meta);
+	return { fill, meta };
 }
 
 export interface TabsListProps extends Omit<ViewProps, "style"> {
@@ -225,7 +226,8 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 		[meta.variant, radius, trackBase],
 	);
 	const trackFill = useResolvedSurfaceFill(trackBase, trackMeta);
-	const selectionFill = useSelectionFill(trackFill, optionRadius, meta.layering);
+	const selection = useSelection(trackFill, optionRadius, meta.layering);
+	const selectionFill = selection.fill;
 
 	const [layouts, setLayouts] = useState<Record<string, TriggerLayout>>({});
 	const reportLayout = useCallback((value: string, layout: TriggerLayout) => {
@@ -301,7 +303,9 @@ export function TabsList({ style, children, ...props }: TabsListProps) {
 					<Animated.View
 						pointerEvents="none"
 						style={[styles.indicator, indicatorShape, indicatorStyle]}
-					/>
+					>
+						{pill ? <SurfaceDecoration {...selection.meta} /> : null}
+					</Animated.View>
 				) : null}
 				{children}
 			</View>
@@ -334,7 +338,8 @@ export function TabsTrigger({
 	const sliding = meta.indicator === "slide";
 	const segments = pill && meta.layering === "segments";
 	const radius = pill ? theme.radius[tabsRadiusTokens(meta, tabs).option] : 0;
-	const selectionFill = useSelectionFill(list?.trackFill ?? "transparent", radius, meta.layering);
+	const selection = useSelection(list?.trackFill ?? "transparent", radius, meta.layering);
+	const selectionFill = selection.fill;
 	const segmentBase = segments ? theme.colors[tabs.background] : "transparent";
 	const segmentMeta = useMemo<SurfaceMeta>(
 		() => ({
@@ -413,6 +418,7 @@ export function TabsTrigger({
 			{...props}
 		>
 			{idleSegment ? <SurfaceDecoration {...segmentMeta} /> : null}
+			{pill && selected && !sliding ? <SurfaceDecoration {...selection.meta} /> : null}
 			<TabsTriggerContext.Provider value={selected}>{children}</TabsTriggerContext.Provider>
 		</Pressable>
 	);

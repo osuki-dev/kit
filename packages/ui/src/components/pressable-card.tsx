@@ -42,6 +42,7 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 	disabled = false,
 	style,
 	onPress,
+	onLongPress,
 	onPressIn,
 	onPressOut,
 	children,
@@ -94,10 +95,24 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 		variantTokens,
 	]);
 
+	// Native press recognition suppresses onPress after a handled long press.
+	// Keeping feedback here leaves responder cancellation (including scrolling) silent.
+	const handlePress: PressableProps["onPress"] = () => {
+		if (!disabled && onPress) {
+			haptics.feedback("light");
+			onPress();
+		}
+	};
+	const handleLongPress: PressableProps["onLongPress"] = (event) => {
+		if (!disabled && onLongPress) {
+			haptics.feedback("light");
+			onLongPress(event);
+		}
+	};
+
 	const handlePressIn: PressableProps["onPressIn"] = (event) => {
 		if (!disabled) {
-			haptics.feedback("light");
-			// Reduce motion keeps the haptic and drops the movement.
+			// Reduce motion drops the movement; confirmed actions still have feedback.
 			if (!reduceMotion) pressProgress.value = withSpring(1, theme.motion.press.springIn);
 		}
 		onPressIn?.(event);
@@ -110,10 +125,11 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 
 	return (
 		<Pressable
-			onPress={onPress}
+			onPress={handlePress}
 			disabled={disabled}
 			accessibilityRole="button"
 			accessibilityState={{ disabled }}
+			onLongPress={onLongPress ? handleLongPress : undefined}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
 			style={[cardStyles, style]}

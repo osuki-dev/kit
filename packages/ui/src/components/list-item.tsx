@@ -68,6 +68,7 @@ export const ListItemRoot: React.FC<ListItemProps> = ({
 	disabled = false,
 	style,
 	onPress,
+	onLongPress,
 	...rest
 }) => {
 	const theme = useThemeTokens();
@@ -83,15 +84,29 @@ export const ListItemRoot: React.FC<ListItemProps> = ({
 		transform: [{ scale: scale.value }],
 	}));
 
-	const handlePressIn = useCallback(() => {
+	// Native press recognition suppresses onPress after a handled long press.
+	// Keeping feedback here leaves responder cancellation (including scrolling) silent.
+	const handlePress: TouchableOpacityProps["onPress"] = () => {
 		if (!disabled && onPress) {
 			haptics.feedback("selection");
+			onPress();
+		}
+	};
+	const handleLongPress: TouchableOpacityProps["onLongPress"] = (event) => {
+		if (!disabled && onLongPress) {
+			haptics.feedback("selection");
+			onLongPress(event);
+		}
+	};
+
+	const handlePressIn = useCallback(() => {
+		if (!disabled && onPress) {
 			scale.value = withSpring(theme.motion.press.row, {
 				stiffness: 400,
 				damping: 25,
 			});
 		}
-	}, [disabled, haptics, onPress, scale, theme.motion.press.row]);
+	}, [disabled, onPress, scale, theme.motion.press.row]);
 
 	const handlePressOut = useCallback(() => {
 		scale.value = withSpring(1, {
@@ -131,10 +146,11 @@ export const ListItemRoot: React.FC<ListItemProps> = ({
 	if (onPress) {
 		return (
 			<AnimatedTouchableOpacity
-				onPress={onPress}
+				onPress={handlePress}
 				disabled={disabled}
 				accessibilityRole="button"
 				accessibilityState={{ disabled }}
+				onLongPress={onLongPress ? handleLongPress : undefined}
 				onPressIn={handlePressIn}
 				onPressOut={handlePressOut}
 				activeOpacity={1}
