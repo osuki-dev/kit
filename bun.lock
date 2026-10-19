@@ -107,7 +107,7 @@
     },
     "packages/kit-community": {
       "name": "@osuki-dev/kit-community",
-      "version": "2.0.0-beta.3",
+      "version": "2.0.0-beta.4",
       "devDependencies": {
         "@osuki-dev/ui": "workspace:*",
         "@tanstack/react-form": "^1.33.5",
@@ -129,7 +129,7 @@
     },
     "packages/ui": {
       "name": "@osuki-dev/ui",
-      "version": "2.0.0-beta.3",
+      "version": "2.0.0-beta.4",
       "devDependencies": {
         "@expo/ui": "~58.0.20",
         "@types/node": "^26.6.5",
