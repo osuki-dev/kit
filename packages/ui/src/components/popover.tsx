@@ -15,6 +15,7 @@ import {
 	type PressableProps,
 	type ViewProps,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 
 export interface PopoverAnchor {
@@ -156,26 +157,29 @@ export function PopoverContent({ children, width = 280, style, ...props }: Popov
 			onRequestClose={actions.close}
 			statusBarTranslucent
 		>
-			<View style={styles.backdrop}>
-				<Pressable style={StyleSheet.absoluteFill} onPress={actions.close} />
-				<View
-					style={[
-						styles.content,
-						{
-							top,
-							left,
-							width,
-							backgroundColor: popoverFill,
-							borderColor: theme.colors.border,
-							borderRadius: theme.radius.lg,
-						},
-						style,
-					]}
-					{...props}
-				>
-					{children}
+			{/* Android draws a Modal in its own window, which needs its own gesture root. */}
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<View style={styles.backdrop}>
+					<Pressable style={StyleSheet.absoluteFill} onPress={actions.close} />
+					<View
+						style={[
+							styles.content,
+							{
+								top,
+								left,
+								width,
+								backgroundColor: popoverFill,
+								borderColor: theme.colors.border,
+								borderRadius: theme.radius.lg,
+							},
+							style,
+						]}
+						{...props}
+					>
+						{children}
+					</View>
 				</View>
-			</View>
+			</GestureHandlerRootView>
 		</Modal>
 	);
 }

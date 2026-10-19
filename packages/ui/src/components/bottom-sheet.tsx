@@ -18,6 +18,7 @@ import {
 	type ViewStyle,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Icon } from "./icon";
@@ -192,31 +193,34 @@ export function SheetContent({
 			navigationBarTranslucent
 			{...props}
 		>
-			<Animated.View
-				entering={FadeIn.duration(140)}
-				exiting={FadeOut.duration(120)}
-				style={{
-					position: "absolute",
-					top: 0,
-					right: 0,
-					bottom: 0,
-					left: 0,
-					zIndex: 1000,
-					elevation: 1000,
-					justifyContent: "flex-end",
-					backgroundColor: sheet.scrim,
-				}}
-			>
-				<Pressable
-					accessibilityRole="button"
-					accessibilityLabel={closeLabel}
-					onPress={actions.close}
-					style={{ flex: 1 }}
-				/>
-				<Animated.View style={[{ zIndex: 1001, elevation: 1001 }, sheetStyle, contentStyle]}>
-					{children}
+			{/* Android draws a Modal in its own window, which needs its own gesture root. */}
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<Animated.View
+					entering={FadeIn.duration(140)}
+					exiting={FadeOut.duration(120)}
+					style={{
+						position: "absolute",
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0,
+						zIndex: 1000,
+						elevation: 1000,
+						justifyContent: "flex-end",
+						backgroundColor: sheet.scrim,
+					}}
+				>
+					<Pressable
+						accessibilityRole="button"
+						accessibilityLabel={closeLabel}
+						onPress={actions.close}
+						style={{ flex: 1 }}
+					/>
+					<Animated.View style={[{ zIndex: 1001, elevation: 1001 }, sheetStyle, contentStyle]}>
+						{children}
+					</Animated.View>
 				</Animated.View>
-			</Animated.View>
+			</GestureHandlerRootView>
 		</Modal>
 	);
 }

@@ -40,6 +40,11 @@ mock.module("react-native", () => ({
 	useWindowDimensions: () => ({ width: 390, height: 844, scale: 3, fontScale: 1 }),
 }));
 
+mock.module("react-native-gesture-handler", () => ({
+	GestureHandlerRootView: "GestureHandlerRootView",
+	Pressable: "GesturePressable",
+}));
+
 mock.module("react-native-reanimated", () => ({
 	cancelAnimation: () => {},
 	default: {
