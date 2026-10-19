@@ -52,6 +52,11 @@ mock.module("react-native", () => ({
 	useWindowDimensions: () => ({ width: 390, height: 844, scale: 3, fontScale: 1 }),
 }));
 
+mock.module("react-native-gesture-handler", () => ({
+	GestureHandlerRootView: "GestureHandlerRootView",
+	Pressable: "GesturePressable",
+}));
+
 mock.module("react-native-safe-area-context", () => ({
 	useSafeAreaInsets: () => ({ top: 47, right: 0, bottom: 34, left: 0 }),
 }));

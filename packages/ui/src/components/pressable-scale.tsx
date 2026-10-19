@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
+import { Pressable, type PressableProps } from "react-native-gesture-handler";
 import Animated, {
 	useAnimatedStyle,
 	useReducedMotion,

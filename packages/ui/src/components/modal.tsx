@@ -16,6 +16,7 @@ import {
 	type ViewProps,
 	type ViewStyle,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
 import { useResolvedSurfaceFill, useThemeTokens } from "../theme";
 import { Icon } from "./icon";
@@ -163,27 +164,30 @@ export function ModalContent({
 			statusBarTranslucent
 			{...props}
 		>
-			<Animated.View
-				entering={FadeIn.duration(160)}
-				exiting={FadeOut.duration(120)}
-				style={{
-					flex: 1,
-					backgroundColor: theme.components.Sheet.scrim,
-					padding: theme.spacing.md,
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Pressable
-					accessibilityRole="button"
-					accessibilityLabel={closeLabel}
-					onPress={actions.close}
-					style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
-				/>
-				<Animated.View entering={FadeInDown.duration(180)} style={[contentStyles, contentStyle]}>
-					{children}
+			{/* Android draws a Modal in its own window, which needs its own gesture root. */}
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<Animated.View
+					entering={FadeIn.duration(160)}
+					exiting={FadeOut.duration(120)}
+					style={{
+						flex: 1,
+						backgroundColor: theme.components.Sheet.scrim,
+						padding: theme.spacing.md,
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					<Pressable
+						accessibilityRole="button"
+						accessibilityLabel={closeLabel}
+						onPress={actions.close}
+						style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+					/>
+					<Animated.View entering={FadeInDown.duration(180)} style={[contentStyles, contentStyle]}>
+						{children}
+					</Animated.View>
 				</Animated.View>
-			</Animated.View>
+			</GestureHandlerRootView>
 		</RNModal>
 	);
 }
