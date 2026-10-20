@@ -1,5 +1,16 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0-beta.5
+
+### Patch Changes
+
+- [#22](https://github.com/osuki-dev/kit/pull/22) [`ca3aae5`](https://github.com/osuki-dev/kit/commit/ca3aae592b659897e1fb80f99e6a10ec525b9236) Thanks [@ryuhzk](https://github.com/ryuhzk)! - `PressableScale` and `PressableCard` use React Native's own `Pressable` on iOS
+  again and keep gesture handler's native press recognition on Android only.
+  `react-native-gesture-handler` 3.4's iOS button marks both its host view and
+  the inner button as accessibility elements with the same label, so VoiceOver
+  and UI test tooling saw every press surface twice. The Android press problem
+  the native recognition fixed never occurred on iOS.
+
 ## 2.0.0-beta.4
 
 ### Minor Changes
