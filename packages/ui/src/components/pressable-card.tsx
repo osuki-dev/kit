@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import type { ViewStyle } from "react-native";
-import { Pressable, type PressableProps } from "react-native-gesture-handler";
+import type { PressableProps } from "react-native-gesture-handler";
+import { PlatformPressable } from "./platform-pressable";
 import Animated, {
 	useAnimatedStyle,
 	useReducedMotion,
@@ -125,7 +126,7 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 	};
 
 	return (
-		<Pressable
+		<PlatformPressable
 			onPress={handlePress}
 			disabled={disabled}
 			accessibilityRole="button"
@@ -139,6 +140,6 @@ export const PressableCard: React.FC<PressableCardProps> = ({
 			<Animated.View pointerEvents="none" style={animatedContentStyle}>
 				{children}
 			</Animated.View>
-		</Pressable>
+		</PlatformPressable>
 	);
 };

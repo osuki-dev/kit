@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
-import { Pressable, type PressableProps } from "react-native-gesture-handler";
+import type { PressableProps } from "react-native-gesture-handler";
+import { PlatformPressable } from "./platform-pressable";
 import Animated, {
 	useAnimatedStyle,
 	useReducedMotion,
@@ -10,7 +11,7 @@ import Animated, {
 import { useThemeTokens } from "../theme";
 import { useHaptics, type HapticFeedbackKind } from "./haptics";
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedPressable = Animated.createAnimatedComponent(PlatformPressable);
 
 /** Which haptic a press plays, or `"none"` for a control that should stay silent. */
 export type PressableScaleFeedback = HapticFeedbackKind | "none";
