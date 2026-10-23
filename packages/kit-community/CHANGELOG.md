@@ -1,5 +1,31 @@
 # @osuki-dev/kit-community Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- [#12](https://github.com/osuki-dev/kit/pull/12) [`5c65316`](https://github.com/osuki-dev/kit/commit/5c65316218a1145a06756745bd4910f765afc7bd) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Release 2.0: composition theming, a pluggable icon pipeline, new visual primitives, and AI elements, on Expo SDK 58. Breaking for 1.x consumers:
+
+  - The peer floor moves to the Expo SDK 58 line: React Native 0.88, React 19.3, Reanimated 4.7, `@expo/ui`, `expo-font`, `expo-image` and `expo-router` 58. `lucide-react-native` and `react-native-svg` become optional peers.
+  - `Surface`, `Card`, `Button` and the other containers split into compound parts (`Card.Root`, `Card.Background`, `Button.Label`, ...). The short forms remain and are built from the same parts. Fills now go through `SurfaceDecoratorContext`, painted once on a background layer.
+  - `Card` no longer clips its children, and the borders on `Card`, `Button` and the underline `Tabs` list are hairlines instead of 1pt. Pass `style={{ overflow: "hidden" }}` or `style={{ borderWidth: 1 }}` for the 1.x look.
+  - `ButtonProps.style` is `StyleProp<ViewStyle>`, and `IconProps` extends `ViewProps` instead of the SVG props. Icons resolve through `IconProvider`, theme chrome names, then Lucide; register custom names on `IconNameRegistry` to keep them type-checked.
+  - `@osuki-dev/kit-community` requires `@osuki-dev/ui` 2, and `CartScreen`'s `emptyArtwork` takes the kit `Image` source type.
+
+  See `docs/migrating-to-2.0.md` for every change with before and after code.
+
+### Minor Changes
+
+- [#12](https://github.com/osuki-dev/kit/pull/12) [`ff680c9`](https://github.com/osuki-dev/kit/commit/ff680c95d0a9bef1537bb4af773afe267cc4ea60) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Move the remaining appearance choices into the theme so an app does not need wrapper components: `SegmentedControl` and `Skeleton` get component tokens, `Tabs` now reads its existing tokens (its `activeForeground` default becomes `text`, matching what it drew) plus a new `indicator`, `Input.searchRadius` sets the `SearchInput` corners, `motion.press` sets how far `Button`, `PressableCard`, `ListItem`, `Tag` and `PressableScale` dip while pressed, and a font role's `trailingSlack` turns the Android `hugSlack` on for every kit `Text` in that role. `PressableScale` stays still under reduce motion.
+
+- [#12](https://github.com/osuki-dev/kit/pull/12) [`5bf18bd`](https://github.com/osuki-dev/kit/commit/5bf18bdd65b60515238b89ec5caca1f5b515a32c) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Add accordion, popover, command, combobox, field, input group, button group, calendar, attachment, and message primitives for any app to compose.
+
+- [#12](https://github.com/osuki-dev/kit/pull/12) [`5bf18bd`](https://github.com/osuki-dev/kit/commit/5bf18bdd65b60515238b89ec5caca1f5b515a32c) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Paint each control fill once through the surface decorator, and draw field placeholders with the same text component as the value.
+
+- [#12](https://github.com/osuki-dev/kit/pull/12) [`1b3b3ba`](https://github.com/osuki-dev/kit/commit/1b3b3ba1905a95a8f5e30c3b9db678b6a4c009b5) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Give the surface decorator a stable contract. Slots are a typed `SurfaceSlot` union, listed with their roles in `docs/theme.md`, and apps register their own through `SurfaceSlotRegistry`. `SurfaceMeta` gains `role` (`surface`, `overlay`, `mark`), `over` (the fill an overlay sits on) and `mode`. `Tabs` and `SegmentedControl` follow one layering rule: the track is painted once and the selection is an overlay. `Tabs.Root` takes `indicator="slide"` for a selection that travels between triggers, `Tabs.Label` passes `transform`, `weight` and `numberOfLines` through, and labels on `Button`, `Tabs` and `SegmentedControl` take their casing from the type style. Sheets, dialogs, popovers, tooltips, toasts, menu and select triggers and list rows now paint through the decorator, `Skeleton` sends a `style.backgroundColor` override through it too, and `ScrollScreen` keeps its decoration fixed behind the scrolling content. New: `SurfaceDecoration` for views the kit does not own, `TextPlateProvider` and the `plated` prop on `Text` for text over a decorated background, `multiplyAlpha` for opacity policies, and `motion.press` springs and timings that `Button`, `PressableCard` and `PressableScale` read, with reduce motion honored. The fill cache and its helpers are no longer exported.
+
+- [#12](https://github.com/osuki-dev/kit/pull/12) [`cdcc835`](https://github.com/osuki-dev/kit/commit/cdcc8355fd48630401f196a59c4aadfe2e67a0ad) Thanks [@ryuhzk](https://github.com/ryuhzk)! - Support variable fonts in the theme. A font role can declare its face's axes (`{ family, axes: { wght, opsz?, wdth? } }`), and `resolveFontStyle` then returns that family at native weight 400 with the weight, and the optical size when the face has one, as `fontVariationSettings`, so weights of 700 and above render on Android. `Text` and `resolveFontStyle` accept numeric weights, a `fontWeight` in a `Text` style resolves through the theme, the fields and the AI elements now draw in the theme's faces, and on Android `Text` puts the axes on an inner run so heavier weights are measured as drawn. The Android thin-space slack on `Text` is now opt-in through `hugSlack`.
+
 ## 2.0.0-beta.7
 
 No changes in this release.
