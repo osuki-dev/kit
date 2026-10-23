@@ -105,7 +105,7 @@ version installed:
 | `MessageScroller` | Conversation scroll                  | `follow`                                               |
 | `Tabs`            | Composable section switching         | `Root`, `List`, `Trigger`, `Label`                     |
 | `Alert`           | Inline status messages               | `variant`, `title`, `message`                          |
-| `ToastProvider`   | App-level toast notifications        | `placement`, `maxToasts`                               |
+| `ToastProvider`   | App-level toast notifications        | `placement`, `maxToasts`, `durationByVariant`          |
 | `Modal`           | Composable centered overlay          | `Root`, `Trigger`, `Content`, `Close`                  |
 | `Dialog`          | Composable decision modal            | `Root`, `Content`, `Actions`, `Close`                  |
 | `Sheet`           | Composable bottom overlay primitives | `Root`, `Trigger`, `Content`, `Body`                   |

@@ -52,7 +52,9 @@ This document tracks the exported primitives in `@osuki-dev/ui`.
   one provider inside the app theme and safe-area roots; only its viewport
   subscribes to queue updates. `toastStyle` on the provider is merged onto every
   toast body after the variant fill, and `showToast({ style })` is merged after
-  that for a single toast.
+  that for a single toast. A toast's duration resolves as `showToast({ durationMs })`,
+  then the provider's `durationByVariant[variant]`, then `defaultDurationMs`;
+  errors should outlast confirmations, since they have to be read and acted on.
 - `Skeleton`: loading placeholder with explicit `motion="pulse" | "static"`.
   `style` is merged last; with `lines` above 1 a `backgroundColor` override goes
   to the lines rather than the wrapper, so the gaps stay empty.

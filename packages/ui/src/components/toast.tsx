@@ -51,7 +51,15 @@ export interface ToastProviderProps {
 	children: ReactNode;
 	placement?: ToastPlacement;
 	maxToasts?: number;
+	/** How long a toast stays when neither it nor its variant names a duration. */
 	defaultDurationMs?: number;
+	/**
+	 * Per-variant durations, used when a toast passes no `durationMs` of its own.
+	 * A variant left out falls back to `defaultDurationMs`. Give `warning` and
+	 * `danger` longer than `success`: an error has to be read and acted on, a
+	 * confirmation only has to be noticed.
+	 */
+	durationByVariant?: Partial<Record<ToastVariant, number>>;
 	maxWidth?: number;
 	/**
 	 * Style merged last onto every toast body, so a `backgroundColor` here
@@ -64,18 +72,21 @@ export interface ToastProviderProps {
 
 const ToastContext = createContext<ToastController | undefined>(undefined);
 
+interface ToastStoreOptions {
+	maxToasts: number;
+	defaultDurationMs: number;
+	durationByVariant?: Partial<Record<ToastVariant, number>>;
+}
+
 interface ToastStore {
 	controller: ToastController;
 	getSnapshot: () => ToastItem[];
 	subscribe: (listener: () => void) => () => void;
-	updateOptions: (options: { maxToasts: number; defaultDurationMs: number }) => void;
+	updateOptions: (options: ToastStoreOptions) => void;
 	destroy: () => void;
 }
 
-function createToastStore(initialOptions: {
-	maxToasts: number;
-	defaultDurationMs: number;
-}): ToastStore {
+function createToastStore(initialOptions: ToastStoreOptions): ToastStore {
 	let snapshot: ToastItem[] = [];
 	let options = initialOptions;
 	let counter = 0;
@@ -101,10 +112,12 @@ function createToastStore(initialOptions: {
 	};
 	const showToast = (toast: ToastOptions) => {
 		const id = `toast-${Date.now()}-${counter++}`;
-		const durationMs = toast.durationMs ?? options.defaultDurationMs;
+		const variant = toast.variant ?? "info";
+		const durationMs =
+			toast.durationMs ?? options.durationByVariant?.[variant] ?? options.defaultDurationMs;
 		const nextToast: ToastItem = {
 			id,
-			variant: toast.variant ?? "info",
+			variant,
 			title: toast.title,
 			message: toast.message,
 			action: toast.action,
@@ -157,13 +170,15 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 	placement = "top",
 	maxToasts = 3,
 	defaultDurationMs = 3600,
+	durationByVariant,
 	maxWidth,
 	toastStyle,
 }) => {
 	const storeRef = useRef<ToastStore | null>(null);
-	if (!storeRef.current) storeRef.current = createToastStore({ maxToasts, defaultDurationMs });
+	if (!storeRef.current)
+		storeRef.current = createToastStore({ maxToasts, defaultDurationMs, durationByVariant });
 	const store = storeRef.current;
-	store.updateOptions({ maxToasts, defaultDurationMs });
+	store.updateOptions({ maxToasts, defaultDurationMs, durationByVariant });
 
 	useEffect(() => {
 		return () => store.destroy();
