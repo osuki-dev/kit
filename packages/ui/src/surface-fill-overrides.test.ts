@@ -176,6 +176,75 @@ function renderToasts(
 		.reverse();
 }
 
+/**
+ * Mounts a provider, raises one toast through its controller, and returns the
+ * duration the queue resolved for it. The toast is cleared straight away so the
+ * timer it armed does not outlive the test.
+ */
+function resolvedDuration(
+	providerProps: Omit<ToastProviderProps, "children">,
+	toast: ToastOptions,
+): number {
+	const provider = renderOnce(
+		React.createElement(ToastProvider, { ...providerProps, children: null }),
+	);
+	const controller = provider.props.value as ToastController;
+	const viewport = React.Children.toArray(provider.props.children as never).find(
+		(child) => React.isValidElement(child) && typeof child.type === "function",
+	) as unknown as AnyElement;
+	const store = viewport.props.store as { getSnapshot: () => { durationMs: number }[] };
+	controller.showToast(toast);
+	const [item] = store.getSnapshot();
+	controller.clearToasts();
+	assert.ok(item, "the toast is queued");
+	return item.durationMs;
+}
+
+const byVariant = { success: 3000, danger: 8000 };
+
+test("a danger toast stays for its variant's duration", () => {
+	assert.equal(
+		resolvedDuration(
+			{ durationByVariant: byVariant },
+			{ message: "Upload failed", variant: "danger" },
+		),
+		8000,
+	);
+});
+
+test("a toast's own durationMs wins over its variant's", () => {
+	assert.equal(
+		resolvedDuration(
+			{ durationByVariant: byVariant },
+			{ message: "Upload failed", variant: "danger", durationMs: 1200 },
+		),
+		1200,
+	);
+	assert.equal(
+		resolvedDuration(
+			{ durationByVariant: byVariant },
+			{ message: "Upload failed", variant: "danger", durationMs: 0 },
+		),
+		0,
+		"0 still means the toast stays until dismissed",
+	);
+});
+
+test("a variant left out of durationByVariant falls back to defaultDurationMs", () => {
+	assert.equal(
+		resolvedDuration(
+			{ defaultDurationMs: 5000, durationByVariant: byVariant },
+			{ message: "Disk almost full", variant: "warning" },
+		),
+		5000,
+	);
+	assert.equal(
+		resolvedDuration({ durationByVariant: byVariant }, { message: "Synced" }),
+		3600,
+		"an info toast with no mapping uses the built-in default",
+	);
+});
+
 const translucent = "rgba(20, 20, 22, 0.62)";
 const variantFill = defaultTheme.colors.surface;
 

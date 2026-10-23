@@ -257,6 +257,18 @@ screen it occupies.
 The dividing line between `Alert` and a toast: an alert describes the screen it
 is on and stays; a toast describes something that just happened and leaves.
 
+A toast stays for `showToast({ durationMs })` if given, otherwise for its
+variant's entry in the provider's `durationByVariant`, otherwise for
+`defaultDurationMs` (3600 ms). Give `warning` and `danger` longer than
+`success`: an error has to be read and often acted on, while a confirmation
+only has to be noticed. `durationMs: 0` keeps a toast until it is dismissed.
+
+```tsx
+<ToastProvider defaultDurationMs={4000} durationByVariant={{ warning: 7000, danger: 8000 }}>
+	{children}
+</ToastProvider>
+```
+
 `ToastProvider` accepts `toastStyle`, merged onto every toast body after the
 variant fill, and `showToast` accepts a `style` merged after that for one toast.
 `Skeleton` merges `style` last as well. Both exist so an app that paints its own
