@@ -1,4 +1,5 @@
 import { strict as assert } from "node:assert";
+import { readFileSync } from "node:fs";
 import { mock, test } from "bun:test";
 
 mock.module("react-native", () => ({
@@ -173,4 +174,100 @@ test("IconProvider injects custom resolvers and passes through", () => {
 	});
 	assert.ok(provider);
 	assert.equal(customResolverInvoked, false);
+});
+
+const { defaultTheme } = await import("./theme");
+const { IconContext } = await import("./components/icon");
+type IconContextValue = import("./components/icon").IconContextValue;
+type AnyElement = { type: unknown; props: Record<string, unknown> };
+
+const internals = (
+	React as unknown as {
+		__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE: { H: unknown };
+	}
+).__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+
+/**
+ * Calls one function component with a hook dispatcher installed. `useContext`
+ * answers with the given icon context for `IconContext` and with the default
+ * theme for everything else, the only other context these components read.
+ */
+function renderOnce(element: AnyElement, iconContext: IconContextValue | null): unknown {
+	const previous = internals.H;
+	internals.H = {
+		useContext: (context: unknown) => (context === IconContext ? iconContext : defaultTheme),
+		useMemo: (factory: () => unknown) => factory(),
+	};
+	try {
+		return (element.type as (props: unknown) => unknown)(element.props);
+	} finally {
+		internals.H = previous;
+	}
+}
+
+/** Renders `IconGlyph` and unwraps the fragment it returns around a bare glyph. */
+function glyph(name: string, iconContext: IconContextValue | null, props = {}): AnyElement | null {
+	const rendered = renderOnce(
+		React.createElement(IconGlyph, { name: name as never, ...props }) as unknown as AnyElement,
+		iconContext,
+	) as AnyElement | null;
+	return rendered?.type === React.Fragment ? (rendered.props.children as AnyElement) : rendered;
+}
+
+const lucideModule = { Home: "LucideHome", Send: "LucideSend" };
+
+test("the kit never requires lucide-react-native itself", () => {
+	const source = readFileSync(new URL("components/icon.tsx", import.meta.url), "utf8");
+	assert.doesNotMatch(source, /require\(\s*["']lucide-react-native["']\s*\)/);
+	assert.doesNotMatch(source, /import\(\s*["']lucide-react-native["']\s*\)/);
+	assert.doesNotMatch(source, /^import (?!type)[^;]*["']lucide-react-native["']/m);
+});
+
+test("without a lucide module, a Lucide name renders the fallback or nothing", () => {
+	// lucide-react-native is mocked above and resolvable, yet it must not be used.
+	const warn = console.warn;
+	console.warn = () => {};
+	try {
+		assert.equal(glyph("Home", null), null);
+		assert.equal(glyph("Home", {}), null);
+	} finally {
+		console.warn = warn;
+	}
+	const Fallback = () => null;
+	const rendered = glyph("Home", {}, { fallback: Fallback });
+	assert.equal(rendered?.type, Fallback);
+	assert.equal(rendered?.props.name, "Home");
+});
+
+test("a lucide module given to the context resolves names and chrome fallbacks", () => {
+	const home = glyph("Home", { lucide: lucideModule });
+	assert.equal(home?.type, "LucideHome");
+	assert.equal(home?.props.size, 24);
+	assert.equal(glyph("home", { lucide: lucideModule })?.type, "LucideHome");
+	assert.equal(glyph("chrome.send", { lucide: lucideModule })?.type, "LucideSend");
+});
+
+test("a resolver and the icon map still win over the lucide module", () => {
+	const fromResolver = glyph("Home", {
+		lucide: lucideModule,
+		resolve: (name) => (name === "Home" ? React.createElement("Resolved") : null),
+	});
+	assert.equal(fromResolver?.type, "Resolved");
+	const Mapped = () => null;
+	assert.equal(glyph("Home", { lucide: lucideModule, icons: { Home: Mapped } })?.type, Mapped);
+});
+
+test("IconProvider passes its lucide module down and inherits the parent's", () => {
+	const provide = (props: Record<string, unknown>, parent: IconContextValue | null) =>
+		(
+			renderOnce(
+				React.createElement(IconProvider, { children: null, ...props }) as unknown as AnyElement,
+				parent,
+			) as AnyElement
+		).props.value as IconContextValue;
+
+	const outer = provide({ lucide: lucideModule }, null);
+	assert.equal(outer.lucide, lucideModule);
+	assert.equal(provide({ resolve: () => null }, outer).lucide, lucideModule);
+	assert.equal(provide({}, null).lucide, undefined);
 });

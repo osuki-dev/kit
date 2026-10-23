@@ -8,10 +8,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "expo-router/react-navigation";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import * as lucide from "lucide-react-native";
 
 import {
 	FontLoader,
 	HapticsProvider,
+	IconProvider,
 	ToastProvider,
 	ThemeProvider as OsukiThemeProvider,
 	useNavigationTheme,
@@ -216,7 +218,9 @@ export default function RootLayout() {
 						<AppI18nProvider>
 							<AppHapticsProvider>
 								<KeyboardProvider>
-									<NavigationContent />
+									<IconProvider lucide={lucide}>
+										<NavigationContent />
+									</IconProvider>
 								</KeyboardProvider>
 							</AppHapticsProvider>
 						</AppI18nProvider>

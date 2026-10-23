@@ -25,22 +25,33 @@ bun add @osuki-dev/ui
 Peer dependencies are intentionally external — the app owns their versions, and
 there are twelve of them:
 
-| Peer                                               | Needed for                                 |
-| -------------------------------------------------- | ------------------------------------------ |
-| `react`, `react-native`                            | everything                                 |
-| `react-native-reanimated`, `react-native-worklets` | motion, sheets, skeletons                  |
-| `react-native-safe-area-context`                   | `Screen`, `ScrollScreen`, sheets           |
-| `react-native-svg`                                 | icon rendering                             |
-| `lucide-react-native`                              | `Icon`, and every component that takes one |
-| `react-native-keyboard-controller`                 | the four keyboard components               |
-| `expo-font`                                        | `FontLoader`                               |
-| `expo-image`                                       | `Image`                                    |
-| `expo-router`                                      | the navigation helpers                     |
-| `@expo/ui`                                         | the native pickers behind `DateInput`      |
+| Peer                                               | Needed for                             |
+| -------------------------------------------------- | -------------------------------------- |
+| `react`, `react-native`                            | everything                             |
+| `react-native-reanimated`, `react-native-worklets` | motion, sheets, skeletons              |
+| `react-native-safe-area-context`                   | `Screen`, `ScrollScreen`, sheets       |
+| `react-native-svg`                                 | icon rendering                         |
+| `lucide-react-native`                              | Lucide names, passed to `IconProvider` |
+| `react-native-keyboard-controller`                 | the four keyboard components           |
+| `expo-font`                                        | `FontLoader`                           |
+| `expo-image`                                       | `Image`                                |
+| `expo-router`                                      | the navigation helpers                 |
+| `@expo/ui`                                         | the native pickers behind `DateInput`  |
 
 In an Expo app install them with `npx expo install` so the versions match the
 SDK. `react-native-gesture-handler` is **not** required: sheets and pressables
 are built on React Native's own `Pressable` with Reanimated.
+
+The kit never imports `lucide-react-native` itself, so a bundler never has to
+resolve it. An app that uses Lucide names hands its own module to
+`IconProvider`:
+
+```tsx
+import { IconProvider } from "@osuki-dev/ui";
+import * as lucide from "lucide-react-native";
+
+<IconProvider lucide={lucide}>{children}</IconProvider>;
+```
 
 The package contains no font binaries. Install and load fonts in the application
 only when its brand needs them.
@@ -114,7 +125,7 @@ version installed:
 
 | Component              | Description               | Props                                               |
 | ---------------------- | ------------------------- | --------------------------------------------------- |
-| `Icon`                 | Lucide icons wrapper      | `name`, `size`, `color`                             |
+| `Icon`                 | Named glyph               | `name`, `size`, `color`                             |
 | `Tag`                  | Labels and badges         | `variant` (default/active/pill/technical)           |
 | `Badge`                | Notification counters     | `variant`, `display`                                |
 | `Avatar`               | User profile images       | `source`, `initials`, `size`, `isOnline`            |

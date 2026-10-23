@@ -73,6 +73,20 @@ export const DEFAULT_CHROME_FALLBACKS: Record<string, string> = {
 export type LucideIconName = keyof typeof LucideIcons;
 
 /**
+ * The `lucide-react-native` module namespace, handed to `IconProvider` by an app
+ * that installs it:
+ *
+ * ```tsx
+ * import * as lucide from "lucide-react-native";
+ *
+ * <IconProvider lucide={lucide}>{children}</IconProvider>
+ * ```
+ *
+ * The kit never requires Lucide itself, so a bundler never has to resolve it.
+ */
+export type LucideIconModule = Readonly<Record<string, unknown>>;
+
+/**
  * Register the names your own icons answer to, so `IconName` keeps checking
  * them at compile time:
  *
@@ -139,24 +153,6 @@ function combineTransforms(
 		return [rotationTransform] as any;
 	}
 	return [...baseTransform, rotationTransform] as any;
-}
-
-// Lazy / safe Lucide loader
-let lucideModule: Record<string, React.ComponentType<any>> | null = null;
-let lucideAttempted = false;
-
-function getLucideModule(): Record<string, React.ComponentType<any>> | null {
-	if (lucideAttempted) return lucideModule;
-	lucideAttempted = true;
-	try {
-		if (typeof require === "function") {
-			// eslint-disable-next-line @typescript-eslint/no-require-imports
-			lucideModule = require("lucide-react-native");
-		}
-	} catch {
-		lucideModule = null;
-	}
-	return lucideModule;
 }
 
 // Lazy / safe Expo Image loader
@@ -229,6 +225,8 @@ export interface IconContextValue {
 	renderMode?: IconRenderMode;
 	/** Fallback component when an icon is not resolved */
 	fallback?: React.ComponentType<IconRenderProps>;
+	/** The app's `lucide-react-native` module, looked up after resolvers and icon maps */
+	lucide?: LucideIconModule;
 	/** Whether parent Icon.Root already owns geometry and rotation */
 	hasRootContainer?: boolean;
 	/** Inherited size from parent Icon.Root */
@@ -261,6 +259,12 @@ export interface IconProviderProps {
 	renderMode?: IconRenderMode;
 	/** Fallback component to render when an icon cannot be resolved */
 	fallback?: React.ComponentType<IconRenderProps>;
+	/**
+	 * The app's own `lucide-react-native` module (`import * as lucide from
+	 * "lucide-react-native"`). Names no resolver or icon map claims are looked up
+	 * in it. Without it, a Lucide name renders the fallback, or nothing.
+	 */
+	lucide?: LucideIconModule;
 }
 
 /**
@@ -273,6 +277,7 @@ export const IconProvider: React.FC<IconProviderProps> = ({
 	sourceDirections,
 	renderMode,
 	fallback,
+	lucide,
 }) => {
 	const parentContext = useIconContext();
 
@@ -303,8 +308,9 @@ export const IconProvider: React.FC<IconProviderProps> = ({
 			sourceDirections: mergedSourceDirections,
 			renderMode: renderMode ?? parentContext?.renderMode,
 			fallback: fallback ?? parentContext?.fallback,
+			lucide: lucide ?? parentContext?.lucide,
 		};
-	}, [parentContext, resolve, icons, sourceDirections, renderMode, fallback]);
+	}, [parentContext, resolve, icons, sourceDirections, renderMode, fallback, lucide]);
 
 	return <IconContext.Provider value={contextValue}>{children}</IconContext.Provider>;
 };
@@ -517,7 +523,8 @@ export interface IconGlyphProps extends Omit<ViewProps, "children"> {
 }
 
 /**
- * Resolves and renders an icon glyph by name through resolvers, theme packs, or Lucide.
+ * Resolves and renders an icon glyph by name through resolvers, theme packs, or
+ * the Lucide module given to `IconProvider`.
  */
 export const IconGlyph: React.FC<IconGlyphProps> = ({
 	name,
@@ -608,24 +615,23 @@ export const IconGlyph: React.FC<IconGlyphProps> = ({
 		}
 	}
 
-	// 4. Lucide lookup
-	if (!renderedNode) {
-		const lucide = getLucideModule();
-		if (lucide) {
-			const targetLookup = fallbackName ?? name;
-			const pascalName = toPascalCase(targetLookup);
-			const LucideIcon = lucide[targetLookup] || lucide[pascalName];
-			if (LucideIcon) {
-				renderedNode = (
-					<LucideIcon
-						width={size}
-						height={size}
-						size={size}
-						color={resolvedColor}
-						strokeWidth={strokeWidth}
-					/>
-				);
-			}
+	// 4. Lucide lookup, only in the module the app handed to IconProvider
+	const lucide = context?.lucide;
+	if (!renderedNode && lucide) {
+		const targetLookup = fallbackName ?? name;
+		const LucideIcon = (lucide[targetLookup] ?? lucide[toPascalCase(targetLookup)]) as
+			| React.ComponentType<any>
+			| undefined;
+		if (LucideIcon) {
+			renderedNode = (
+				<LucideIcon
+					width={size}
+					height={size}
+					size={size}
+					color={resolvedColor}
+					strokeWidth={strokeWidth}
+				/>
+			);
 		}
 	}
 
@@ -638,7 +644,7 @@ export const IconGlyph: React.FC<IconGlyphProps> = ({
 			if (isDev) {
 				console.warn(
 					`[@osuki-dev/ui] Unknown icon: "${String(name)}". ` +
-						`Ensure it is registered in IconProvider, matches a Lucide PascalCase name (e.g. "Home", "Settings"), or is provided by an active icon resolver.`,
+						`Ensure it is registered in IconProvider, is provided by an active icon resolver, or matches a Lucide PascalCase name (e.g. "Home", "Settings") in the module passed to IconProvider's \`lucide\` prop.`,
 				);
 			}
 			return null;
