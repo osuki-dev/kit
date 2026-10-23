@@ -136,6 +136,7 @@ export {
 	type IconRenderProps,
 	type IconResolver,
 	type IconRootProps,
+	type LucideIconModule,
 	type LucideIconName,
 	type NanoIconComponent,
 	type NanoIconConfig,

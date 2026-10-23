@@ -38,8 +38,16 @@ released. Betas may break each other; each break is listed in the changelog
 | `@osuki-dev/ui` (kit-community)    | `^1.0.1`    | `^2.0.0-beta.0`       |
 
 Keep `lucide-react-native` and `react-native-svg` installed if you use Lucide
-names with `Icon`; they only became optional so an app with its own icon set
-does not need them.
+names with `Icon`, and pass the module to `IconProvider` once near the root:
+
+```tsx
+import * as lucide from "lucide-react-native";
+
+<IconProvider lucide={lucide}>{children}</IconProvider>;
+```
+
+The kit does not look Lucide up on its own, so an app with its own icon set
+neither installs it nor has its bundler resolve it.
 
 React Native 0.88 changes some types in your own code too. The kit itself
 moved to these:

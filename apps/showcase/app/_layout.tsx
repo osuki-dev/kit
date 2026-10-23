@@ -6,6 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import * as lucide from "lucide-react-native";
 
 import {
 	HapticsProvider,
@@ -75,7 +76,7 @@ export default function RootLayout() {
 					<OsukiThemeProvider defaultMode="system">
 						<HapticsProvider feedback={handleHaptic}>
 							<ToastProvider>
-								<IconProvider resolve={customNanoSet.resolve}>
+								<IconProvider resolve={customNanoSet.resolve} lucide={lucide}>
 									<Stack
 										screenOptions={{
 											headerShown: false,

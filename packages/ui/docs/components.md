@@ -25,7 +25,7 @@ The things a screen is made of before it is made of interactions.
 | Component     | What it solves                                                                                                                               | Main props                                                                                         |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `Text`        | Every string on screen. Carries the CJK-safe line height and the type scale, so a Japanese screen and an English screen stay the same shape. | `variant`, `colorKey`, `color`, `weight`, `transform`, `overflowMode`, `numberOfLines`, `hugSlack` |
-| `Icon`        | A glyph at the theme's stroke width and default colour, resolved through `IconProvider`, theme chrome names, then Lucide.                    | `name` (a typed `IconName`), `size`, `color`, `strokeWidth`, `direction`, `renderMode`             |
+| `Icon`        | A glyph at the theme's stroke width and default colour, resolved through `IconProvider`, theme chrome names, then its `lucide` module.       | `name` (a typed `IconName`), `size`, `color`, `strokeWidth`, `direction`, `renderMode`             |
 | `Image`       | Remote or bundled image with caching and a fade-in, so lists do not flash white on scroll. Wraps `expo-image`.                               | `source`, `contentFit`, `cachePolicy`, `transition`                                                |
 | `Avatar`      | A person or entity, with initials as the fallback when there is no picture.                                                                  | `source`, `initials`, `size`, `isOnline`                                                           |
 | `AvatarGroup` | Several avatars overlapped, with a `+N` overflow chip past `max`.                                                                            | `items`, `max`, `size`, `overlap`                                                                  |
@@ -55,6 +55,11 @@ declare module "@osuki-dev/ui" {
 	}
 }
 ```
+
+Lucide names render only when the app passes its own module to
+`IconProvider` (`<IconProvider lucide={lucide}>`, with
+`import * as lucide from "lucide-react-native"`); the kit never requires Lucide
+itself.
 
 A named `Icon` renders the glyph itself. It adds a host `View` only when it
 needs one: a `direction` rotation, a `style`, or view props such as `testID`.

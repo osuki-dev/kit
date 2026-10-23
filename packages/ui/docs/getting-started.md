@@ -29,12 +29,13 @@ context, and one keyboard strategy.
 | `expo-router`                      | `>=58.0.0` | `createNavigationTheme`, `useNavigationTheme`              |
 | `@expo/ui`                         | `>=58.0.0` | `DateInput`, `SegmentedControl`, `Slider` on iOS           |
 
-These are optional. Each one is loaded only when present, and the component
-falls back without it:
+These are optional. Each one is used only when present, and the component
+falls back without it. Lucide is never loaded by the kit: it is used only when
+the app passes it to `IconProvider` (see [Icons](#icons)).
 
 | Package                   | Range                  | Used by                                              |
 | ------------------------- | ---------------------- | ---------------------------------------------------- |
-| `lucide-react-native`     | `^0.487.0 \|\| ^1.0.0` | `Icon` names no `IconProvider` resolver claims       |
+| `lucide-react-native`     | `^0.487.0 \|\| ^1.0.0` | `Icon` names, once passed to `IconProvider`          |
 | `react-native-svg`        | `>=15.16.0`            | required by `lucide-react-native`                    |
 | `react-native-nano-icons` | `>=1.0.0`              | `createNanoIconSet` glyphs drawn natively            |
 | `expo-glass-effect`       | `>=58.0.0`             | `GlassSurface` Liquid Glass on iOS 26                |
@@ -98,6 +99,28 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 	</FontLoader>
 </SafeAreaProvider>;
 ```
+
+### Icons
+
+`Icon` resolves a name through, in order, the `IconProvider` resolver, its
+`icons` map, the theme chrome fallbacks (`"chrome.back"` to `"ChevronLeft"`),
+and then the Lucide module the app hands to `IconProvider`. The kit never
+requires `lucide-react-native` itself, so an app with its own icon set does not
+install it and its bundler never tries to resolve it. To use Lucide names, pass
+the module once near the root:
+
+```tsx
+import { IconProvider } from "@osuki-dev/ui";
+import * as lucide from "lucide-react-native";
+
+<ThemeProvider>
+	<IconProvider lucide={lucide}>{children}</IconProvider>
+</ThemeProvider>;
+```
+
+A nested `IconProvider` inherits the module, so a subtree can add a resolver
+without passing it again. A name nothing resolves renders the `fallback`, or
+nothing with a development warning.
 
 ### Optional providers
 
