@@ -1,5 +1,11 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0-beta.7
+
+### Minor Changes
+
+- [#26](https://github.com/osuki-dev/kit/pull/26) [`4833985`](https://github.com/osuki-dev/kit/commit/4833985e75142322b59615a30b0ee38e09d78b39) Thanks [@ryuhzk](https://github.com/ryuhzk)! - `ToastProvider` takes `durationByVariant`, a per-variant default duration, so errors can stay on screen longer than confirmations. A toast's duration now resolves as its own `durationMs`, then `durationByVariant[variant]`, then `defaultDurationMs` (still 3600 ms by default). A variant left out of the map keeps the old behaviour.
+
 ## 2.0.0-beta.6
 
 ### Minor Changes

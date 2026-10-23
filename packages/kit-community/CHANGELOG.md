@@ -1,5 +1,9 @@
 # @osuki-dev/kit-community Changelog
 
+## 2.0.0-beta.7
+
+No changes in this release.
+
 ## 2.0.0-beta.6
 
 No changes in this release.
