@@ -1,5 +1,11 @@
 # @osuki-dev/ui Changelog
 
+## 2.0.0-beta.6
+
+### Minor Changes
+
+- [#24](https://github.com/osuki-dev/kit/pull/24) [`9661362`](https://github.com/osuki-dev/kit/commit/96613627c55f014b60cc7e58d11685ec84728f5b) Thanks [@ryuhzk](https://github.com/ryuhzk)! - `Icon` no longer looks up `lucide-react-native` on its own. The kit dropped its `require("lucide-react-native")`, so an app that does not install Lucide no longer has Metro try to resolve it at bundle time. An app that renders Lucide names now passes its own module once, near the root: `import * as lucide from "lucide-react-native"` and `<IconProvider lucide={lucide}>`. Nested providers inherit it, and the resolver, the `icons` map and the theme chrome fallbacks still run first. Without it, a Lucide name renders the `fallback`, or nothing with a development warning. The new `LucideIconModule` type describes the prop.
+
 ## 2.0.0-beta.5
 
 ### Patch Changes
