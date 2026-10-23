@@ -74,9 +74,9 @@ authors.
 
 ## Pre-releases
 
-The repository is in changesets pre-release mode with the `beta` tag:
-`.changeset/pre.json` holds `{ "mode": "pre", "tag": "beta" }`. While it is
-there:
+The 2.0 line was developed in changesets pre-release mode with the `beta` tag
+(`2.0.0-beta.0` through `2.0.0-beta.7`) and left it for the stable `2.0.0`.
+While `.changeset/pre.json` holds `{ "mode": "pre", "tag": "beta" }`:
 
 - `changeset version` produces `X.Y.Z-beta.N` instead of `X.Y.Z`. The first
   version PR after entering 2.0 pre mode turns `1.1.0` plus a `major` changeset
